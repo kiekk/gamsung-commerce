@@ -11,8 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserV1ApiE2ETest @Autowired constructor(
@@ -35,10 +38,17 @@ class UserV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsUserInfo_whenSignUpIsSuccessful() {
             // arrange
+            val signUpRequest = UserV1Dto.SignUpRequest(
+                userId = "user123",
+                name = "soono",
+                email = "soono@example.com",
+                birthday = "1000-01-01",
+                gender = UserV1Dto.SignUpRequest.GenderRequest.M,
+            )
 
             // act
             val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
-            val response = testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(null), userResponseType)
+            val response = testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(signUpRequest), userResponseType)
 
             // assert
             assertAll(
@@ -54,10 +64,19 @@ class UserV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsBadRequest_whenGenderIsMissing() {
             // arrange
+            val user = mapOf(
+                "userId" to "user123",
+                "name" to "soono",
+                "email" to "soono@example.com",
+                "birthday" to "1000-01-01",
+            )
+            val headers = HttpHeaders()
+            headers.contentType = MediaType.APPLICATION_JSON
+            val httpEntity = HttpEntity(ObjectMapper().writeValueAsString(user), headers)
 
             // act
             val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
-            val response = testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(null), userResponseType)
+            val response = testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(httpEntity), userResponseType)
 
             // assert
             assertAll(
