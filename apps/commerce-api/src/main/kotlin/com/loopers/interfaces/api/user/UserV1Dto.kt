@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.user
 
+import com.loopers.application.user.UserInfo
 import com.loopers.domain.user.UserEntity
 import org.jetbrains.annotations.NotNull
 
@@ -51,6 +52,14 @@ class UserV1Dto {
                 email = entity.email,
                 birthday = entity.birthday,
                 gender = GenderResponse.valueOf(entity.gender.name),
+            )
+
+            fun from(info: UserInfo): UserResponse = UserResponse(
+                userId = info.userId,
+                name = info.name,
+                email = info.email,
+                birthday = info.birthday,
+                gender = GenderResponse.valueOf(info.gender.name),
             )
         }
     }
