@@ -3,15 +3,27 @@ package com.loopers.domain.user
 import com.loopers.domain.BaseEntity
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Table
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.format.ResolverStyle
 
+@Entity
+@Table(name = "member")
 class UserEntity(
+    @Column(name = "userId", unique = true, nullable = false)
     val userId: String,
+    @Column(name = "email", unique = true, nullable = false)
     val email: String,
+    @Column(name = "birthday", nullable = false)
     val birthday: String,
+    @Column(name = "gender", nullable = false)
+    @Enumerated(EnumType.STRING)
     val gender: GenderType,
 ) : BaseEntity() {
 

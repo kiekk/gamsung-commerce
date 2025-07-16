@@ -1,10 +1,13 @@
 package com.loopers.domain.user
 
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -14,11 +17,20 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.TestConstructor
 
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
 class UserServiceIntegrationTest @Autowired constructor(
     private val userService: UserService,
+    private val userJpaRepository: UserJpaRepository,
+    private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @AfterEach
+    fun tearDown() {
+        databaseCleanUp.truncateAllTables()
+    }
 
     /*
     **🔗 통합 테스트**
@@ -34,8 +46,8 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun savesUser_whenSigningUp() {
             // arrange
-            var userEntity = aUser().build()
-            val spyUserRepository = spy(UserRepositoryImpl())
+            val userEntity = aUser().build()
+            val spyUserRepository = spy(UserRepositoryImpl(userJpaRepository))
             val userServiceWithSpy = UserService(spyUserRepository)
 
             // act
