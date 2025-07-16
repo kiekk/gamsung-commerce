@@ -6,6 +6,7 @@ import com.loopers.support.error.ErrorType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.format.ResolverStyle
 
 class UserEntity(
     val userId: String,
@@ -30,7 +31,7 @@ class UserEntity(
             throw CoreException(ErrorType.BAD_REQUEST, "생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)")
         }
         try {
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT)
             LocalDate.parse(birthday, formatter)
         } catch (e: DateTimeParseException) {
             throw CoreException(ErrorType.BAD_REQUEST, "존재하지 않는 생년월일입니다. (${birthday})")
