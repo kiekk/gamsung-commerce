@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.user
 
+import com.loopers.domain.user.UserEntity
 import org.jetbrains.annotations.NotNull
 
 class UserV1Dto {
@@ -16,6 +17,14 @@ class UserV1Dto {
         @NotNull
         val gender: GenderRequest,
     ) {
+        fun toEntity(): UserEntity = UserEntity(
+            userId = userId,
+            name = name,
+            email = email,
+            birthday = birthday,
+            gender = UserEntity.GenderType.valueOf(gender.name),
+        )
+
         enum class GenderRequest {
             M,
             F,
@@ -32,6 +41,17 @@ class UserV1Dto {
         enum class GenderResponse {
             M,
             F,
+        }
+
+
+        companion object {
+            fun fromEntity(entity: UserEntity): UserResponse = UserResponse(
+                userId = entity.userId,
+                name = entity.name,
+                email = entity.email,
+                birthday = entity.birthday,
+                gender = GenderResponse.valueOf(entity.gender.name),
+            )
         }
     }
 }

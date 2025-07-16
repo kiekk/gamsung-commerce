@@ -3,6 +3,7 @@ package com.loopers.domain.user
 class UserEntityFixture {
 
     private var userId: String = "userId123"
+    private var name: String = "soono"
     private var email: String = "shyoon991@gmail.com"
     private var birthday: String = "2000-01-01"
     private var gender: UserEntity.GenderType = UserEntity.GenderType.M
@@ -13,6 +14,8 @@ class UserEntityFixture {
 
     fun userId(userId: String): UserEntityFixture = apply { this.userId = userId }
 
+    fun name(name: String): UserEntityFixture = apply { this.name = name }
+
     fun email(email: String): UserEntityFixture = apply { this.email = email }
 
     fun birthday(birthday: String): UserEntityFixture = apply { this.birthday = birthday }
@@ -21,6 +24,7 @@ class UserEntityFixture {
 
     fun build(): UserEntity = UserEntity(
         userId = userId,
+        name = name,
         email = email,
         birthday = birthday,
         gender = gender,

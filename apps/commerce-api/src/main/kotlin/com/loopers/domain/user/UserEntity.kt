@@ -18,6 +18,8 @@ import java.time.format.ResolverStyle
 class UserEntity(
     @Column(name = "userId", unique = true, nullable = false)
     val userId: String,
+    @Column(name = "name", nullable = false)
+    val name: String,
     @Column(name = "email", unique = true, nullable = false)
     val email: String,
     @Column(name = "birthday", nullable = false)
