@@ -73,4 +73,46 @@ class UserServiceIntegrationTest @Autowired constructor(
             assertThat(exception.errorType).isEqualTo(ErrorType.CONFLICT)
         }
     }
+
+    /*
+    **🔗 통합 테스트**
+
+    - [ ]  해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.
+    - [ ]  해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
+     */
+    @DisplayName("내 정보를 조회할 때, ")
+    @Nested
+    inner class GetMyInfo {
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+        @Test
+        fun returnsMyInfo_whenRequestingMyInfo() {
+            // arrange
+            val userEntity = aUser().build()
+            userService.save(userEntity)
+
+            // act
+            val myInfo = userService.getUser(userEntity.userId)
+
+            // assert
+            assertThat(myInfo).isNotNull
+            assertThat(myInfo?.userId).isEqualTo(userEntity.userId)
+            assertThat(myInfo?.name).isEqualTo(userEntity.name)
+            assertThat(myInfo?.email).isEqualTo(userEntity.email)
+            assertThat(myInfo?.birthday).isEqualTo(userEntity.birthday)
+            assertThat(myInfo?.gender).isEqualTo(userEntity.gender)
+        }
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @Test
+        fun returnsNull_whenUserDoesNotExist() {
+            // arrange
+            val nonExistentUserId = "nonExistentUser"
+
+            // act
+            val myInfo = userService.getUser(nonExistentUserId)
+
+            // assert
+            assertThat(myInfo).isNull()
+        }
+    }
 }
