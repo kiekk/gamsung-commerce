@@ -19,4 +19,8 @@ class UserRepositoryImpl(
         }
         return userJpaRepository.save(userEntity)
     }
+
+    override fun findByUserId(userId: String): UserEntity? {
+        return userJpaRepository.findByUserId(userId)
+    }
 }

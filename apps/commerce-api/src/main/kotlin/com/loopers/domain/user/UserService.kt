@@ -1,7 +1,7 @@
 package com.loopers.domain.user
 
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -11,4 +11,10 @@ class UserService(
     fun save(userEntity: UserEntity): UserEntity {
         return userRepository.save(userEntity)
     }
+
+    @Transactional(readOnly = true)
+    fun getUser(userId: String): UserEntity? {
+        return userRepository.findByUserId(userId)
+    }
+
 }
