@@ -1,6 +1,8 @@
 package com.loopers.interfaces.api.point
 
+import com.loopers.domain.point.PointEntity
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
 import com.loopers.interfaces.api.example.ExampleV1Dto
@@ -26,6 +28,9 @@ class PointV1ApiE2ETest @Autowired constructor(
     private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+    @Autowired
+    private lateinit var pointJpaRepository: PointJpaRepository
+
     companion object {
         private const val ENDPOINT_GET = "/api/v1/points"
         private const val ENDPOINT_CHARGE = "/api/v1/points/charge"
@@ -50,7 +55,9 @@ class PointV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsPoints_whenGetPointsIsSuccessful() {
             // arrange
+            val point = 100L
             val userEntity = userJpaRepository.save(aUser().build())
+            val pointEntity = pointJpaRepository.save(PointEntity(userEntity.userId, point))
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", userEntity.userId)
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
@@ -63,7 +70,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             assertThat(response.statusCode.is2xxSuccessful).isTrue()
             assertThat(response.body?.data).isNotNull
             assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId)
-            assertThat(response.body?.data?.point).isGreaterThanOrEqualTo(0L)
+            assertThat(response.body?.data?.point).isEqualTo(pointEntity.point)
         }
 
         @DisplayName("`X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.")

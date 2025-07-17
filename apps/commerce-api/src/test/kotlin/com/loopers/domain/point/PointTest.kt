@@ -33,8 +33,7 @@ class PointTest {
             val result = assertThrows<CoreException> {
                 PointEntity(
                     userId = "testUser",
-                    point = invalidPoint,
-                )
+                ).chargePoint(invalidPoint)
             }
 
             // assert

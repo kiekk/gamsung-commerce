@@ -2,12 +2,15 @@ package com.loopers.domain.point
 
 import com.loopers.application.point.PointFacade
 import com.loopers.infrastructure.point.PointJpaRepository
+import com.loopers.support.error.CoreException
+import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -45,7 +48,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             )
 
             // act
-            val userPoints = pointFacade.getUserPoints(pointEntity.userId)
+            val userPoints = pointFacade.getUserPoint(pointEntity.userId)
 
             // assert
             assertThat(userPoints).isNotNull
@@ -60,10 +63,33 @@ class PointServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "non-existent-user-id"
 
             // act
-            val userPoints = pointFacade.getUserPoints(nonExistentUserId)
+            val userPoints = pointFacade.getUserPoint(nonExistentUserId)
 
             // assert
             assertThat(userPoints).isNull()
+        }
+    }
+
+    /*
+    **통합 테스트**
+
+    - [ ]  존재하지 않는 유저 ID 로 충전을 시도한 경우, 실패한다.
+     */
+    @DisplayName("포인트 충전을 할 때, ")
+    @Nested
+    inner class Charge {
+        @DisplayName("존재하지 않는 유저 ID 로 충전을 시도한 경우, 실패한다.")
+        @Test
+        fun failsToCharge_whenUserDoesNotExist() {
+            // arrange
+            val nonExistentUserId = "non-existent-user-id"
+            val chargeAmount = 100L
+
+            // act & assert
+            val exception = assertThrows<CoreException> {
+                pointFacade.chargePoint(nonExistentUserId, chargeAmount)
+            }
+            assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND)
         }
     }
 }

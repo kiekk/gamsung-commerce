@@ -8,7 +8,11 @@ import org.springframework.stereotype.Repository
 class PointRepositoryImpl(
     private val pointJpaRepository: PointJpaRepository,
 ) : PointRepository {
-    override fun getPoints(userId: String): PointEntity? {
+    override fun save(pointEntity: PointEntity): PointEntity {
+        return pointJpaRepository.save(pointEntity)
+    }
+
+    override fun getPoint(userId: String): PointEntity? {
         return pointJpaRepository.findByUserId(userId)
     }
 }

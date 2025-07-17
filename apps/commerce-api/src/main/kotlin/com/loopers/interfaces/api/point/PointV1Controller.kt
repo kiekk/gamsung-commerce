@@ -1,5 +1,6 @@
 package com.loopers.interfaces.api.point
 
+import com.loopers.application.point.PointFacade
 import com.loopers.interfaces.api.ApiResponse
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -12,13 +13,17 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/points")
-class PointV1Controller : PointV1ApiSpec {
+class PointV1Controller(
+    private val pointFacade: PointFacade,
+) : PointV1ApiSpec {
 
     @GetMapping("")
     override fun getPoint(httpServletRequest: HttpServletRequest): ApiResponse<PointV1Dto.PointResponse> {
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
-        return PointV1Dto.PointResponse.from(userId, 1000L)
+
+        return pointFacade.getUserPoint(userId)
+            ?.let { PointV1Dto.PointResponse.from(it.userId, it.point) }
             .let { ApiResponse.success(it) }
     }
 
@@ -29,11 +34,14 @@ class PointV1Controller : PointV1ApiSpec {
     ): ApiResponse<PointV1Dto.PointResponse> {
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
-        userId == "nonexistent-user" && throw CoreException(ErrorType.NOT_FOUND, "유효하지 않은 사용자 ID입니다.")
 
-        return PointV1Dto.PointResponse.from(
-            userId = userId,
-            point = request.point,
-        ).let { ApiResponse.success(it) }
+        return pointFacade.chargePoint(userId, request.point)
+            ?.let {
+                PointV1Dto.PointResponse.from(
+                    userId = userId,
+                    point = it.point,
+                )
+            }
+            .let { ApiResponse.success(it) }
     }
 }
