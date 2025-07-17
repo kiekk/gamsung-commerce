@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point
 
-import com.loopers.domain.point.PointEntity
+import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
@@ -55,9 +55,12 @@ class PointV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsPoints_whenGetPointsIsSuccessful() {
             // arrange
-            val point = 100L
             val userEntity = userJpaRepository.save(aUser().build())
-            val pointEntity = pointJpaRepository.save(PointEntity(userEntity.userId, point))
+            val pointEntity = pointJpaRepository.save(
+                aPoint()
+                    .userId(userEntity.userId)
+                    .build(),
+            )
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", userEntity.userId)
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)

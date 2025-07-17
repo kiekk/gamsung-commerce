@@ -1,5 +1,6 @@
 package com.loopers.domain.point
 
+import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.assertj.core.api.Assertions.assertThat
@@ -28,12 +29,11 @@ class PointTest {
         )
         fun failWhenChargePointIsZeroOrLess(invalidPoint: Long) {
             // arrange
+            val pointEntity = aPoint().build()
 
             // act
             val result = assertThrows<CoreException> {
-                PointEntity(
-                    userId = "testUser",
-                ).chargePoint(invalidPoint)
+                pointEntity.chargePoint(invalidPoint)
             }
 
             // assert
