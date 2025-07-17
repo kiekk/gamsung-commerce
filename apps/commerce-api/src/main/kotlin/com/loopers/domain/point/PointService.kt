@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 class PointService(
     private val pointRepository: PointRepository,
 ) {
-    fun getPoints(userId: String): Long? {
+    fun getPoints(userId: String): PointEntity? {
         return pointRepository.getPoints(userId)
     }
 }

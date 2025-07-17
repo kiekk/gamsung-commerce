@@ -1,9 +1,7 @@
 package com.loopers.domain.point
 
 import com.loopers.application.point.PointFacade
-import com.loopers.application.user.SignUp
-import com.loopers.application.user.UserFacade
-import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -15,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class PointServiceIntegrationTest @Autowired constructor(
-    private val userFacade: UserFacade,
     private val pointFacade: PointFacade,
+    private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -39,25 +37,20 @@ class PointServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsPoints_whenUserExists() {
             // arrange
-            val userEntity = userFacade.signUp(
-                aUser().build().let {
-                    SignUp(
-                        userId = it.userId,
-                        name = it.name,
-                        email = it.email,
-                        birthday = it.birthday,
-                        gender = SignUp.GenderRequest.valueOf(it.gender.name),
-                    )
-                },
+            val pointEntity = pointJpaRepository.save(
+                PointEntity(
+                    userId = "test-user-id",
+                    point = 100L,
+                ),
             )
 
             // act
-            val userPoints = pointFacade.getUserPoints(userEntity.userId)
+            val userPoints = pointFacade.getUserPoints(pointEntity.userId)
 
             // assert
             assertThat(userPoints).isNotNull
-            assertThat(userPoints?.userId).isEqualTo(userEntity.userId)
-            assertThat(userPoints?.point).isGreaterThanOrEqualTo(0L)
+            assertThat(userPoints?.userId).isEqualTo(pointEntity.userId)
+            assertThat(userPoints?.point).isEqualTo(pointEntity.point)
         }
 
         @Test
