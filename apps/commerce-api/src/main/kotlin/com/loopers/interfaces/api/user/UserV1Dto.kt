@@ -2,20 +2,23 @@ package com.loopers.interfaces.api.user
 
 import com.loopers.application.user.SignUp
 import com.loopers.application.user.UserInfo
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import org.jetbrains.annotations.NotNull
 
 class UserV1Dto {
 
     data class SignUpRequest(
-        @NotNull
+        @field:NotBlank
         val userId: String,
-        @NotNull
+        @field:NotBlank
         val name: String,
-        @NotNull
+        @field:NotBlank
         val email: String,
-        @NotNull
+        @field:NotBlank
+        @field:Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "생일은 YYYY-MM-DD 형식이어야 합니다.")
         val birthday: String,
-        @NotNull
+        @field:NotNull
         val gender: GenderRequest,
     ) {
         fun toSignUp(): SignUp = SignUp(
