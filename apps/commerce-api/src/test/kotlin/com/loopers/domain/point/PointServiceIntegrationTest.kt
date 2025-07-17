@@ -1,8 +1,9 @@
 package com.loopers.domain.point
 
 import com.loopers.application.point.PointFacade
+import com.loopers.application.user.SignUp
+import com.loopers.application.user.UserFacade
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
-import com.loopers.domain.user.UserService
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -14,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class PointServiceIntegrationTest @Autowired constructor(
-    private val userService: UserService,
+    private val userFacade: UserFacade,
     private val pointFacade: PointFacade,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
@@ -38,8 +39,17 @@ class PointServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsPoints_whenUserExists() {
             // arrange
-            // TODO: userFacade로 변경 예정
-            val userEntity = userService.save(aUser().build())
+            val userEntity = userFacade.signUp(
+                aUser().build().let {
+                    SignUp(
+                        userId = it.userId,
+                        name = it.name,
+                        email = it.email,
+                        birthday = it.birthday,
+                        gender = SignUp.GenderRequest.valueOf(it.gender.name),
+                    )
+                },
+            )
 
             // act
             val userPoints = pointFacade.getUserPoints(userEntity.userId)
