@@ -1,6 +1,5 @@
 package com.loopers.interfaces.api.user
 
-import com.loopers.application.user.SignUp
 import com.loopers.application.user.UserInfo
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -21,12 +20,12 @@ class UserV1Dto {
         @field:NotNull
         val gender: GenderRequest,
     ) {
-        fun toSignUp(): SignUp = SignUp(
+        fun toSignUp(): UserInfo.SignUp = UserInfo.SignUp(
             userId,
             name,
             email,
             birthday,
-            SignUp.GenderRequest.valueOf(gender.name),
+            UserInfo.SignUp.GenderRequest.valueOf(gender.name),
         )
 
         enum class GenderRequest {

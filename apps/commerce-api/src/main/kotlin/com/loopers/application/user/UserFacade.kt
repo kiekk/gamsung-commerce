@@ -19,7 +19,7 @@ class UserFacade(
             )
     }
 
-    fun signUp(signUp: SignUp): UserInfo {
+    fun signUp(signUp: UserInfo.SignUp): UserInfo {
         return userService.save(signUp.toUserEntity())
             .let { UserInfo.from(it) }
     }
