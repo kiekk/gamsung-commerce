@@ -14,4 +14,13 @@ interface PointV1ApiSpec {
     fun getPoint(
         httpServletRequest: HttpServletRequest,
     ): ApiResponse<PointV1Dto.PointResponse>
+
+    @Operation(
+        summary = "포인트 충전",
+        description = "포인트 충전",
+    )
+    fun chargePoint(
+        httpServletRequest: HttpServletRequest,
+        request: PointV1Dto.ChargeRequest,
+    ): ApiResponse<PointV1Dto.PointResponse>
 }

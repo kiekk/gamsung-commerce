@@ -98,7 +98,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", userEntity.userId)
             httpHeaders.contentType = MediaType.APPLICATION_JSON
-            val requestBody = PointV1Dto.ChargeRequest(userEntity.userId, point)
+            val requestBody = PointV1Dto.ChargeRequest(point)
             val httpEntity = HttpEntity(requestBody, httpHeaders)
 
             // act
@@ -116,12 +116,11 @@ class PointV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsNotFound_whenUserDoesNotExist() {
             // arrange
-            val unExistingUserId = "nonexistent-user"
             val point = 1000L
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", "nonexistent-user")
             httpHeaders.contentType = MediaType.APPLICATION_JSON
-            val requestBody = PointV1Dto.ChargeRequest(unExistingUserId, point)
+            val requestBody = PointV1Dto.ChargeRequest(point)
             val httpEntity = HttpEntity(requestBody, httpHeaders)
 
             // act
