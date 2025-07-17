@@ -18,4 +18,9 @@ class UserFacade(
                 customMessage = "사용자를 찾을 수 없습니다: $userId",
             )
     }
+
+    fun signUp(signUp: SignUp): UserInfo {
+        return userService.save(signUp.toUserEntity())
+            .let { UserInfo.from(it) }
+    }
 }

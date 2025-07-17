@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.user
 
+import com.loopers.application.user.SignUp
 import com.loopers.application.user.UserInfo
-import com.loopers.domain.user.UserEntity
 import org.jetbrains.annotations.NotNull
 
 class UserV1Dto {
@@ -18,12 +18,12 @@ class UserV1Dto {
         @NotNull
         val gender: GenderRequest,
     ) {
-        fun toEntity(): UserEntity = UserEntity(
+        fun toSignUp(): SignUp = SignUp(
             userId = userId,
             name = name,
             email = email,
             birthday = birthday,
-            gender = UserEntity.GenderType.valueOf(gender.name),
+            gender = SignUp.GenderRequest.valueOf(gender.name),
         )
 
         enum class GenderRequest {
@@ -46,14 +46,6 @@ class UserV1Dto {
 
 
         companion object {
-            fun fromEntity(entity: UserEntity): UserResponse = UserResponse(
-                userId = entity.userId,
-                name = entity.name,
-                email = entity.email,
-                birthday = entity.birthday,
-                gender = GenderResponse.valueOf(entity.gender.name),
-            )
-
             fun from(info: UserInfo): UserResponse = UserResponse(
                 userId = info.userId,
                 name = info.name,
