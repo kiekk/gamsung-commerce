@@ -28,6 +28,7 @@ class PointV1ApiE2ETest @Autowired constructor(
 ) {
     companion object {
         private const val ENDPOINT_GET = "/api/v1/points"
+        private const val ENDPOINT_CHARGE = "/api/v1/points/charge"
     }
 
     @AfterEach
@@ -76,6 +77,59 @@ class PointV1ApiE2ETest @Autowired constructor(
 
             // assert
             assertThat(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    /*
+    **🌐 E2E 테스트**
+
+    - [ ]  존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.
+    - [ ]  존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.
+     */
+    @DisplayName("POST /api/v1/points/charge")
+    @Nested
+    inner class Charge {
+        @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
+        @Test
+        fun returnsChargedPoints_whenUserExistsAndCharges1000() {
+            // arrange
+            val point = 1000L
+            val userEntity = userJpaRepository.save(aUser().build())
+            val httpHeaders = HttpHeaders()
+            httpHeaders.set("X-USER-ID", userEntity.userId)
+            httpHeaders.contentType = MediaType.APPLICATION_JSON
+            val requestBody = PointV1Dto.ChargeRequest(userEntity.userId, point)
+            val httpEntity = HttpEntity(requestBody, httpHeaders)
+
+            // act
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>>() {}
+            val response = testRestTemplate.exchange(ENDPOINT_CHARGE, HttpMethod.POST, httpEntity, responseType)
+
+            // assert
+            assertThat(response.statusCode.is2xxSuccessful).isTrue()
+            assertThat(response.body?.data).isNotNull
+            assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId)
+            assertThat(response.body?.data?.point).isEqualTo(point)
+        }
+
+        @DisplayName("존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.")
+        @Test
+        fun returnsNotFound_whenUserDoesNotExist() {
+            // arrange
+            val unExistingUserId = "nonexistent-user"
+            val point = 1000L
+            val httpHeaders = HttpHeaders()
+            httpHeaders.set("X-USER-ID", "nonexistent-user")
+            httpHeaders.contentType = MediaType.APPLICATION_JSON
+            val requestBody = PointV1Dto.ChargeRequest(unExistingUserId, point)
+            val httpEntity = HttpEntity(requestBody, httpHeaders)
+
+            // act
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>>() {}
+            val response = testRestTemplate.exchange(ENDPOINT_CHARGE, HttpMethod.POST, httpEntity, responseType)
+
+            // assert
+            assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
         }
     }
 

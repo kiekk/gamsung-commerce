@@ -2,6 +2,12 @@ package com.loopers.interfaces.api.point
 
 class PointV1Dto {
 
+    data class ChargeRequest(
+        val userId: String,
+        val point: Long,
+    ) {
+    }
+
     data class PointResponse(
         val userId: String,
         val point: Long,
