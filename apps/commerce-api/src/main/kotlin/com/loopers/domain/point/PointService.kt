@@ -3,8 +3,10 @@ package com.loopers.domain.point
 import org.springframework.stereotype.Service
 
 @Service
-class PointService {
+class PointService(
+    private val pointRepository: PointRepository,
+) {
     fun getPoints(userId: String): Long? {
-        return 100L // 임시로 100 포인트를 반환
+        return pointRepository.getPoints(userId)
     }
 }
