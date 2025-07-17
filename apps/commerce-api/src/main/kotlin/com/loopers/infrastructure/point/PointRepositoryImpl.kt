@@ -12,7 +12,7 @@ class PointRepositoryImpl(
         return pointJpaRepository.save(pointEntity)
     }
 
-    override fun getPoint(userId: String): PointEntity? {
+    override fun findByUserId(userId: String): PointEntity? {
         return pointJpaRepository.findByUserId(userId)
     }
 }

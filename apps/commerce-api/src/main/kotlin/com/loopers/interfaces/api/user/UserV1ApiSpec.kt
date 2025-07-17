@@ -4,6 +4,7 @@ import com.loopers.interfaces.api.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.bind.annotation.RequestHeader
 
 @Tag(name = "User V1 API", description = "사용자 API 입니다.")
@@ -23,7 +24,6 @@ interface UserV1ApiSpec {
         description = "내 정보를 조회합니다.",
     )
     fun getMyInfo(
-        @Schema(name = "내 ID", description = "나의 회원 ID")
-        @RequestHeader("X-USER-ID") userId: String,
+        httpServletRequest: HttpServletRequest,
     ): ApiResponse<UserV1Dto.UserResponse>
 }

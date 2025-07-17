@@ -1,8 +1,6 @@
 package com.loopers.domain.user
 
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
-import com.loopers.support.error.CoreException
-import com.loopers.support.error.ErrorType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -35,12 +33,12 @@ class UserTest {
             // arrange
 
             // act
-            val result = assertThrows<CoreException> {
+            val result = assertThrows<IllegalArgumentException> {
                 aUser().userId(invalidUserId).build()
             }
 
             // assert
-            assertThat(result.errorType).isEqualTo(ErrorType.BAD_REQUEST)
+            assertThat(result).isInstanceOf(IllegalArgumentException::class.java)
         }
 
         @DisplayName("이메일이 `xx@yy.zz` 형식에 맞지 않으면, User 객체 생성에 실패한다.")
@@ -59,12 +57,12 @@ class UserTest {
             // arrange
 
             // act
-            val result = assertThrows<CoreException> {
+            val result = assertThrows<IllegalArgumentException> {
                 aUser().email(invalidEmail).build()
             }
 
             // assert
-            assertThat(result.errorType).isEqualTo(ErrorType.BAD_REQUEST)
+            assertThat(result).isInstanceOf(IllegalArgumentException::class.java)
         }
 
         @DisplayName("생년월일이 `yyyy-MM-dd` 형식에 맞지 않으면, User 객체 생성에 실패한다.")
@@ -82,12 +80,12 @@ class UserTest {
             // arrange
 
             // act
-            val result = assertThrows<CoreException> {
+            val result = assertThrows<IllegalArgumentException> {
                 aUser().birthday(invalidBirthday).build()
             }
 
             // assert
-            assertThat(result.errorType).isEqualTo(ErrorType.BAD_REQUEST)
+            assertThat(result).isInstanceOf(IllegalArgumentException::class.java)
         }
 
     }

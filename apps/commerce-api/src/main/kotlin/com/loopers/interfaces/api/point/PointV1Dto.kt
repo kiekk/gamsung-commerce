@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min
 class PointV1Dto {
 
     data class ChargeRequest(
-        @Min(value = 1, message = "포인트는 1 이상이어야 합니다.")
+        @field:Min(value = 1, message = "포인트는 1 이상이어야 합니다.")
         val point: Long,
     ) {
     }
@@ -16,8 +16,8 @@ class PointV1Dto {
     ) {
         companion object {
             fun from(userId: String, point: Long): PointResponse = PointResponse(
-                userId = userId,
-                point = point,
+                userId,
+                point,
             )
         }
     }

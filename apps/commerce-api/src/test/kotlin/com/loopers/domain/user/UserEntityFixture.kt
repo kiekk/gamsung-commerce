@@ -23,10 +23,10 @@ class UserEntityFixture {
     fun gender(gender: UserEntity.GenderType): UserEntityFixture = apply { this.gender = gender }
 
     fun build(): UserEntity = UserEntity(
-        userId = userId,
-        name = name,
-        email = email,
-        birthday = birthday,
-        gender = gender,
+        userId,
+        name,
+        email,
+        birthday,
+        gender,
     )
 }

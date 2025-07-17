@@ -5,12 +5,20 @@ import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.*
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,11 +51,11 @@ class UserV1ApiE2ETest @Autowired constructor(
         fun returnsUserInfo_whenSignUpIsSuccessful() {
             // arrange
             val signUpRequest = UserV1Dto.SignUpRequest(
-                userId = "user123",
-                name = "soono",
-                email = "soono@example.com",
-                birthday = "1000-01-01",
-                gender = UserV1Dto.SignUpRequest.GenderRequest.M,
+                "user123",
+                "soono",
+                "soono@example.com",
+                "1000-01-01",
+                UserV1Dto.SignUpRequest.GenderRequest.M,
             )
 
             // act
@@ -56,7 +64,7 @@ class UserV1ApiE2ETest @Autowired constructor(
                 ENDPOINT_POST,
                 HttpMethod.POST,
                 HttpEntity<Any>(signUpRequest),
-                userResponseType
+                userResponseType,
             )
 
             // assert
