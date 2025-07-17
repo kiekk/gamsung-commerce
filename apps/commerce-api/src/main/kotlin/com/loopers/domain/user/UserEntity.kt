@@ -42,7 +42,7 @@ class UserEntity(
             throw IllegalArgumentException("생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)")
 
         runCatching { LocalDate.parse(birthday, BIRTH_DATE_FORMATTER) }
-            .onFailure { throw IllegalArgumentException("존재하지 않는 생년월일입니다. (${birthday})") }
+            .onFailure { throw IllegalArgumentException("존재하지 않는 생년월일입니다. ($birthday)") }
     }
 
     companion object {

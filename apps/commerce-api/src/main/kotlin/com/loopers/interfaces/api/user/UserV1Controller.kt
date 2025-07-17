@@ -33,5 +33,4 @@ class UserV1Controller(
             .let { UserV1Dto.UserResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
-
 }

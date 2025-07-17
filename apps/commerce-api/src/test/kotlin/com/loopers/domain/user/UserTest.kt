@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class UserTest {
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ]  ID 가 `영문 및 숫자 10자 이내` 형식에 맞지 않으면, User 객체 생성에 실패한다.
     - [ ]  이메일이 `xx@yy.zz` 형식에 맞지 않으면, User 객체 생성에 실패한다.
     - [ ]  생년월일이 `yyyy-MM-dd` 형식에 맞지 않으면, User 객체 생성에 실패한다.
@@ -87,6 +87,5 @@ class UserTest {
             // assert
             assertThat(result).isInstanceOf(IllegalArgumentException::class.java)
         }
-
     }
 }

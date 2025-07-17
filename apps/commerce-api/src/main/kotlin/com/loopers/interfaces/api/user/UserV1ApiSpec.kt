@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
-import org.springframework.web.bind.annotation.RequestHeader
 
 @Tag(name = "User V1 API", description = "사용자 API 입니다.")
 interface UserV1ApiSpec {

@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class PointTest {
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
 
     - [ ]  0 이하의 정수로 포인트를 충전 시 실패한다.
      */

@@ -16,5 +16,4 @@ class UserService(
     fun getUser(userId: String): UserEntity? {
         return userRepository.findByUserId(userId)
     }
-
 }

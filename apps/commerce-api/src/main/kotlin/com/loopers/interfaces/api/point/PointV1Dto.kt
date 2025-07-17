@@ -7,8 +7,7 @@ class PointV1Dto {
     data class ChargeRequest(
         @field:Min(value = 1, message = "포인트는 1 이상이어야 합니다.")
         val point: Long,
-    ) {
-    }
+    )
 
     data class PointResponse(
         val userId: String,

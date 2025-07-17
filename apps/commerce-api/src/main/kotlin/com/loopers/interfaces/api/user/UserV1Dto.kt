@@ -46,7 +46,6 @@ class UserV1Dto {
             F,
         }
 
-
         companion object {
             fun from(info: UserInfo): UserResponse = UserResponse(
                 info.userId,
