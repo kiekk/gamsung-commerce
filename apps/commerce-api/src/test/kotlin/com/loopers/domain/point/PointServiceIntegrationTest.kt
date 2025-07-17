@@ -56,8 +56,8 @@ class PointServiceIntegrationTest @Autowired constructor(
 
             // assert
             assertThat(userPoints).isNotNull
-            assertThat(userPoints.userId).isEqualTo(userEntity.userId)
-            assertThat(userPoints.point).isGreaterThanOrEqualTo(0L)
+            assertThat(userPoints?.userId).isEqualTo(userEntity.userId)
+            assertThat(userPoints?.point).isGreaterThanOrEqualTo(0L)
         }
 
         @Test
