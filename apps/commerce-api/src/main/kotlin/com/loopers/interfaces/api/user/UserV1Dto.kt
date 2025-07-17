@@ -19,11 +19,11 @@ class UserV1Dto {
         val gender: GenderRequest,
     ) {
         fun toSignUp(): SignUp = SignUp(
-            userId = userId,
-            name = name,
-            email = email,
-            birthday = birthday,
-            gender = SignUp.GenderRequest.valueOf(gender.name),
+            userId,
+            name,
+            email,
+            birthday,
+            SignUp.GenderRequest.valueOf(gender.name),
         )
 
         enum class GenderRequest {
@@ -47,11 +47,11 @@ class UserV1Dto {
 
         companion object {
             fun from(info: UserInfo): UserResponse = UserResponse(
-                userId = info.userId,
-                name = info.name,
-                email = info.email,
-                birthday = info.birthday,
-                gender = GenderResponse.valueOf(info.gender.name),
+                info.userId,
+                info.name,
+                info.email,
+                info.birthday,
+                GenderResponse.valueOf(info.gender.name),
             )
         }
     }

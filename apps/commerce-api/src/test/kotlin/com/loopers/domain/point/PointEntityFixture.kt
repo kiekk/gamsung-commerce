@@ -13,7 +13,7 @@ class PointEntityFixture {
     fun point(point: Long): PointEntityFixture = apply { this.point = point }
 
     fun build(): PointEntity = PointEntity(
-        userId = userId,
-        point = point,
+        userId,
+        point,
     )
 }

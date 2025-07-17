@@ -16,8 +16,8 @@ class PointV1Dto {
     ) {
         companion object {
             fun from(userId: String, point: Long): PointResponse = PointResponse(
-                userId = userId,
-                point = point,
+                userId,
+                point,
             )
         }
     }
