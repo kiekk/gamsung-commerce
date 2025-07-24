@@ -9,7 +9,7 @@ ProductLike 에서 사용자, 상품별로 좋아요를 관리하며, 좋아요 
 
 ```mermaid
 classDiagram
-    class Member {
+    class User {
         -Long id
         -String userId
         -String name
@@ -28,19 +28,24 @@ classDiagram
         -Brand brand
         -ProductStatus status
         -String description
+        -ProductLikeCount productLikeCount
+        +getProductLikeCount()
     }
     class ProductLike {
+        -Long id
         -Product product
         -User user
+        +create(product, user)
+        +delete(product, user)
     }
     class ProductLikeCount {
         -Product product
         -Long productLikeCount
-        +increaseProductLikeCount()
-        +decreaseProductLikeCount()
+        +increase()
+        +decrease()
     }
     Brand --> Product
-    Member --> ProductLike
+    User --> ProductLike
     Product --> ProductLike
     Product --> ProductLikeCount 
 ```
@@ -54,7 +59,7 @@ Order 에서 사용자, 주문자 정보, 주문 상품 목록을 관리하며, 
 OrderItem 에서 상품명, 수량, 총 가격 등을 관리합니다.
 추후 쿠폰/할인 개념 도입을 고려하여 Order, OrderItem 에서 totalPrice(총 가격), amount(결제 금액) 등의 속성을 추가했습니다.
 Payment 에서 결제 방법, 상태, 결제 아이템 목록, 결제 내역을 관리합니다.
-PaymentItem 에서 주문 상품과 결제 금액을 관리하며, 
+PaymentItem 에서 주문 상품과 결제 금액을 관리하며,
 PaymentGatewayHistory 에서 결제 내역을 관리합니다. (ex: 결제/환불)
 ```
 
@@ -69,6 +74,7 @@ classDiagram
         -Stock stock
         -Price price
         -String description
+        +availableOrder(quantity)
     }
 %% 사용자
     class Member {
@@ -83,7 +89,6 @@ classDiagram
     class Order {
         -Long id
         -Member member
-        -PurchaseMethod purchaseMethod
         -OrderCustomer orderCustomer
         -OrderStatus orderStatus
         -Price totalPrice
@@ -92,16 +97,20 @@ classDiagram
         +getOrderTotalPrice()
         +getOrderAmount()
     }
+%% 주문 상태 enum 정의
+    class OrderStatus {
+        <<enumeration>>
+        ORDER
+        PURCHASE
+        CANCEL
+    }
 %% 주문자 정보
     class OrderCustomer {
-        -Long id
         -Order order
         -String name
-        -String email
-        -String phoneNumber
-        -String zipCode
-        -String address
-        -String addressDetail
+        -Email email
+        -Mobile mobile
+        -Address address
     }
 %% 주문 상품
     class OrderItem {
@@ -122,6 +131,17 @@ classDiagram
         -List~PaymentItem~ paymentItems
         -List~PaymentGatewayHistory~ histories
         -Price totalAmount
+    }
+%% 결제 방식 enum 정의
+    class PaymentMethod {
+        <<enumeration>>
+        POINT
+    }
+%% 결제 상태 enum 정의
+    class PaymentStatus {
+        <<enumeration>>
+        PURCHASE
+        CANCEL
     }
 %% 결제 아이템
     class PaymentItem {
@@ -148,6 +168,9 @@ classDiagram
     Payment --> PaymentItem
     PaymentItem --> OrderItem
     Payment --> PaymentGatewayHistory
+    Payment --> PaymentMethod
+    Payment --> PaymentStatus
+    Order --> OrderStatus
 ```
 
 ## 상품-주문-결제 클래스 다이어그램 V2
@@ -199,7 +222,7 @@ classDiagram
         -Long id
         -Product product
         -ProductAttributeType type
-        -List~ProductAttributeValueType~ values
+        -List~ProductAttributeValue~ values
     }
 %% 상품 아이템 - SKU
     class ProductItem {
