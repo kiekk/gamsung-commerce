@@ -9,27 +9,45 @@ sequenceDiagram
     participant UserService
     participant ProductService
     participant ProductLikeService
+    activate User
     User ->> ProductLikeController: 상품 좋아요 등록 요청
+    deactivate User
+    activate ProductLikeController
     alt 인증 헤더(`X-USER-ID`)가 없는 경우
         ProductLikeController -->> User: 인증 예외 (401 Unauthorized)
     end
     ProductLikeController ->> UserService: 사용자 정보 조회
+    deactivate ProductLikeController
+    activate UserService
     alt 사용자 정보가 존재하지 않는 경우
         UserService -->> ProductLikeController: 사용자 정보 없음 예외 (404 Not Found)
+        deactivate UserService
     end
+    activate ProductLikeController
     ProductLikeController ->> ProductService: 상품 정보 조회
+    deactivate ProductLikeController
+    activate ProductService
     alt 상품 정보가 존재하지 않는 경우
         ProductService -->> ProductLikeController: 상품 정보 없음 예외 (404 Not Found)
+        deactivate ProductService
     end
+    activate ProductLikeController
     ProductLikeController ->> ProductLikeService: 상품 좋아요 조회 요청
+    deactivate ProductLikeController
+    activate ProductLikeService
     alt 상품 좋아요가 이미 등록된 경우
         ProductLikeService -->> ProductLikeController: 상품 좋아요 등록 성공 응답 (204 No Content)
+        deactivate ProductLikeService
     end
+    activate ProductLikeController
     ProductLikeController ->> ProductLikeService: 상품 좋아요 등록 요청
+    deactivate ProductLikeController
+    activate ProductLikeService
     alt 상품 좋아요 등록에 실패할 경우
         ProductLikeService -->> ProductLikeController: 상품 좋아요 등록 실패 예외 (500 Internal Server Error)
     end
     ProductLikeService -->> ProductLikeController: 상품 좋아요 등록 성공 응답 (201 Created)
+    deactivate ProductLikeService
 ```
 
 ### 상품 좋아요 취소
