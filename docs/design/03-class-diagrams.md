@@ -77,7 +77,7 @@ classDiagram
         +availableOrder(quantity)
     }
 %% 사용자
-    class Member {
+    class User {
         -Long id
         -String userId
         -String name
@@ -88,7 +88,7 @@ classDiagram
 %% 주문
     class Order {
         -Long id
-        -Member member
+        -User user
         -OrderCustomer orderCustomer
         -OrderStatus orderStatus
         -Price totalPrice
@@ -162,7 +162,7 @@ classDiagram
 
     Order --> OrderItem
     OrderItem --> Product
-    Order --> Member
+    Order --> User
     Order --> OrderCustomer
     Order --> Payment
     Payment --> PaymentItem
@@ -188,7 +188,7 @@ ProductAttributeValue 는 상품 속성 값 타입을 관리합니다. (ex: 빨�
 ```mermaid
 classDiagram
 %% 회원
-    class Member {
+    class User {
         -Long id
         -String userId
         -String name
@@ -243,7 +243,7 @@ classDiagram
 %% 주문
     class Order {
         -Long id
-        -Member member
+        -User user
         -PurchaseMethod purchaseMethod
         -OrderCustomer orderCustomer
         -OrderStatus orderStatus
@@ -311,7 +311,7 @@ classDiagram
     ProductItemAttribute --> ProductAttributeValue
     Order --> OrderItem
     OrderItem --> ProductItem
-    Order --> Member
+    Order --> User
     Order --> OrderCustomer
     Order --> Payment
     Payment --> PaymentItem
