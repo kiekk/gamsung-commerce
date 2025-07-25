@@ -119,8 +119,8 @@ classDiagram
         -int quantity
         -Price totalPrice
         -Price amount
-        +getProductTotalPrice()
-        +getProductTotalAmount()
+        +getOrderTotalPrice()
+        +getOrderTotalAmount()
     }
 %% 결제
     class Payment {
@@ -215,7 +215,7 @@ classDiagram
         -Long id
         -ProductAttributeType type
         -String name
-        -Integer ordering
+        -int ordering
     }
 %% 상품 속성 그룹
     class ProductAttribute {
@@ -258,8 +258,8 @@ classDiagram
         -Long id
         -Order order
         -String name
-        -String email
-        -String phoneNumber
+        -Email email
+        -Mobile mobile
         -String zipCode
         -String address
         -String addressDetail
@@ -272,8 +272,8 @@ classDiagram
         -int quantity
         -Price totalPrice
         -Price amount
-        +getProductTotalPrice()
-        +getProductTotalAmount()
+        +getOrderTotalPrice()
+        +getOrderTotalAmount()
     }
 %% 결제
     class Payment {
