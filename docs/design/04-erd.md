@@ -31,6 +31,7 @@ erDiagram
         VARCHAR gender
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PRODUCT {
@@ -61,6 +62,7 @@ erDiagram
         INT amount
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     ORDER_ITEM {
@@ -72,6 +74,7 @@ erDiagram
         INT amount
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PAYMENT {
@@ -81,6 +84,7 @@ erDiagram
         INT total_amount
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PAYMENT_ITEM {
@@ -91,6 +95,7 @@ erDiagram
         INT amount
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PRODUCT_LIKE_COUNT {
@@ -98,6 +103,7 @@ erDiagram
         BIGINT product_like_count
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PRODUCT_LIKE {
@@ -106,6 +112,7 @@ erDiagram
         BIGINT product_id UK
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 
     PAYMENT_GATEWAY_HISTORY {
@@ -115,5 +122,6 @@ erDiagram
         TEXT gateway_response
         DATETIME created_at
         DATETIME updated_at
+        DATETIME deleted_at
     }
 ```
