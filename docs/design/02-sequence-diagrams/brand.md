@@ -6,22 +6,10 @@
 sequenceDiagram
     participant User
     participant BrandController
-    participant UserService
     participant BrandService
     activate User
     User ->> BrandController: 브랜드 목록 조회 요청
     deactivate User
-    activate BrandController
-    alt 인증 헤더(`X-USER-ID`)가 없는 경우
-        BrandController -->> User: 인증 예외 (401 Unauthorized)
-    end
-    BrandController ->> UserService: 사용자 정보 조회
-    deactivate BrandController
-    activate UserService
-    alt 사용자 정보가 존재하지 않는 경우
-        UserService -->> BrandController: 인증 예외 (401 Unauthorized)
-        deactivate UserService
-    end
     activate BrandController
     BrandController ->> BrandService: 브랜드 목록 조회<br/>(페이징, 정렬, 필터링)
     deactivate BrandController
@@ -39,22 +27,9 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant BrandController
-    participant UserService
     participant BrandService
     activate User
     User ->> BrandController: 브랜드 상세 조회 요청
-    deactivate User
-    activate BrandController
-    alt 인증 헤더(`X-USER-ID`)가 없는 경우
-        BrandController -->> User: 인증 예외 (401 Unauthorized)
-    end
-    BrandController ->> UserService: 사용자 정보 조회
-    deactivate BrandController
-    activate UserService
-    alt 사용자 정보가 존재하지 않는 경우
-        UserService -->> BrandController: 인증 예외 (401 Unauthorized)
-        deactivate UserService
-    end
     activate BrandController
     BrandController ->> BrandService: 브랜드 상세 조회
     deactivate BrandController
