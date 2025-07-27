@@ -1,6 +1,11 @@
 package com.loopers.domain.vo
 
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+
+@Embeddable
 class Price(
+    @Column(name = "price")
     val value: Long,
 ) {
     init {

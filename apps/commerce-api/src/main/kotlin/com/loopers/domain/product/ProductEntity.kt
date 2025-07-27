@@ -1,14 +1,21 @@
 package com.loopers.domain.product
 
+import com.loopers.domain.BaseEntity
 import com.loopers.domain.vo.Price
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "product")
 class ProductEntity(
     val brandId: Long,
     val name: String,
     val description: String? = null,
+    @Embedded
     val price: Price,
     val status: ProductStatusType = ProductStatusType.ACTIVE,
-) {
+) : BaseEntity() {
 
     enum class ProductStatusType {
         ACTIVE,
