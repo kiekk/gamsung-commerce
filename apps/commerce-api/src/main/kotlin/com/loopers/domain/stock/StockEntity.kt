@@ -1,13 +1,18 @@
 package com.loopers.domain.stock
 
 import com.loopers.domain.BaseEntity
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "stock")
 class StockEntity(
     val productId: Long,
     var quantity: Int,
 ) : BaseEntity() {
 
     init {
+        require(productId > 0) { "상품 ID는 1 이상이어야 합니다." }
         require(quantity >= 0) { "재고는 0 이상이어야 합니다." }
     }
 
