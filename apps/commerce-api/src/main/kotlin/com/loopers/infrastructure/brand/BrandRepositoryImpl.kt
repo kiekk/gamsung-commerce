@@ -2,6 +2,9 @@ package com.loopers.infrastructure.brand
 
 import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.BrandRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -19,5 +22,11 @@ class BrandRepositoryImpl(
 
     override fun findByName(name: String): BrandEntity? {
         return brandJpaRepository.findByName(name)
+    }
+
+    override fun findAll(
+        spec: Specification<BrandEntity>, pageRequest: PageRequest,
+    ): Page<BrandEntity> {
+        return brandJpaRepository.findAll(spec, pageRequest)
     }
 }
