@@ -281,4 +281,47 @@ class BrandServiceIntegrationTest @Autowired constructor(
         }
 
     }
+
+    /*
+    **🔗 통합 테스트
+    - [ ] 브랜드 ID에 해당하는 브랜드가 존재하지 않을 경우, null을 반환한다.
+    - [ ] 브랜드 ID에 해당하는 브랜드가 존재할 경우, 해당 브랜드를 반환한다.
+    */
+    @DisplayName("브랜드를 조회할 때, ")
+    @Nested
+    inner class Get {
+        @DisplayName("브랜드 ID에 해당하는 브랜드가 존재하지 않을 경우, null을 반환한다.")
+        @Test
+        fun returnsNull_whenBrandDoesNotExist() {
+            // arrange
+            val nonExistentBrandId = 999L
+            val searchBrands = brandService.searchBrands(BrandSearchCondition(), PageRequest.of(0, 10))
+            assertThat(searchBrands).isEmpty()
+
+            // act
+            val brand = brandService.findBrandBy(nonExistentBrandId)
+
+            // assert
+            assertThat(brand).isNull()
+        }
+
+        @DisplayName("브랜드 ID에 해당하는 브랜드가 존재할 경우, 해당 브랜드를 반환한다.")
+        @Test
+        fun returnsBrand_whenBrandExists() {
+            // arrange
+            val brandEntity = aBrand().build()
+            val createdBrand = brandService.createBrand(brandEntity)
+
+            // act
+            val findBrand = brandService.findBrandBy(createdBrand.id)
+
+            // assert
+            assertAll(
+                { assertThat(findBrand).isNotNull() },
+                { assertThat(findBrand?.id).isEqualTo(createdBrand.id) },
+                { assertThat(findBrand?.name).isEqualTo(createdBrand.name) },
+                { assertThat(findBrand?.status).isEqualTo(createdBrand.status) },
+            )
+        }
+    }
 }
