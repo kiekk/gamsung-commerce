@@ -15,4 +15,8 @@ class ProductRepositoryImpl(
     override fun findByBrandIdAndName(brandId: Long, name: String): ProductEntity? {
         return productJpaRepository.findByBrandIdAndName(brandId, name)
     }
+
+    override fun findById(id: Long): ProductEntity? {
+        return productJpaRepository.findById(id).orElse(null)
+    }
 }

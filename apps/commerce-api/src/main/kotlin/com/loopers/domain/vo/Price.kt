@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-class Price(
+data class Price(
     @Column(name = "price")
     val value: Long,
 ) {
