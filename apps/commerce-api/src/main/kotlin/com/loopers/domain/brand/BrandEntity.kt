@@ -1,9 +1,14 @@
 package com.loopers.domain.brand
 
 import com.loopers.domain.BaseEntity
+import jakarta.persistence.*
 
+@Entity
+@Table(name = "brand")
 class BrandEntity(
+    @Column(unique = true)
     val name: String,
+    @Enumerated(EnumType.STRING)
     val status: BrandStatusType,
 ) : BaseEntity() {
 
