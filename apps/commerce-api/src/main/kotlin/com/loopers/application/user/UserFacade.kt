@@ -11,7 +11,7 @@ class UserFacade(
 ) {
     fun getUserInfo(userId: String): UserInfo {
         // user가 있으면 반환, 없으면 CoreException 발생
-        return userService.getUser(userId)
+        return userService.getUserByUserId(userId)
             ?.let { UserInfo.from(it) }
             ?: throw CoreException(
                 errorType = ErrorType.NOT_FOUND,

@@ -13,7 +13,12 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
-    fun getUser(userId: String): UserEntity? {
+    fun getUserById(id: Long): UserEntity? {
+        return userRepository.findById(id)
+    }
+
+    @Transactional(readOnly = true)
+    fun getUserByUserId(userId: String): UserEntity? {
         return userRepository.findByUserId(userId)
     }
 }

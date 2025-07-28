@@ -91,7 +91,7 @@ class UserServiceIntegrationTest @Autowired constructor(
             userService.save(userEntity)
 
             // act
-            val myInfo = userService.getUser(userEntity.userId)
+            val myInfo = userService.getUserByUserId(userEntity.userId)
 
             // assert
             assertThat(myInfo).isNotNull
@@ -109,7 +109,7 @@ class UserServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "nonExistentUser"
 
             // act
-            val myInfo = userService.getUser(nonExistentUserId)
+            val myInfo = userService.getUserByUserId(nonExistentUserId)
 
             // assert
             assertThat(myInfo).isNull()
