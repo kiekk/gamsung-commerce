@@ -17,7 +17,7 @@ class PointFacade(
     }
 
     fun chargePoint(userId: String, point: Long): PointInfo? {
-        userService.getUser(userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다: $userId")
+        userService.getUserByUserId(userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다: $userId")
         return pointService.chargePoint(userId, point).let {
             PointInfo(userId = it.userId, point = it.point)
         }

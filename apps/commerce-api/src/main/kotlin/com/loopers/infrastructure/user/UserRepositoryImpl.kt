@@ -23,4 +23,8 @@ class UserRepositoryImpl(
     override fun findByUserId(userId: String): UserEntity? {
         return userJpaRepository.findByUserId(userId)
     }
+
+    override fun findById(id: Long): UserEntity? {
+        return userJpaRepository.findById(id).orElse(null)
+    }
 }
