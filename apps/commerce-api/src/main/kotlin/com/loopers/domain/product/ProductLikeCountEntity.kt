@@ -1,7 +1,11 @@
 package com.loopers.domain.product
 
 import com.loopers.domain.BaseEntity
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "product_like_count")
 class ProductLikeCountEntity(
     val productId: Long,
     var productLikeCount: Int = 0,
