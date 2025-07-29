@@ -1,5 +1,6 @@
 package com.loopers.domain.point
 
+import com.loopers.application.point.PointCriteria
 import com.loopers.application.point.PointFacade
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.infrastructure.point.PointJpaRepository
@@ -82,11 +83,17 @@ class PointServiceIntegrationTest @Autowired constructor(
             // arrange
             val nonExistentUserId = "non-existent-user-id"
             val chargeAmount = 100L
+            val pointChargeCriteria = PointCriteria.Charge(
+                nonExistentUserId,
+                chargeAmount,
+            )
 
-            // act & assert
+            // act
             val exception = assertThrows<CoreException> {
-                pointFacade.chargePoint(nonExistentUserId, chargeAmount)
+                pointFacade.chargePoint(pointChargeCriteria)
             }
+
+            // assert
             assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND)
         }
     }
