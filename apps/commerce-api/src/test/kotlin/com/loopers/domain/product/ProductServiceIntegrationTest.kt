@@ -1,6 +1,7 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.brand.BrandEntityFixture.Companion.aBrand
+import com.loopers.domain.brand.BrandCommand
+import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.BrandService
 import com.loopers.domain.productlike.ProductService
 import com.loopers.domain.vo.Price
@@ -45,7 +46,6 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateProduct_whenNameIsDuplicate() {
             // arrange
-            // TODO: 브랜드 커맨드 생성
             val productCreateCommand = ProductCommand.Create(
                 1L,
                 "상품A",
@@ -71,20 +71,25 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsProduct_whenBrandIsDifferent() {
             // arrange
-            // TODO: 브랜드 커맨드 생성
-            val brandEntity1 = aBrand().name("브랜드A").build()
-            val brandEntity2 = aBrand().name("브랜드B").build()
-            val createBrand1 = brandService.createBrand(brandEntity1)
-            val createBrand2 = brandService.createBrand(brandEntity2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
+            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
             val productCreateCommand1 = ProductCommand.Create(
-                brandEntity1.id,
+                createdBrand1.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
             val productCreateCommand2 = ProductCommand.Create(
-                brandEntity2.id,
+                createdBrand2.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
@@ -99,8 +104,8 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(createdProduct1.name).isEqualTo(productCreateCommand1.name) },
                 { assertThat(createdProduct2.name).isEqualTo(productCreateCommand2.name) },
-                { assertThat(createdProduct1.brandId).isEqualTo(createBrand1.id) },
-                { assertThat(createdProduct2.brandId).isEqualTo(createBrand2.id) },
+                { assertThat(createdProduct1.brandId).isEqualTo(createdBrand1.id) },
+                { assertThat(createdProduct2.brandId).isEqualTo(createdBrand2.id) },
             )
         }
 

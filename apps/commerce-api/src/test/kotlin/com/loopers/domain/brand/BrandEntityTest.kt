@@ -1,6 +1,5 @@
 package com.loopers.domain.brand
 
-import com.loopers.domain.brand.BrandEntityFixture.Companion.aBrand
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -36,7 +35,10 @@ class BrandEntityTest {
 
             // act
             val result = assertThrows<IllegalArgumentException> {
-                aBrand().name(invalidBrandName).build()
+                BrandEntity(
+                    invalidBrandName,
+                    BrandEntity.BrandStatusType.ACTIVE,
+                )
             }
 
             // assert
@@ -54,10 +56,10 @@ class BrandEntityTest {
             val validBrandStatus = BrandEntity.BrandStatusType.ACTIVE
 
             // act
-            val brandEntity = aBrand()
-                .name(validBrandName)
-                .status(validBrandStatus)
-                .build()
+            val brandEntity = BrandEntity(
+                validBrandName,
+                validBrandStatus,
+            )
 
             // assert
             assertThat(brandEntity.name).isEqualTo(validBrandName)
