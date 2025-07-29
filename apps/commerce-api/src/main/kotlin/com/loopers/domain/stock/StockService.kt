@@ -8,7 +8,7 @@ class StockService(
     private val stockRepository: StockRepository,
 ) {
     @Transactional
-    fun createStock(stockEntity: StockEntity): StockEntity {
-        return stockRepository.save(stockEntity)
+    fun createStock(command : StockCommand.Create): StockEntity {
+        return stockRepository.save(command.toEntity())
     }
 }

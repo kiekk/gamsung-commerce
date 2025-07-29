@@ -1,6 +1,5 @@
 package com.loopers.domain.stock
 
-import com.loopers.domain.stock.StockEntityFixture.Companion.aStock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -66,8 +65,8 @@ class StockEntityTest {
         @Test
         fun checksIfStockIsLessThanDeductAmount_whenValueIsLessThanDeductAmount() {
             // arrange
-            val initialStockValue = 1
-            val stockEntity = aStock().quantity(initialStockValue).build()
+            val initialStockQuantity = 1
+            val stockEntity = StockEntity(1L, initialStockQuantity)
             val deductAmount = 2
 
             // act
@@ -81,8 +80,8 @@ class StockEntityTest {
         @Test
         fun checksIfStockIsGreaterThanOrEqualToDeductAmount_whenValueIsGreaterThan() {
             // arrange
-            val initialStockValue = 1
-            val stockEntity = aStock().quantity(initialStockValue).build()
+            val initialStockQuantity = 1
+            val stockEntity = StockEntity(1L, initialStockQuantity)
             val deductAmount = 1
 
             // act
@@ -96,8 +95,8 @@ class StockEntityTest {
         @Test
         fun failsToDeductStock_whenValueIsLessThanDeductAmount() {
             // arrange
-            val initialStockValue = 1
-            val stockEntity = aStock().quantity(initialStockValue).build()
+            val initialStockQuantity = 1
+            val stockEntity = StockEntity(1L, initialStockQuantity)
             val deductQuantity = 2
 
             // act & assert
@@ -115,15 +114,15 @@ class StockEntityTest {
         @Test
         fun deductsStock_whenValueIsGreaterThanOrEqualToDeductAmount() {
             // arrange
-            val initialStockValue = 2
-            val stockEntity = aStock().quantity(initialStockValue).build()
+            val initialStockQuantity = 2
+            val stockEntity = StockEntity(1L, initialStockQuantity)
             val deductQuantity = 1
 
             // act
             stockEntity.deductQuantity(deductQuantity)
 
             // assert
-            assertThat(stockEntity.quantity).isEqualTo(initialStockValue - deductQuantity)
+            assertThat(stockEntity.quantity).isEqualTo(initialStockQuantity - deductQuantity)
         }
 
     }

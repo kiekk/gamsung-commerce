@@ -27,13 +27,6 @@ class ProductCriteria {
             }
         }
 
-        fun toStockEntity(productId: Long): StockEntity {
-            return StockEntity(
-                productId,
-                quantity ?: 0,
-            )
-        }
-
         fun toCommand(): ProductCommand.Create {
             return ProductCommand.Create(
                 brandId,

@@ -3,7 +3,6 @@ package com.loopers.domain.stock
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductService
-import com.loopers.domain.stock.StockEntityFixture.Companion.aStock
 import com.loopers.domain.vo.Price
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -37,22 +36,25 @@ class StockServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsStock_whenProductExistsAndQuantityIsValid() {
             // arrange
-            val command = ProductCommand.Create(
+            val productCreateCommand = ProductCommand.Create(
                 1L,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdProduct = productService.createProduct(command)
-            val quantity = 20
+            val createdProduct = productService.createProduct(productCreateCommand)
+            val stockCreateCommand = StockCommand.Create(
+                createdProduct.id,
+                20,
+            )
 
             // act
-            val createdStock = stockService.createStock(aStock().productId(createdProduct.id).quantity(quantity).build())
+            val createdStock = stockService.createStock(stockCreateCommand)
 
             // assert
-            assertThat(createdStock.productId).isEqualTo(createdProduct.id)
-            assertThat(createdStock.quantity).isEqualTo(quantity)
+            assertThat(createdStock.productId).isEqualTo(stockCreateCommand.productId)
+            assertThat(createdStock.quantity).isEqualTo(stockCreateCommand.quantity)
         }
     }
 }
