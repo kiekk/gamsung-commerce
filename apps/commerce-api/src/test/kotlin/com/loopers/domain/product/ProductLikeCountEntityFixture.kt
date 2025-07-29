@@ -10,7 +10,8 @@ class ProductLikeCountEntityFixture {
 
     fun productId(productId: Long): ProductLikeCountEntityFixture = apply { this.productId = productId }
 
-    fun productLikeCount(productLikeCount: Int): ProductLikeCountEntityFixture = apply { this.productLikeCount = productLikeCount }
+    fun productLikeCount(productLikeCount: Int): ProductLikeCountEntityFixture =
+        apply { this.productLikeCount = productLikeCount }
 
     fun build(): ProductLikeCountEntity = ProductLikeCountEntity(
         productId,

@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 
 @Service
 class ProductService(
@@ -40,13 +39,13 @@ class ProductService(
 
             condition.minPrice?.let {
                 predicates.add(
-                    cb.greaterThanOrEqualTo(root.get<Price>("price").get("value"), it)
+                    cb.greaterThanOrEqualTo(root.get<Price>("price").get("value"), it),
                 )
             }
 
             condition.maxPrice?.let {
                 predicates.add(
-                    cb.lessThanOrEqualTo(root.get<Price>("price").get("value"), it)
+                    cb.lessThanOrEqualTo(root.get<Price>("price").get("value"), it),
                 )
             }
 

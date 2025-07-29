@@ -1,7 +1,11 @@
 package com.loopers.domain.brand
 
 import com.loopers.domain.BaseEntity
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "brand")

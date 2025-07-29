@@ -33,13 +33,13 @@ class UserEntity(
 
     init {
         (userId.length > 10 || !userId.matches(USER_ID_PATTERN)) &&
-            throw IllegalArgumentException("ID는 영문 및 숫자 10자 이내여야 합니다.")
+                throw IllegalArgumentException("ID는 영문 및 숫자 10자 이내여야 합니다.")
 
         !email.matches(EMAIL_PATTERN) &&
-            throw IllegalArgumentException("이메일 형식이 올바르지 않습니다.")
+                throw IllegalArgumentException("이메일 형식이 올바르지 않습니다.")
 
         !birthday.matches(BIRTH_DATE_PATTERN) &&
-            throw IllegalArgumentException("생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)")
+                throw IllegalArgumentException("생년월일 형식이 올바르지 않습니다. (yyyy-MM-dd)")
 
         runCatching { LocalDate.parse(birthday, BIRTH_DATE_FORMATTER) }
             .onFailure { throw IllegalArgumentException("존재하지 않는 생년월일입니다. ($birthday)") }

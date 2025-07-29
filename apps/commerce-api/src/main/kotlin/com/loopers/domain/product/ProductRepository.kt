@@ -11,5 +11,5 @@ interface ProductRepository {
 
     fun findById(id: Long): ProductEntity?
 
-    fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest) : Page<ProductEntity>
+    fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest): Page<ProductEntity>
 }

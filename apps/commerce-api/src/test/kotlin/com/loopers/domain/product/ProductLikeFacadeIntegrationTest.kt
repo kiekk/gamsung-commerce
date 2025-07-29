@@ -57,7 +57,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") }
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") },
             )
         }
 
@@ -77,7 +77,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") }
+                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") },
             )
         }
 
@@ -128,7 +128,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") }
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") },
             )
         }
 
@@ -147,7 +147,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") }
+                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") },
             )
         }
 
