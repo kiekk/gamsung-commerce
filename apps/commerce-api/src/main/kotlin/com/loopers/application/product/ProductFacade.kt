@@ -1,6 +1,6 @@
 package com.loopers.application.product
 
-import com.loopers.domain.productlike.ProductService
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import org.springframework.stereotype.Component

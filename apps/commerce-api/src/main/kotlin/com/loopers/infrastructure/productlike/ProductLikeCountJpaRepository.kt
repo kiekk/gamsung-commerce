@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.product
+package com.loopers.infrastructure.productlike
 
 import com.loopers.domain.productlike.ProductLikeCountEntity
 import org.springframework.data.jpa.repository.JpaRepository

@@ -1,9 +1,10 @@
 package com.loopers.domain.productlike
 
-import com.loopers.application.product.ProductLikeCriteria
-import com.loopers.application.product.ProductLikeFacade
+import com.loopers.application.productlike.ProductLikeCriteria
+import com.loopers.application.productlike.ProductLikeFacade
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.user.UserCommand
 import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService

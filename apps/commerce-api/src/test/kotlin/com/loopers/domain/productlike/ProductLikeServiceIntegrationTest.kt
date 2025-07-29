@@ -2,6 +2,7 @@ package com.loopers.domain.productlike
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.user.UserCommand
 import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService

@@ -1,4 +1,4 @@
-package com.loopers.application.product
+package com.loopers.application.productlike
 
 import com.loopers.domain.productlike.ProductLikeCommand
 
