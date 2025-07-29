@@ -1,7 +1,6 @@
 package com.loopers.domain.order
 
-import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.vo.Price
+import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.DisplayName
@@ -17,21 +16,13 @@ class OrderItemEntityTest {
         @Test
         fun failsToCreateOrderItem_whenProductIdIsEmpty() {
             // arrange
-            val productId = 0L
-            val productName = "Test Product"
-            val quantity = Quantity(1)
-            val price = Price(1000L)
-            val totalPrice = Price(1000L)
+            val invalidProductId = 0L
 
             // act
             val exception = assertThrows<IllegalArgumentException> {
-                OrderItemEntity(
-                    productId,
-                    productName,
-                    quantity,
-                    price,
-                    totalPrice,
-                )
+                anOrderItem()
+                    .productId(invalidProductId)
+                    .build()
             }
 
             // assert
@@ -45,21 +36,13 @@ class OrderItemEntityTest {
         @Test
         fun failsToCreateOrderItem_whenProductNameIsEmpty() {
             // arrange
-            val productId = 1L
-            val productName = ""
-            val quantity = Quantity(1)
-            val price = Price(1000L)
-            val totalPrice = Price(1000L)
+            val invalidProductName = ""
 
             // act
             val exception = assertThrows<IllegalArgumentException> {
-                OrderItemEntity(
-                    productId,
-                    productName,
-                    quantity,
-                    price,
-                    totalPrice,
-                )
+                anOrderItem()
+                    .productName(invalidProductName)
+                    .build()
             }
 
             // assert

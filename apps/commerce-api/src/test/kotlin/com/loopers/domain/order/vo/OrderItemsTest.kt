@@ -1,6 +1,7 @@
 package com.loopers.domain.order.vo
 
 import com.loopers.domain.order.OrderItemEntity
+import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
@@ -17,21 +18,22 @@ class OrderItemsTest {
         @Test
         fun calculatesTotalPrice() {
             // arrange
-            val item1 = OrderItemEntity(
-                1L,
-                "Product 1",
-                Quantity(2),
-                Price(1000L),
-                Price(2000L),
+            val items = listOf(
+                anOrderItem()
+                    .productId(1L)
+                    .productName("Product 1")
+                    .quantity(Quantity(2))
+                    .price(Price(1000L))
+                    .totalPrice(Price(2000L))
+                    .build(),
+                anOrderItem()
+                    .productId(2L)
+                    .productName("Product 2")
+                    .quantity(Quantity(1))
+                    .price(Price(1500L))
+                    .totalPrice(Price(1500L))
+                    .build(),
             )
-            val item2 = OrderItemEntity(
-                2L,
-                "Product 2",
-                Quantity(1),
-                Price(1500L),
-                Price(1500L),
-            )
-            val items = listOf(item1, item2)
 
             // act
             val orderItems = OrderItems(items)
