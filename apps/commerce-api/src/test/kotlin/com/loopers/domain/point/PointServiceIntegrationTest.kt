@@ -47,7 +47,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             )
 
             // act
-            val userPoints = pointFacade.getUserPoint(pointEntity.userId)
+            val userPoints = pointFacade.getPoint(pointEntity.userId)
 
             // assert
             assertThat(userPoints).isNotNull
@@ -62,7 +62,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "non-existent-user-id"
 
             // act
-            val userPoints = pointFacade.getUserPoint(nonExistentUserId)
+            val userPoints = pointFacade.getPoint(nonExistentUserId)
 
             // assert
             assertThat(userPoints).isNull()

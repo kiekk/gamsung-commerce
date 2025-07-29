@@ -14,7 +14,6 @@ class PointEntity(
     val userId: String,
     point: Long = 0L,
 ) : BaseEntity() {
-    @Column(name = "point", nullable = false)
     var point: Long = point
         private set
 
