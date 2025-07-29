@@ -2,7 +2,6 @@ package com.loopers.domain.product
 
 import com.loopers.domain.brand.BrandEntityFixture.Companion.aBrand
 import com.loopers.domain.brand.BrandService
-import com.loopers.domain.product.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -45,20 +44,25 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateProduct_whenNameIsDuplicate() {
             // arrange
-            val brandEntity = aBrand().build()
-            val createBrand = brandService.createBrand(brandEntity)
-            val productEntity = aProduct().brandId(createBrand.id).name("상품A").build()
-            productService.createProduct(productEntity)
+            // TODO: 브랜드 커맨드 생성
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            productService.createProduct(productCreateCommand)
 
             // act
             val exception = assertThrows<CoreException> {
-                productService.createProduct(productEntity)
+                productService.createProduct(productCreateCommand)
             }
 
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.CONFLICT) },
-                { assertThat(exception.message).isEqualTo("이미 존재하는 상품입니다: ${productEntity.name}") },
+                { assertThat(exception.message).isEqualTo("이미 존재하는 상품입니다: ${productCreateCommand.name}") },
             )
         }
 
@@ -66,21 +70,34 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsProduct_whenBrandIsDifferent() {
             // arrange
+            // TODO: 브랜드 커맨드 생성
             val brandEntity1 = aBrand().name("브랜드A").build()
             val brandEntity2 = aBrand().name("브랜드B").build()
             val createBrand1 = brandService.createBrand(brandEntity1)
             val createBrand2 = brandService.createBrand(brandEntity2)
-            val productEntity1 = aProduct().brandId(createBrand1.id).name("상품A").build()
-            val productEntity2 = aProduct().brandId(createBrand2.id).name("상품A").build()
+            val productCreateCommand1 = ProductCommand.Create(
+                brandEntity1.id,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                brandEntity2.id,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
 
             // act
-            val createdProduct1 = productService.createProduct(productEntity1)
-            val createdProduct2 = productService.createProduct(productEntity2)
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
+            val createdProduct2 = productService.createProduct(productCreateCommand2)
 
             // assert
             assertAll(
-                { assertThat(createdProduct1.name).isEqualTo(productEntity1.name) },
-                { assertThat(createdProduct2.name).isEqualTo(productEntity2.name) },
+                { assertThat(createdProduct1.name).isEqualTo(productCreateCommand1.name) },
+                { assertThat(createdProduct2.name).isEqualTo(productCreateCommand2.name) },
                 { assertThat(createdProduct1.brandId).isEqualTo(createBrand1.id) },
                 { assertThat(createdProduct2.brandId).isEqualTo(createBrand2.id) },
             )
@@ -90,17 +107,23 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsProduct_whenAllFieldsAreValid() {
             // arrange
-            val productEntity = aProduct().build()
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
 
             // act
-            val createdProduct = productService.createProduct(productEntity)
+            val createdProduct = productService.createProduct(productCreateCommand)
 
             // assert
             assertAll(
-                { assertThat(createdProduct.name).isEqualTo(productEntity.name) },
-                { assertThat(createdProduct.description).isEqualTo(productEntity.description) },
-                { assertThat(createdProduct.price).isEqualTo(productEntity.price) },
-                { assertThat(createdProduct.status).isEqualTo(productEntity.status) },
+                { assertThat(createdProduct.name).isEqualTo(productCreateCommand.name) },
+                { assertThat(createdProduct.description).isEqualTo(productCreateCommand.description) },
+                { assertThat(createdProduct.price).isEqualTo(productCreateCommand.price) },
+                { assertThat(createdProduct.status).isEqualTo(productCreateCommand.status) },
             )
         }
     }
@@ -125,10 +148,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductListByPageAndSize() {
             // arrange
-            val product1 = aProduct().name("상품A").build()
-            val product2 = aProduct().name("상품B").build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            productService.createProduct(productCreateCommand1)
+            productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -146,10 +181,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPartialNameSearch() {
             // arrange
-            val product1 = aProduct().name("상품A").build()
-            val product2 = aProduct().name("상품B").build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            productService.createProduct(productCreateCommand1)
+            productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -167,10 +214,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPriceRange() {
             // arrange
-            val product1 = aProduct().name("상품A").price(Price(1000L)).build()
-            val product2 = aProduct().name("상품B").price(Price(2000L)).build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(2000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
+            productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -180,9 +239,9 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(productsPage).hasSize(1) },
                 { assertThat(productsPage.totalElements).isEqualTo(1) },
-                { assertThat(productsPage.content[0].name).isEqualTo(product1.name) },
-                { assertThat(productsPage.content[0].price).isEqualTo(product1.price) },
-                { assertThat(productsPage.content[0].status).isEqualTo(product1.status) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct1.name) },
+                { assertThat(productsPage.content[0].price).isEqualTo(createdProduct1.price) },
+                { assertThat(productsPage.content[0].status).isEqualTo(createdProduct1.status) },
             )
         }
 
@@ -190,10 +249,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsEmptyList_whenNoMatchingProducts() {
             // arrange
-            val product1 = aProduct().name("상품A").build()
-            val product2 = aProduct().name("상품B").build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            productService.createProduct(productCreateCommand1)
+            productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -207,10 +278,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceAsc() {
             // arrange
-            val product1 = aProduct().name("상품A").price(Price(1000L)).build()
-            val product2 = aProduct().name("상품B").price(Price(2000L)).build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(2000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
+            val createdProduct2 = productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").ascending())
@@ -220,10 +303,10 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(productsPage).hasSize(2) },
                 { assertThat(productsPage.totalElements).isEqualTo(2) },
-                { assertThat(productsPage.content[0].price).isEqualTo(product1.price) },
-                { assertThat(productsPage.content[0].name).isEqualTo(product1.name) },
-                { assertThat(productsPage.content[1].price).isEqualTo(product2.price) },
-                { assertThat(productsPage.content[1].name).isEqualTo(product2.name) },
+                { assertThat(productsPage.content[0].price).isEqualTo(createdProduct1.price) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct1.name) },
+                { assertThat(productsPage.content[1].price).isEqualTo(createdProduct2.price) },
+                { assertThat(productsPage.content[1].name).isEqualTo(createdProduct2.name) },
             )
         }
 
@@ -231,10 +314,22 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceDesc() {
             // arrange
-            val product1 = aProduct().name("상품A").price(Price(1000L)).build()
-            val product2 = aProduct().name("상품B").price(Price(2000L)).build()
-            productService.createProduct(product1)
-            productService.createProduct(product2)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(2000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
+            val createdProduct2 = productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").descending())
@@ -244,10 +339,10 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(productsPage).hasSize(2) },
                 { assertThat(productsPage.totalElements).isEqualTo(2) },
-                { assertThat(productsPage.content[0].price).isEqualTo(product2.price) },
-                { assertThat(productsPage.content[0].name).isEqualTo(product2.name) },
-                { assertThat(productsPage.content[1].price).isEqualTo(product1.price) },
-                { assertThat(productsPage.content[1].name).isEqualTo(product1.name) },
+                { assertThat(productsPage.content[0].price).isEqualTo(createdProduct2.price) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct2.name) },
+                { assertThat(productsPage.content[1].price).isEqualTo(createdProduct1.price) },
+                { assertThat(productsPage.content[1].name).isEqualTo(createdProduct1.name) },
             )
         }
 
@@ -255,11 +350,23 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtAsc() {
             // arrange
-            val product1 = aProduct().name("상품A").build()
-            val product2 = aProduct().name("상품B").build()
-            productService.createProduct(product1)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
             Thread.sleep(10)
-            productService.createProduct(product2)
+            val createdProduct2 = productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").ascending())
@@ -269,8 +376,8 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(productsPage).hasSize(2) },
                 { assertThat(productsPage.totalElements).isEqualTo(2) },
-                { assertThat(productsPage.content[0].name).isEqualTo(product1.name) },
-                { assertThat(productsPage.content[1].name).isEqualTo(product2.name) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct1.name) },
+                { assertThat(productsPage.content[1].name).isEqualTo(createdProduct2.name) },
             )
         }
 
@@ -278,11 +385,23 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtDesc() {
             // arrange
-            val product1 = aProduct().name("상품A").build()
-            val product2 = aProduct().name("상품B").build()
-            productService.createProduct(product1)
+            val productCreateCommand1 = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val productCreateCommand2 = ProductCommand.Create(
+                1L,
+                "상품B",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct1 = productService.createProduct(productCreateCommand1)
             Thread.sleep(10)
-            productService.createProduct(product2)
+            val createdProduct2 = productService.createProduct(productCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending())
@@ -292,8 +411,8 @@ class ProductServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(productsPage).hasSize(2) },
                 { assertThat(productsPage.totalElements).isEqualTo(2) },
-                { assertThat(productsPage.content[0].name).isEqualTo(product2.name) },
-                { assertThat(productsPage.content[1].name).isEqualTo(product1.name) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct2.name) },
+                { assertThat(productsPage.content[1].name).isEqualTo(createdProduct1.name) },
             )
         }
 
@@ -335,8 +454,14 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProduct_whenProductExists() {
             // arrange
-            val productEntity = aProduct().build()
-            val createdProduct = productService.createProduct(productEntity)
+            val productCreateProduct = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
+            val createdProduct = productService.createProduct(productCreateProduct)
 
             // act
             val product = productService.getProduct(createdProduct.id)

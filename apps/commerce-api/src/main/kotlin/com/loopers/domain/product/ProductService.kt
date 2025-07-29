@@ -15,11 +15,11 @@ class ProductService(
     private val productRepository: ProductRepository,
 ) {
     @Transactional
-    fun createProduct(product: ProductEntity): ProductEntity {
-        productRepository.findByBrandIdAndName(product.brandId, product.name)?.let {
-            throw CoreException(ErrorType.CONFLICT, "이미 존재하는 상품입니다: ${product.name}")
+    fun createProduct(command: ProductCommand.Create): ProductEntity {
+        productRepository.findByBrandIdAndName(command.brandId, command.name)?.let {
+            throw CoreException(ErrorType.CONFLICT, "이미 존재하는 상품입니다: ${command.name}")
         }
-        return productRepository.createProduct(product)
+        return productRepository.createProduct(command.toEntity())
     }
 
     @Transactional(readOnly = true)

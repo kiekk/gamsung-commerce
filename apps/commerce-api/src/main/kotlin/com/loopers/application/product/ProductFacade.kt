@@ -12,9 +12,9 @@ class ProductFacade(
 ) {
 
     @Transactional
-    fun createProduct(command: ProductCommand.Create): ProductCommand.ProductInfo {
-        val createdProduct = productService.createProduct(command.toProductEntity())
-        val createdStock = stockService.createStock(command.toStockEntity(createdProduct.id))
-        return ProductCommand.ProductInfo.from(createdProduct, createdStock)
+    fun createProduct(criteria: ProductCriteria.Create): ProductCriteria.ProductInfo {
+        val createdProduct = productService.createProduct(criteria.toCommand())
+        val createdStock = stockService.createStock(criteria.toStockEntity(createdProduct.id))
+        return ProductCriteria.ProductInfo.from(createdProduct, createdStock)
     }
 }

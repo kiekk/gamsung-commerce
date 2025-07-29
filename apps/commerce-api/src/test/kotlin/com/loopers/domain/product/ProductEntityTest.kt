@@ -1,6 +1,6 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.product.ProductEntityFixture.Companion.aProduct
+import com.loopers.domain.vo.Price
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
@@ -32,11 +32,18 @@ class ProductEntityTest {
         fun failsToCreateProductEntity_whenNameIsInvalid(invalidProductName: String) {
             // arrange
 
-            // act & assert
+            // act
             val exception = assertThrows<IllegalArgumentException> {
-                aProduct().name(invalidProductName).build()
+                ProductEntity(
+                    1L,
+                    invalidProductName,
+                    "Valid description.",
+                    Price(1000L),
+                    ProductEntity.ProductStatusType.ACTIVE,
+                )
             }
 
+            // assert
             assertAll(
                 { assertEquals(IllegalArgumentException::class.java, exception::class.java) },
                 { assertEquals("상품명은 한글, 영문, 숫자 20자 이내로 입력해야 합니다.", exception.message) },
@@ -49,11 +56,18 @@ class ProductEntityTest {
             // arrange
             val longDescription = "a".repeat(101) // 101자 이상의 설명
 
-            // act & assert
+            // act
             val exception = assertThrows<IllegalArgumentException> {
-                aProduct().description(longDescription).build()
+                ProductEntity(
+                    1L,
+                    "상품A",
+                    longDescription,
+                    Price(1000L),
+                    ProductEntity.ProductStatusType.ACTIVE,
+                )
             }
 
+            // assert
             assertAll(
                 { assertEquals(IllegalArgumentException::class.java, exception::class.java) },
                 { assertEquals("상품 설명은 최대 100자 이내로 입력해야 합니다.", exception.message) },
@@ -70,10 +84,13 @@ class ProductEntityTest {
             val status = ProductEntity.ProductStatusType.ACTIVE
 
             // act
-            val productEntity = aProduct()
-                .name(productName)
-                .description(description)
-                .build()
+            val productEntity = ProductEntity(
+                1L,
+                productName,
+                description,
+                Price(1000L),
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
 
             // assert
             assertAll(

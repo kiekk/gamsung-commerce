@@ -1,4 +1,6 @@
-package com.loopers.domain.product
+package com.loopers.domain.product.fixture
+
+import com.loopers.domain.product.ProductLikeEntity
 
 class ProductLikeEntityFixture {
     private var userId: Long = 1L

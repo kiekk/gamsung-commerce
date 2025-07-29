@@ -1,9 +1,9 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.product.ProductEntityFixture.Companion.aProduct
-import com.loopers.domain.product.ProductLikeEntityFixture.Companion.aProductLike
+import com.loopers.domain.product.fixture.ProductLikeEntityFixture.Companion.aProductLike
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.user.UserService
+import com.loopers.domain.vo.Price
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -43,8 +43,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun likesProductSuccessfully() {
             // arrange
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
             val createdUser = userService.save(aUser().build())
-            val createdProduct = productService.createProduct(aProduct().build())
+            val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeEntity = aProductLike().build()
 
             // act
@@ -65,8 +72,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun doesNotAllowDuplicateLikes() {
             // arrange
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
             val createdUser = userService.save(aUser().build())
-            val createdProduct = productService.createProduct(aProduct().build())
+            val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeEntity = aProductLike().build()
 
             // act
@@ -98,8 +112,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun unlikesProductSuccessfully() {
             // arrange
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
             val createdUser = userService.save(aUser().build())
-            val createdProduct = productService.createProduct(aProduct().build())
+            val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeEntity = aProductLike().build()
             productLikeService.like(productLikeEntity)
 
@@ -119,8 +140,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun doesNotAllowDuplicateUnlikes() {
             // arrange
+            val productCreateCommand = ProductCommand.Create(
+                1L,
+                "상품A",
+                Price(1000),
+                "This is a test product.",
+                ProductEntity.ProductStatusType.ACTIVE,
+            )
             val createdUser = userService.save(aUser().build())
-            val createdProduct = productService.createProduct(aProduct().build())
+            val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeEntity = aProductLike().build()
             productLikeService.like(productLikeEntity)
 

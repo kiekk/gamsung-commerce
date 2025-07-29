@@ -1,0 +1,38 @@
+package com.loopers.domain.product
+
+import com.loopers.domain.vo.Price
+
+class ProductCommand {
+    data class Create(
+        val brandId: Long,
+        val name: String,
+        val price: Price,
+        val description: String?,
+        val status: ProductEntity.ProductStatusType,
+    ) {
+
+        init {
+            require(brandId > 0) { "브랜드 ID는 1 이상이어야 합니다." }
+            !name.matches(PRODUCT_NAME_REGEX) && throw IllegalArgumentException("상품명은 한글, 영문, 숫자 20자 이내로 입력해야 합니다.")
+            description?.let {
+                !it.matches(PRODUCT_DESCRIPTION_REGEX) && throw IllegalArgumentException("상품 설명은 최대 100자 이내로 입력해야 합니다.")
+            }
+            require(price.value > 0) { "상품 가격은 0 이상이어야 합니다." }
+        }
+
+        fun toEntity(): ProductEntity {
+            return ProductEntity(
+                brandId,
+                name,
+                description,
+                price,
+                status,
+            )
+        }
+
+        companion object {
+            private val PRODUCT_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
+            private val PRODUCT_DESCRIPTION_REGEX = "^.{0,100}$".toRegex()
+        }
+    }
+}

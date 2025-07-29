@@ -1,6 +1,6 @@
 package com.loopers.domain.product
 
-import com.loopers.application.product.ProductCommand
+import com.loopers.application.product.ProductCriteria
 import com.loopers.application.product.ProductFacade
 import com.loopers.domain.vo.Price
 import com.loopers.utils.DatabaseCleanUp
@@ -37,7 +37,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun createsProductWithStock_whenProductCommandIsValid() {
             // arrange
-            val command = ProductCommand.Create(
+            val productCreateCriteria = ProductCriteria.Create(
                 1L,
                 "상품A",
                 Price(100L),
@@ -47,16 +47,16 @@ class ProductFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            val productInfo = productFacade.createProduct(command)
+            val productInfo = productFacade.createProduct(productCreateCriteria)
 
             // assert
             assertAll(
-                { assertThat(productInfo.brandId).isEqualTo(command.brandId) },
-                { assertThat(productInfo.name).isEqualTo(command.name) },
-                { assertThat(productInfo.price).isEqualTo(command.price) },
-                { assertThat(productInfo.description).isEqualTo(command.description) },
-                { assertThat(productInfo.status).isEqualTo(command.status) },
-                { assertThat(productInfo.stockQuantity).isEqualTo(command.quantity) },
+                { assertThat(productInfo.brandId).isEqualTo(productCreateCriteria.brandId) },
+                { assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
+                { assertThat(productInfo.price).isEqualTo(productCreateCriteria.price) },
+                { assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
+                { assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
+                { assertThat(productInfo.stockQuantity).isEqualTo(productCreateCriteria.quantity) },
             )
         }
 
@@ -64,7 +64,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun createsProductWithZeroStock_whenStockQuantityIsNotProvided() {
             // arrange
-            val command = ProductCommand.Create(
+            val productCreateCriteria = ProductCriteria.Create(
                 1L,
                 "상품A",
                 Price(100L),
@@ -73,15 +73,15 @@ class ProductFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            val productInfo = productFacade.createProduct(command)
+            val productInfo = productFacade.createProduct(productCreateCriteria)
 
             // assert
             assertAll(
-                { assertThat(productInfo.brandId).isEqualTo(command.brandId) },
-                { assertThat(productInfo.name).isEqualTo(command.name) },
-                { assertThat(productInfo.price).isEqualTo(command.price) },
-                { assertThat(productInfo.description).isEqualTo(command.description) },
-                { assertThat(productInfo.status).isEqualTo(command.status) },
+                { assertThat(productInfo.brandId).isEqualTo(productCreateCriteria.brandId) },
+                { assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
+                { assertThat(productInfo.price).isEqualTo(productCreateCriteria.price) },
+                { assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
+                { assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
                 { assertThat(productInfo.stockQuantity).isEqualTo(0) }, // 재고 수량이 0으로 설정됨
             )
         }

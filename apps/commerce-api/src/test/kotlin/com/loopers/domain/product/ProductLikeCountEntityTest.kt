@@ -1,6 +1,6 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.product.ProductLikeCountEntityFixture.Companion.aProductLikeCount
+import com.loopers.domain.product.fixture.ProductLikeCountEntityFixture.Companion.aProductLikeCount
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
