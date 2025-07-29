@@ -2,7 +2,7 @@ package com.loopers.domain.stock
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.product.ProductService
+import com.loopers.domain.productlike.ProductService
 import com.loopers.domain.vo.Price
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat

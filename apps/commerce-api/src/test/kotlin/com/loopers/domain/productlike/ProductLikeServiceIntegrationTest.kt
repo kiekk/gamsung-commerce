@@ -1,6 +1,7 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
-import com.loopers.domain.product.fixture.ProductLikeEntityFixture.Companion.aProductLike
+import com.loopers.domain.product.ProductCommand
+import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
@@ -52,10 +53,13 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(aUser().build())
             val createdProduct = productService.createProduct(productCreateCommand)
-            val productLikeEntity = aProductLike().build()
+            val productLikeCommand = ProductLikeCommand.Like(
+                createdUser.id,
+                createdProduct.id,
+            )
 
             // act
-            productLikeService.like(productLikeEntity)
+            productLikeService.like(productLikeCommand)
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
@@ -81,12 +85,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(aUser().build())
             val createdProduct = productService.createProduct(productCreateCommand)
-            val productLikeEntity = aProductLike().build()
+            val productLikeCommand = ProductLikeCommand.Like(
+                createdUser.id,
+                createdProduct.id,
+            )
 
             // act
-            productLikeService.like(productLikeEntity)
-            productLikeService.like(productLikeEntity)
-            productLikeService.like(productLikeEntity)
+            productLikeService.like(productLikeCommand)
+            productLikeService.like(productLikeCommand)
+            productLikeService.like(productLikeCommand)
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
@@ -121,11 +128,20 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(aUser().build())
             val createdProduct = productService.createProduct(productCreateCommand)
-            val productLikeEntity = aProductLike().build()
-            productLikeService.like(productLikeEntity)
+            productLikeService.like(
+                ProductLikeCommand.Like(
+                    createdUser.id,
+                    createdProduct.id,
+                ),
+            )
 
             // act
-            productLikeService.unlike(productLikeEntity)
+            productLikeService.unlike(
+                ProductLikeCommand.Unlike(
+                    createdUser.id,
+                    createdProduct.id,
+                ),
+            )
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
@@ -149,13 +165,21 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(aUser().build())
             val createdProduct = productService.createProduct(productCreateCommand)
-            val productLikeEntity = aProductLike().build()
-            productLikeService.like(productLikeEntity)
+            productLikeService.like(
+                ProductLikeCommand.Like(
+                    createdUser.id,
+                    createdProduct.id,
+                ),
+            )
 
             // act
-            productLikeService.unlike(productLikeEntity)
-            productLikeService.unlike(productLikeEntity)
-            productLikeService.unlike(productLikeEntity)
+            val productUnlikeCommand = ProductLikeCommand.Unlike(
+                createdUser.id,
+                createdProduct.id,
+            )
+            productLikeService.unlike(productUnlikeCommand)
+            productLikeService.unlike(productUnlikeCommand)
+            productLikeService.unlike(productUnlikeCommand)
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)

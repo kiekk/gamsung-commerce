@@ -1,4 +1,4 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
 interface ProductLikeRepository {
     fun create(productLike: ProductLikeEntity): ProductLikeEntity

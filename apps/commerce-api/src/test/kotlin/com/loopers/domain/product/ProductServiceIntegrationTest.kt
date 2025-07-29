@@ -2,6 +2,7 @@ package com.loopers.domain.product
 
 import com.loopers.domain.brand.BrandEntityFixture.Companion.aBrand
 import com.loopers.domain.brand.BrandService
+import com.loopers.domain.productlike.ProductService
 import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType

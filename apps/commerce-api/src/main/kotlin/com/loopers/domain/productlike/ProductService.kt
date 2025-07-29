@@ -1,5 +1,9 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
+import com.loopers.domain.product.ProductCommand
+import com.loopers.domain.product.ProductEntity
+import com.loopers.domain.product.ProductRepository
+import com.loopers.domain.product.ProductSearchCondition
 import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType

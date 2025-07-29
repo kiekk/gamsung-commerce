@@ -1,7 +1,9 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
-import com.loopers.application.product.ProductLikeCommand
+import com.loopers.application.product.ProductLikeCriteria
 import com.loopers.application.product.ProductLikeFacade
+import com.loopers.domain.product.ProductCommand
+import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
@@ -54,7 +56,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdProduct = productService.createProduct(productCreateCommand)
             val nonExistentUserId = 999L
-            val likeCommand = ProductLikeCommand.Like(nonExistentUserId, createdProduct.id)
+            val likeCommand = ProductLikeCriteria.Like(nonExistentUserId, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -74,7 +76,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // arrange
             val createdUser = userService.save(aUser().build())
             val nonExistentProductId = 999L
-            val likeCommand = ProductLikeCommand.Like(createdUser.id, nonExistentProductId)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.id, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -101,7 +103,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(aUser().build())
             val createdProduct = productService.createProduct(productCreateCommand)
-            val likeCommand = ProductLikeCommand.Like(createdUser.id, createdProduct.id)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.id, createdProduct.id)
 
             // act
             productLikeFacade.like(likeCommand)
@@ -139,7 +141,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdProduct = productService.createProduct(command)
             val nonExistentUserId = 999L
-            val unlikeCommand = ProductLikeCommand.Unlike(nonExistentUserId, createdProduct.id)
+            val unlikeCommand = ProductLikeCriteria.Unlike(nonExistentUserId, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -158,7 +160,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // arrange
             val createdUser = userService.save(aUser().build())
             val nonExistentProductId = 999L
-            val unlikeCommand = ProductLikeCommand.Unlike(createdUser.id, nonExistentProductId)
+            val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.id, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -175,7 +177,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         @DisplayName("상품 좋아요 취소에 성공하면 상품 좋아요 이력이 삭제된다.")
         fun unlikesProductSuccessfully() {
             // arrange
-            val command = ProductCommand.Create(
+            val productCreateCommand = ProductCommand.Create(
                 1L,
                 "상품A",
                 Price(1000),
@@ -183,12 +185,16 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 ProductEntity.ProductStatusType.ACTIVE,
             )
             val createdUser = userService.save(aUser().build())
-            val createdProduct = productService.createProduct(command)
-            val productLikeEntity = ProductLikeEntity(createdUser.id, createdProduct.id)
-            productLikeService.like(productLikeEntity)
+            val createdProduct = productService.createProduct(productCreateCommand)
+            productLikeService.like(
+                ProductLikeCommand.Like(
+                    createdUser.id,
+                    createdProduct.id,
+                ),
+            )
 
             // act
-            productLikeFacade.unlike(ProductLikeCommand.Unlike(createdUser.id, createdProduct.id))
+            productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.id, createdProduct.id))
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)

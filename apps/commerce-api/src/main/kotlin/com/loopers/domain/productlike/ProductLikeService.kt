@@ -1,4 +1,4 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -9,10 +9,10 @@ class ProductLikeService(
     private val productLikeCountRepository: ProductLikeCountRepository,
 ) {
     @Transactional
-    fun like(productLike: ProductLikeEntity) {
-        if (productLikeRepository.existsByUserIdAndProductId(productLike.userId, productLike.productId)) return
+    fun like(command: ProductLikeCommand.Like) {
+        if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
-        productLikeRepository.create(productLike).let { created ->
+        productLikeRepository.create(command.toEntity()).let { created ->
             productLikeCountRepository.findByProductId(created.productId)?.apply {
                 increaseProductLikeCount()
             } ?: productLikeCountRepository.save(
@@ -23,11 +23,11 @@ class ProductLikeService(
     }
 
     @Transactional
-    fun unlike(productLike: ProductLikeEntity) {
-        if (!productLikeRepository.existsByUserIdAndProductId(productLike.userId, productLike.productId)) return
+    fun unlike(command: ProductLikeCommand.Unlike) {
+        if (!productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
-        productLikeRepository.deleteByUserIdAndProductId(productLike.userId, productLike.productId).also {
-            productLikeCountRepository.findByProductId(productLike.productId)?.decreaseProductLikeCount()
+        productLikeRepository.deleteByUserIdAndProductId(command.userId, command.productId).also {
+            productLikeCountRepository.findByProductId(command.productId)?.decreaseProductLikeCount()
         }
     }
 
