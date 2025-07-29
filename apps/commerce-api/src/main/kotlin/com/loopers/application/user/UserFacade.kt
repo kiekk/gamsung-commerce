@@ -10,17 +10,16 @@ class UserFacade(
     private val userService: UserService,
 ) {
     fun getUserInfo(userId: String): UserInfo {
-        // user가 있으면 반환, 없으면 CoreException 발생
         return userService.getUserByUserId(userId)
             ?.let { UserInfo.from(it) }
             ?: throw CoreException(
-                errorType = ErrorType.NOT_FOUND,
-                customMessage = "사용자를 찾을 수 없습니다: $userId",
+                ErrorType.NOT_FOUND,
+                "사용자를 찾을 수 없습니다: $userId",
             )
     }
 
-    fun signUp(signUp: UserInfo.SignUp): UserInfo {
-        return userService.save(signUp.toUserEntity())
+    fun signUp(criteria: UserCriteria.SignUp): UserInfo {
+        return userService.save(criteria.toCommand())
             .let { UserInfo.from(it) }
     }
 }

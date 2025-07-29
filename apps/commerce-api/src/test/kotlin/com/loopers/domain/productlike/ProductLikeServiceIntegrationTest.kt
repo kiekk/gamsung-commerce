@@ -2,7 +2,8 @@ package com.loopers.domain.productlike
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.user.UserCommand
+import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
 import com.loopers.utils.DatabaseCleanUp
@@ -51,7 +52,14 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeCommand = ProductLikeCommand.Like(
                 createdUser.id,
@@ -83,7 +91,14 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             val productLikeCommand = ProductLikeCommand.Like(
                 createdUser.id,
@@ -126,7 +141,14 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             productLikeService.like(
                 ProductLikeCommand.Like(
@@ -163,7 +185,14 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             productLikeService.like(
                 ProductLikeCommand.Like(

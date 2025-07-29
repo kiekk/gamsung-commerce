@@ -4,7 +4,8 @@ import com.loopers.application.product.ProductLikeCriteria
 import com.loopers.application.product.ProductLikeFacade
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.user.UserCommand
+import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
@@ -74,7 +75,14 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToLikeProduct_whenProductNotFound() {
             // arrange
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
             val likeCommand = ProductLikeCriteria.Like(createdUser.id, nonExistentProductId)
 
@@ -101,7 +109,14 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             val likeCommand = ProductLikeCriteria.Like(createdUser.id, createdProduct.id)
 
@@ -158,7 +173,14 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         @DisplayName("존재하지 않는 상품에 대해 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.")
         fun failsToUnlikeProduct_whenProductNotFound() {
             // arrange
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
             val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.id, nonExistentProductId)
 
@@ -184,7 +206,14 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "This is a test product.",
                 ProductEntity.ProductStatusType.ACTIVE,
             )
-            val createdUser = userService.save(aUser().build())
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
             productLikeService.like(
                 ProductLikeCommand.Like(
