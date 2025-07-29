@@ -13,8 +13,8 @@ class UserRepositoryImpl(
     override fun save(userEntity: UserEntity): UserEntity {
         userJpaRepository.findByUserId(userEntity.userId)?.let {
             throw CoreException(
-                errorType = ErrorType.CONFLICT,
-                customMessage = "이미 존재하는 사용자입니다: ${userEntity.userId}",
+                ErrorType.CONFLICT,
+                "이미 존재하는 사용자입니다: ${userEntity.userId}",
             )
         }
         return userJpaRepository.save(userEntity)

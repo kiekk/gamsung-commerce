@@ -11,13 +11,13 @@ class PointFacade(
     private val pointService: PointService,
     private val userService: UserService,
 ) {
-    fun getUserPoint(userId: String): PointInfo? {
+    fun getPoint(userId: String): PointInfo? {
         return pointService.getPoint(userId)
             ?.let { pointEntity -> PointInfo(pointEntity.userId, pointEntity.point) }
     }
 
     fun chargePoint(criteria: PointCriteria.Charge): PointInfo? {
-        userService.getUserByUserId(criteria.userId) ?: throw CoreException(
+        userService.findUserBy(criteria.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자를 찾을 수 없습니다: ${criteria.userId}",
         )

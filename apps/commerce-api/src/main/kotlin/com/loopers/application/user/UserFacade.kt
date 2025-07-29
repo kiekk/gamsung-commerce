@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component
 class UserFacade(
     private val userService: UserService,
 ) {
-    fun getUserInfo(userId: String): UserInfo {
-        return userService.getUserByUserId(userId)
+    fun getMyInfo(userId: String): UserInfo {
+        return userService.findUserBy(userId)
             ?.let { UserInfo.from(it) }
             ?: throw CoreException(
                 ErrorType.NOT_FOUND,
