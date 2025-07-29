@@ -36,7 +36,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
     inner class Create {
         @DisplayName("브랜드명이 중복될 경우, 브랜드 등록에 실패한다.")
         @Test
-        fun failsToCreateBrand_when브랜드AIsDuplicate() {
+        fun failsToCreateBrand_whenBrandNameAIsDuplicate() {
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
@@ -58,7 +58,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
 
         @DisplayName("브랜드명, 브랜드상태가 올바른 경우 브랜드를 등록한다.")
         @Test
-        fun createsBrand_when브랜드AAndStatusAreValid() {
+        fun createsBrand_whenBrandNameAAndStatusAreValid() {
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
