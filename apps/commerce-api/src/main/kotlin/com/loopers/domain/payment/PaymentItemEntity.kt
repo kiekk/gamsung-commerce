@@ -13,7 +13,7 @@ class PaymentItemEntity(
     enum class PaymentItemStatusType {
         PENDING,
         COMPLETED,
-        FAILED
+        FAILED,
     }
 
     init {

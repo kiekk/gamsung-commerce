@@ -32,5 +32,4 @@ class OrderEntity(
     fun cancel() {
         orderStatus = OrderStatusType.CANCELED
     }
-
 }

@@ -25,7 +25,8 @@ class BrandRepositoryImpl(
     }
 
     override fun findAll(
-        spec: Specification<BrandEntity>, pageRequest: PageRequest,
+        spec: Specification<BrandEntity>,
+        pageRequest: PageRequest,
     ): Page<BrandEntity> {
         return brandJpaRepository.findAll(spec, pageRequest)
     }

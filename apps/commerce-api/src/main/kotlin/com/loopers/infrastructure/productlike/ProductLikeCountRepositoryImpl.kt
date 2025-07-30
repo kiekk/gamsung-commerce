@@ -15,5 +15,4 @@ class ProductLikeCountRepositoryImpl(
     override fun save(productLikeCountEntity: ProductLikeCountEntity): ProductLikeCountEntity {
         return productLikeCountJpaRepository.save(productLikeCountEntity)
     }
-
 }

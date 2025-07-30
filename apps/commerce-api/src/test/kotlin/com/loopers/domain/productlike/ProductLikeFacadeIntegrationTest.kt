@@ -37,7 +37,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 존재하지 않는 사용자가 상품 좋아요 등록 요청을 하면 404 Not Found 에러가 발생한다.
     - [ ] 존재하지 않는 상품에 대해 좋아요 등록 요청을 하면 404 Not Found 에러가 발생한다.
     - [ ] 상품 좋아요 등록에 성공하면 상품 좋아요 수가 증가하고 상품 상품 좋아요 이력이 추가된다.
@@ -68,7 +68,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -95,7 +95,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") },
+                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId") },
             )
         }
 
@@ -137,7 +137,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 존재하지 않는 사용자가 상품 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.
     - [ ] 존재하지 않는 상품에 대해 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.
     - [ ] 상품 좋아요 취소에 성공하면 상품 좋아요 수가 감소하고 상품 좋아요 이력이 삭제된다.
@@ -167,7 +167,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: ${nonExistentUserId}") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -193,7 +193,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: ${nonExistentProductId}") },
+                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId") },
             )
         }
 

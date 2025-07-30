@@ -27,7 +27,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 브랜드명이 중복될 경우, 브랜드 등록에 실패한다.
     - [ ] 브랜드명, 브랜드상태가 올바른 경우 브랜드를 등록한다.
      */
@@ -78,7 +78,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 브랜드 목록은 페이지 번호와 페이지 크기를 기준으로 조회할 수 있다.
     - [ ] 브랜드 목록은 브랜드명으로 부분 일치 (Like) 검색할 수 있으며 대소문자를 구분하지 않는다.
     - [ ] 브랜드 목록은 브랜드 상태로 필터링할 수 있다.
@@ -343,14 +343,13 @@ class BrandServiceIntegrationTest @Autowired constructor(
                 { assertThat(brandsPage.content[1].status).isEqualTo(createdBrand1.status) },
             )
         }
-
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 브랜드 ID에 해당하는 브랜드가 존재하지 않을 경우, null을 반환한다.
     - [ ] 브랜드 ID에 해당하는 브랜드가 존재할 경우, 해당 브랜드를 반환한다.
-    */
+     */
     @DisplayName("브랜드를 조회할 때, ")
     @Nested
     inner class Get {

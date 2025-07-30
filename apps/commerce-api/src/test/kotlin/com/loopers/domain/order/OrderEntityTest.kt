@@ -15,7 +15,7 @@ import org.junit.jupiter.api.assertAll
 class OrderEntityTest {
 
     /*
-    * 🧱 단위 테스트
+     * 🧱 단위 테스트
     - [ ] 주문 아이템 목록에서 주문의 총 금액을 계산한다.
     - [ ] 주문 생성 시 상태는 PENDING이다.
     - [ ] 주문을 완료 처리하면 상태는 COMPLETED가 된다
@@ -57,10 +57,10 @@ class OrderEntityTest {
             )
         }
 
+        // 영어로
         @DisplayName("주문 생성 시 상태는 PENDING이다.")
         @Test
-        // 영어로
-        fun createsOrderWithPendingStatus() {
+fun createsOrderWithPendingStatus() {
             // arrange
 
             // act

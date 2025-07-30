@@ -35,7 +35,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 상품 좋아요 등록에 성공하면 상품 좋아요 수가 증가하고 상품 좋아요 이력이 추가된다.
     - [ ] 상품 좋아요 등록 시, 이미 좋아요를 누른 상품에 대해서는 중복 등록이 되지 않는다.
      */
@@ -124,7 +124,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 상품 좋아요 취소에 성공하면 상품 좋아요 수가 감소하고 상품 좋아요 이력이 삭제된다.
     - [ ] 상품 좋아요 취소 시, 이미 좋아요를 취소한 상품에 대해서는 중복 취소가 되지 않는다.
      */

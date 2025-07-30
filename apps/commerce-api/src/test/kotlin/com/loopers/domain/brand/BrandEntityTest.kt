@@ -12,10 +12,10 @@ import org.junit.jupiter.params.provider.ValueSource
 class BrandEntityTest {
 
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ]  브랜드명이 `한글, 영문, 숫자 20자 이내` 형식에 맞지 않으면, BrandEntity 생성에 실패한다.
     - [ ]  브랜드명, 브랜드상태가 올바른 경우 BrandEntity를 생성한다.
-    */
+     */
     @DisplayName("브랜드를 생성할 때, ")
     @Nested
     inner class Create {

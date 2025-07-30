@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class PaymentEntityTest {
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ] 결제 정보를 생성하면 결제 금액과 결제 항목의 총 금액은 일치해야 한다.
     - [ ] 결제 정볼르 생성하면 상태는 PENDING로 초기화된다.
     - [ ] 결제 완료 처리 시 상태는 COMPLETED로 변경된다.

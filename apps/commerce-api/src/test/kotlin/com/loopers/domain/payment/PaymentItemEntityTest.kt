@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class PaymentItemEntityTest {
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ] 결제 항목을 생성하면 상태는 PENDING로 초기화된다.
     - [ ] 결제 항목은 결제가 완료되면 상태가 COMPLETED로 변경된다.
     - [ ] 결제 항목은 결제가 실패하면 상태가 FAILED로 변경된다.
@@ -87,5 +87,4 @@ class PaymentItemEntityTest {
             assertThat(paymentItem.amount).isEqualTo(amount)
         }
     }
-
 }

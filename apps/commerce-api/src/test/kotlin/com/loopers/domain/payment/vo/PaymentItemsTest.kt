@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 
 class PaymentItemsTest {
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ] 결제 항목 목록이 비어있으면 예외를 던진다.
     - [ ] 결제 항목 목록은 총 금액을 계산할 수 있다.
      */

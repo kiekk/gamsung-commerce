@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 class ProductLikeCountEntityTest {
 
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ] 상품 좋아요 수가 음수일 경우, ProductLikeCountEntity를 생성한다.
     - [ ] 상품 ID와 상품 좋아요 수가 올바른 경우, ProductLikeCountEntity를 생성한다.
      */
@@ -37,7 +37,6 @@ class ProductLikeCountEntityTest {
                 { assertThat(exception).isInstanceOf(IllegalArgumentException::class.java) },
                 { assertThat(exception.message).isEqualTo("좋아요 수는 0 이상이어야 합니다.") },
             )
-
         }
 
         @DisplayName("상품 ID와 상품 좋아요 수가 올바른 경우, ProductLikeCountEntity를 생성한다.")
@@ -60,7 +59,7 @@ class ProductLikeCountEntityTest {
     }
 
     /*
-    **🧱 단위 테스트**
+     **🧱 단위 테스트**
     - [ ] 상품 좋아요 수를 증가시킬 수 있다.
     - [ ] 상품 좋아요 수를 감소시킬 수 있다.
     - [ ] 상품 좋아요 수가 0인 경우 상품 좋아요 수를 감소해도 0 이하로 내려가지 않는다.

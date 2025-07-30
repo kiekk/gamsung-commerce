@@ -19,7 +19,6 @@ class ProductLikeService(
                 ProductLikeCountEntity(created.productId, 1),
             )
         }
-
     }
 
     @Transactional
@@ -40,5 +39,4 @@ class ProductLikeService(
     fun getProductLikesByUserId(userId: Long): List<ProductLikeEntity> {
         return productLikeRepository.findByUserId(userId)
     }
-
 }
