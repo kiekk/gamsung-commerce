@@ -2,7 +2,6 @@ package com.loopers.application.product
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.stock.StockEntity
 import com.loopers.domain.vo.Price
 
 class ProductCriteria {
@@ -40,31 +39,6 @@ class ProductCriteria {
         companion object {
             private val PRODUCT_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
             private val PRODUCT_DESCRIPTION_REGEX = "^.{0,100}$".toRegex()
-        }
-    }
-
-    data class ProductInfo(
-        val id: Long,
-        val brandId: Long,
-        val name: String,
-        val description: String?,
-        val price: Price,
-        val status: ProductEntity.ProductStatusType,
-        val stockQuantity: Int,
-    ) {
-
-        companion object {
-            fun from(product: ProductEntity, stock: StockEntity): ProductInfo {
-                return ProductInfo(
-                    product.id,
-                    product.brandId,
-                    product.name,
-                    product.description,
-                    product.price,
-                    product.status,
-                    stock.quantity,
-                )
-            }
         }
     }
 }
