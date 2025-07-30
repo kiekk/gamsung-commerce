@@ -18,7 +18,7 @@ class ProductService(
     }
 
     @Transactional(readOnly = true)
-    fun getProduct(id: Long): ProductEntity? {
+    fun findProductBy(id: Long): ProductEntity? {
         return productRepository.findById(id)
     }
 

@@ -145,7 +145,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
             val nonExistentProductId = 999L
 
             // act
-            val product = productService.getProduct(nonExistentProductId)
+            val product = productService.findProductBy(nonExistentProductId)
 
             // assert
             assertThat(product).isNull()
@@ -165,7 +165,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
             val createdProduct = productService.createProduct(productCreateProduct)
 
             // act
-            val product = productService.getProduct(createdProduct.id)
+            val product = productService.findProductBy(createdProduct.id)
 
             // assert
             assertAll(
