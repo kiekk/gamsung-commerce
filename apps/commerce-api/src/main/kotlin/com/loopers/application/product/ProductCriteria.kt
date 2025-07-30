@@ -1,10 +1,11 @@
 package com.loopers.application.product
 
+import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.stock.StockEntity
 import com.loopers.domain.vo.Price
 
-class ProductCommand {
+class ProductCriteria {
     data class Create(
         val brandId: Long,
         val name: String,
@@ -26,20 +27,13 @@ class ProductCommand {
             }
         }
 
-        fun toProductEntity(): ProductEntity {
-            return ProductEntity(
+        fun toCommand(): ProductCommand.Create {
+            return ProductCommand.Create(
                 brandId,
                 name,
-                description,
                 price,
+                description,
                 status,
-            )
-        }
-
-        fun toStockEntity(productId: Long): StockEntity {
-            return StockEntity(
-                productId,
-                quantity ?: 0,
             )
         }
 

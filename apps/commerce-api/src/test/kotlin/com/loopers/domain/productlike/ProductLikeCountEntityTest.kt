@@ -1,6 +1,5 @@
-package com.loopers.domain.product
+package com.loopers.domain.productlike
 
-import com.loopers.domain.product.ProductLikeCountEntityFixture.Companion.aProductLikeCount
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -27,7 +26,10 @@ class ProductLikeCountEntityTest {
 
             // act & assert
             val exception = assertThrows<IllegalArgumentException> {
-                aProductLikeCount().productLikeCount(invalidProductLikeCount).build()
+                ProductLikeCountEntity(
+                    1L,
+                    invalidProductLikeCount,
+                )
             }
 
             // assert
@@ -45,7 +47,10 @@ class ProductLikeCountEntityTest {
             val validProductLikeCount = 0
 
             // act
-            val productLikeCountEntity = aProductLikeCount().productLikeCount(validProductLikeCount).build()
+            val productLikeCountEntity = ProductLikeCountEntity(
+                1L,
+                validProductLikeCount,
+            )
 
             // assert
             assertAll(
@@ -68,7 +73,10 @@ class ProductLikeCountEntityTest {
         fun increasesLikeCount() {
             // arrange
             val initialProductLikeCount = 0
-            val productLikeCountEntity = aProductLikeCount().productLikeCount(initialProductLikeCount).build()
+            val productLikeCountEntity = ProductLikeCountEntity(
+                1L,
+                initialProductLikeCount,
+            )
 
             // act
             productLikeCountEntity.increaseProductLikeCount()
@@ -82,7 +90,10 @@ class ProductLikeCountEntityTest {
         fun decreasesLikeCount() {
             // arrange
             val initialProductLikeCount = 1
-            val productLikeCountEntity = aProductLikeCount().productLikeCount(initialProductLikeCount).build()
+            val productLikeCountEntity = ProductLikeCountEntity(
+                1L,
+                initialProductLikeCount,
+            )
 
             // act
             productLikeCountEntity.decreaseProductLikeCount()
@@ -96,7 +107,10 @@ class ProductLikeCountEntityTest {
         fun doesNotDecreaseLikeCountBelowZero() {
             // arrange
             val initialProductLikeCount = 0
-            val productLikeCountEntity = aProductLikeCount().productLikeCount(initialProductLikeCount).build()
+            val productLikeCountEntity = ProductLikeCountEntity(
+                1L,
+                initialProductLikeCount,
+            )
 
             // act
             productLikeCountEntity.decreaseProductLikeCount()

@@ -1,7 +1,7 @@
-package com.loopers.infrastructure.product
+package com.loopers.infrastructure.productlike
 
-import com.loopers.domain.product.ProductLikeEntity
-import com.loopers.domain.product.ProductLikeRepository
+import com.loopers.domain.productlike.ProductLikeEntity
+import com.loopers.domain.productlike.ProductLikeRepository
 import org.springframework.stereotype.Repository
 
 @Repository

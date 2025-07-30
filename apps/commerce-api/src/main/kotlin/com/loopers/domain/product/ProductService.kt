@@ -9,18 +9,17 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 
 @Service
 class ProductService(
     private val productRepository: ProductRepository,
 ) {
     @Transactional
-    fun createProduct(product: ProductEntity): ProductEntity {
-        productRepository.findByBrandIdAndName(product.brandId, product.name)?.let {
-            throw CoreException(ErrorType.CONFLICT, "이미 존재하는 상품입니다: ${product.name}")
+    fun createProduct(command: ProductCommand.Create): ProductEntity {
+        productRepository.findByBrandIdAndName(command.brandId, command.name)?.let {
+            throw CoreException(ErrorType.CONFLICT, "이미 존재하는 상품입니다: ${command.name}")
         }
-        return productRepository.createProduct(product)
+        return productRepository.createProduct(command.toEntity())
     }
 
     @Transactional(readOnly = true)
@@ -40,13 +39,13 @@ class ProductService(
 
             condition.minPrice?.let {
                 predicates.add(
-                    cb.greaterThanOrEqualTo(root.get<Price>("price").get("value"), it)
+                    cb.greaterThanOrEqualTo(root.get<Price>("price").get("value"), it),
                 )
             }
 
             condition.maxPrice?.let {
                 predicates.add(
-                    cb.lessThanOrEqualTo(root.get<Price>("price").get("value"), it)
+                    cb.lessThanOrEqualTo(root.get<Price>("price").get("value"), it),
                 )
             }
 

@@ -1,11 +1,15 @@
 package com.loopers.domain.brand
 
-import com.loopers.domain.brand.BrandEntityFixture.Companion.aBrand
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
@@ -32,37 +36,43 @@ class BrandServiceIntegrationTest @Autowired constructor(
     inner class Create {
         @DisplayName("브랜드명이 중복될 경우, 브랜드 등록에 실패한다.")
         @Test
-        fun failsToCreateBrand_whenBrandNameIsDuplicate() {
+        fun failsToCreateBrand_whenBrandNameAIsDuplicate() {
             // arrange
-            val brandEntity = aBrand().build()
-            brandService.createBrand(brandEntity)
+            val brandCreateCommand = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            brandService.createBrand(brandCreateCommand)
 
             // act
             val exception = assertThrows<CoreException> {
-                brandService.createBrand(brandEntity)
+                brandService.createBrand(brandCreateCommand)
             }
 
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.CONFLICT) },
-                { assertThat(exception.message).contains("이미 존재하는 브랜드입니다: ${brandEntity.name}") },
+                { assertThat(exception.message).contains("이미 존재하는 브랜드입니다: ${brandCreateCommand.name}") },
             )
         }
 
         @DisplayName("브랜드명, 브랜드상태가 올바른 경우 브랜드를 등록한다.")
         @Test
-        fun createsBrand_whenBrandNameAndStatusAreValid() {
+        fun createsBrand_whenBrandNameAAndStatusAreValid() {
             // arrange
-            val brandEntity = aBrand().build()
+            val brandCreateCommand = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
 
             // act
-            val createdBrand = brandService.createBrand(brandEntity)
+            val createdBrand = brandService.createBrand(brandCreateCommand)
 
             // assert
             assertAll(
                 { assertThat(createdBrand.id).isNotNull() },
-                { assertThat(createdBrand.name).isEqualTo(brandEntity.name) },
-                { assertThat(createdBrand.status).isEqualTo(brandEntity.status) },
+                { assertThat(createdBrand.name).isEqualTo(brandCreateCommand.name) },
+                { assertThat(createdBrand.status).isEqualTo(brandCreateCommand.status) },
             )
         }
     }
@@ -85,10 +95,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenPageNumberAndSizeAreValid() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            brandService.createBrand(brandCreateCommand1)
+            brandService.createBrand(brandCreateCommand2)
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -98,10 +114,10 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(2) },
                 { assertThat(brandsPage.content).hasSize(2) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand1.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand2.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand2.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(brandCreateCommand1.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(brandCreateCommand1.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(brandCreateCommand2.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(brandCreateCommand2.status) },
             )
         }
 
@@ -109,14 +125,26 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenSearchingByPartialName() {
             // arrange
-            val brand1 = aBrand().name("브랜드AAB").build()
-            val brand2 = aBrand().name("브랜드BA").build()
-            val brand3 = aBrand().name("브랜드ABB").build()
-            val brand4 = aBrand().name("브랜드aba").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
-            brandService.createBrand(brand3)
-            brandService.createBrand(brand4)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드AAB",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드BA",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand3 = BrandCommand.Create(
+                "브랜드ABB",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand4 = BrandCommand.Create(
+                "브랜드aba",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            brandService.createBrand(brandCreateCommand1)
+            brandService.createBrand(brandCreateCommand2)
+            brandService.createBrand(brandCreateCommand3)
+            brandService.createBrand(brandCreateCommand4)
 
             // act
             val condition = BrandSearchCondition(name = "브랜드A")
@@ -127,12 +155,12 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(3) },
                 { assertThat(brandsPage.content).hasSize(3) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand1.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand3.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand3.status) },
-                { assertThat(brandsPage.content[2].name).isEqualTo(brand4.name) },
-                { assertThat(brandsPage.content[2].status).isEqualTo(brand4.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(brandCreateCommand1.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(brandCreateCommand1.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(brandCreateCommand3.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(brandCreateCommand3.status) },
+                { assertThat(brandsPage.content[2].name).isEqualTo(brandCreateCommand4.name) },
+                { assertThat(brandsPage.content[2].status).isEqualTo(brandCreateCommand4.status) },
             )
         }
 
@@ -140,10 +168,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenFilteringByStatus() {
             // arrange
-            val activeBrand = aBrand().name("활성브랜드").status(BrandEntity.BrandStatusType.ACTIVE).build()
-            val inactiveBrand = aBrand().name("비활성브랜드").status(BrandEntity.BrandStatusType.INACTIVE).build()
-            brandService.createBrand(activeBrand)
-            brandService.createBrand(inactiveBrand)
+            val activeBrandCreateCommand = BrandCommand.Create(
+                "활성브랜드",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val inactiveBrandCreateCommand = BrandCommand.Create(
+                "비활성브랜드",
+                BrandEntity.BrandStatusType.INACTIVE,
+            )
+            val activeBrand = brandService.createBrand(activeBrandCreateCommand)
+            brandService.createBrand(inactiveBrandCreateCommand)
 
             // act
             val condition = BrandSearchCondition(status = BrandEntity.BrandStatusType.ACTIVE)
@@ -163,10 +197,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsEmptyList_whenNoBrandsMatchName() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            brandService.createBrand(brandCreateCommand1)
+            brandService.createBrand(brandCreateCommand2)
 
             // act
             val condition = BrandSearchCondition(name = "브랜드C")
@@ -184,10 +224,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByNameAsc() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
+            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
 
             // act
             val condition = BrandSearchCondition()
@@ -198,10 +244,10 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(2) },
                 { assertThat(brandsPage.content).hasSize(2) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand1.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand2.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand2.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(createdBrand1.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(createdBrand1.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(createdBrand2.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(createdBrand2.status) },
             )
         }
 
@@ -209,10 +255,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByNameDesc() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
+            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
 
             // act
             val condition = BrandSearchCondition()
@@ -223,10 +275,10 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(2) },
                 { assertThat(brandsPage.content).hasSize(2) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand2.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand2.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand1.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(createdBrand2.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(createdBrand2.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(createdBrand1.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(createdBrand1.status) },
             )
         }
 
@@ -234,10 +286,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByCreatedAtAsc() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
+            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
 
             // act
             val condition = BrandSearchCondition()
@@ -248,10 +306,10 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(2) },
                 { assertThat(brandsPage.content).hasSize(2) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand1.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand2.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand2.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(createdBrand1.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(createdBrand1.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(createdBrand2.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(createdBrand2.status) },
             )
         }
 
@@ -259,10 +317,16 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByCreatedAtDesc() {
             // arrange
-            val brand1 = aBrand().name("브랜드A").build()
-            val brand2 = aBrand().name("브랜드B").build()
-            brandService.createBrand(brand1)
-            brandService.createBrand(brand2)
+            val brandCreateCommand1 = BrandCommand.Create(
+                "브랜드A",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val brandCreateCommand2 = BrandCommand.Create(
+                "브랜드B",
+                BrandEntity.BrandStatusType.ACTIVE,
+            )
+            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
+            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
 
             // act
             val condition = BrandSearchCondition()
@@ -273,10 +337,10 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(brandsPage.totalElements).isEqualTo(2) },
                 { assertThat(brandsPage.content).hasSize(2) },
-                { assertThat(brandsPage.content[0].name).isEqualTo(brand2.name) },
-                { assertThat(brandsPage.content[0].status).isEqualTo(brand2.status) },
-                { assertThat(brandsPage.content[1].name).isEqualTo(brand1.name) },
-                { assertThat(brandsPage.content[1].status).isEqualTo(brand1.status) },
+                { assertThat(brandsPage.content[0].name).isEqualTo(createdBrand2.name) },
+                { assertThat(brandsPage.content[0].status).isEqualTo(createdBrand2.status) },
+                { assertThat(brandsPage.content[1].name).isEqualTo(createdBrand1.name) },
+                { assertThat(brandsPage.content[1].status).isEqualTo(createdBrand1.status) },
             )
         }
 
@@ -309,8 +373,12 @@ class BrandServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsBrand_whenBrandExists() {
             // arrange
-            val brandEntity = aBrand().build()
-            val createdBrand = brandService.createBrand(brandEntity)
+            val createdBrand = brandService.createBrand(
+                BrandCommand.Create(
+                    "브랜드A",
+                    BrandEntity.BrandStatusType.ACTIVE,
+                ),
+            )
 
             // act
             val findBrand = brandService.findBrandBy(createdBrand.id)

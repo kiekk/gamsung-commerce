@@ -1,6 +1,5 @@
 package com.loopers.domain.user
 
-import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
 import com.loopers.support.error.CoreException
@@ -46,12 +45,18 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun savesUser_whenSigningUp() {
             // arrange
-            val userEntity = aUser().build()
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
             val spyUserRepository = spy(UserRepositoryImpl(userJpaRepository))
             val userServiceWithSpy = UserService(spyUserRepository)
 
             // act
-            userServiceWithSpy.save(userEntity)
+            val userEntity = userServiceWithSpy.save(userSignUpCommand)
 
             // assert
             verify(spyUserRepository, times(1)).save(userEntity)
@@ -61,12 +66,18 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun failsToSignUp_whenUserIdAlreadyExists() {
             // arrange
-            val existingUser = aUser().build()
-            userService.save(existingUser)
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            userService.save(userSignUpCommand)
 
             // act
             val exception = assertThrows<CoreException> {
-                userService.save(existingUser)
+                userService.save(userSignUpCommand)
             }
 
             // assert
@@ -87,19 +98,25 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsMyInfo_whenRequestingMyInfo() {
             // arrange
-            val userEntity = aUser().build()
-            userService.save(userEntity)
+            val userSignUpCommand = UserCommand.Create(
+                "userId123",
+                "soono",
+                "shyoon991@gmail.com",
+                "2000-01-01",
+                UserEntity.GenderType.M,
+            )
+            val createdUser = userService.save(userSignUpCommand)
 
             // act
-            val myInfo = userService.getUserByUserId(userEntity.userId)
+            val myInfo = userService.findUserBy(createdUser.userId)
 
             // assert
             assertThat(myInfo).isNotNull
-            assertThat(myInfo?.userId).isEqualTo(userEntity.userId)
-            assertThat(myInfo?.name).isEqualTo(userEntity.name)
-            assertThat(myInfo?.email).isEqualTo(userEntity.email)
-            assertThat(myInfo?.birthday).isEqualTo(userEntity.birthday)
-            assertThat(myInfo?.gender).isEqualTo(userEntity.gender)
+            assertThat(myInfo?.userId).isEqualTo(createdUser.userId)
+            assertThat(myInfo?.name).isEqualTo(createdUser.name)
+            assertThat(myInfo?.email).isEqualTo(createdUser.email)
+            assertThat(myInfo?.birthday).isEqualTo(createdUser.birthday)
+            assertThat(myInfo?.gender).isEqualTo(createdUser.gender)
         }
 
         @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
@@ -109,7 +126,7 @@ class UserServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "nonExistentUser"
 
             // act
-            val myInfo = userService.getUserByUserId(nonExistentUserId)
+            val myInfo = userService.findUserBy(nonExistentUserId)
 
             // assert
             assertThat(myInfo).isNull()

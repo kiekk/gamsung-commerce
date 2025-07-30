@@ -15,19 +15,19 @@ class BrandService(
 ) {
 
     @Transactional
-    fun createBrand(brand: BrandEntity): BrandEntity {
-        brandRepository.findByName(brand.name)?.let {
+    fun createBrand(command: BrandCommand.Create): BrandEntity {
+        brandRepository.findByName(command.name)?.let {
             throw CoreException(
                 ErrorType.CONFLICT,
-                "이미 존재하는 브랜드입니다: ${brand.name}",
+                "이미 존재하는 브랜드입니다: ${command.name}",
             )
         }
-        return brandRepository.save(brand)
+        return brandRepository.save(command.toEntity())
     }
 
     @Transactional(readOnly = true)
     fun searchBrands(
-        condition: BrandSearchCondition, pageRequest: PageRequest
+        condition: BrandSearchCondition, pageRequest: PageRequest,
     ): Page<BrandEntity> {
         val spec = Specification<BrandEntity> { root, query, cb ->
             val predicates = mutableListOf<Predicate>()

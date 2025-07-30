@@ -8,17 +8,17 @@ class UserService(
     private val userRepository: UserRepository,
 ) {
     @Transactional
-    fun save(userEntity: UserEntity): UserEntity {
-        return userRepository.save(userEntity)
+    fun save(command: UserCommand.Create): UserEntity {
+        return userRepository.save(command.toEntity())
     }
 
     @Transactional(readOnly = true)
-    fun getUserById(id: Long): UserEntity? {
+    fun findUserBy(id: Long): UserEntity? {
         return userRepository.findById(id)
     }
 
     @Transactional(readOnly = true)
-    fun getUserByUserId(userId: String): UserEntity? {
+    fun findUserBy(userId: String): UserEntity? {
         return userRepository.findByUserId(userId)
     }
 }

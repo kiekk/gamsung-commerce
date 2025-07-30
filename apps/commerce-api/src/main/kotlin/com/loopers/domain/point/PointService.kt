@@ -8,9 +8,9 @@ class PointService(
     private val pointRepository: PointRepository,
 ) {
     @Transactional
-    fun chargePoint(userId: String, point: Long): PointEntity {
-        val pointEntity = pointRepository.findByUserId(userId) ?: PointEntity(userId, 0L)
-        pointEntity.chargePoint(point)
+    fun chargePoint(command: PointCommand.Charge): PointEntity {
+        val pointEntity = pointRepository.findByUserId(command.userId) ?: PointEntity(command.userId, 0L)
+        pointEntity.chargePoint(command.point)
         return pointRepository.save(pointEntity)
     }
 
