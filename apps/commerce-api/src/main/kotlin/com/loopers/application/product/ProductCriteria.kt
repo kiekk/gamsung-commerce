@@ -3,6 +3,7 @@ package com.loopers.application.product
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.vo.Price
+import java.math.BigDecimal
 
 class ProductCriteria {
     data class Create(

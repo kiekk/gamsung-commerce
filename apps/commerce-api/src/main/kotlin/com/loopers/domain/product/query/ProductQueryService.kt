@@ -53,7 +53,7 @@ class ProductQueryService(
                     product.status,
                     brand.name,
                     likeCount.productLikeCount,
-                    product.createdAt.stringValue()
+                    product.createdAt
                 )
             )
             .from(product)

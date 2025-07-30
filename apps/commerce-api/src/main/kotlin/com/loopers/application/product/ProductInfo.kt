@@ -2,9 +2,11 @@ package com.loopers.application.product
 
 import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.product.ProductEntity
+import com.loopers.domain.product.query.ProductListViewModel
 import com.loopers.domain.productlike.ProductLikeCountEntity
 import com.loopers.domain.stock.StockEntity
 import com.loopers.domain.vo.Price
+import java.time.ZonedDateTime
 
 class ProductInfo {
 
@@ -49,6 +51,30 @@ class ProductInfo {
                     product.status,
                     product.price,
                     productLikeCountEntity?.productLikeCount ?: 0,
+                )
+            }
+        }
+    }
+
+    data class ProductList(
+        val id: Long,
+        val productName: String,
+        val productPrice: Long,
+        val productStatus: ProductEntity.ProductStatusType,
+        val brandName: String,
+        val productLikeCount: Int,
+        val createdAt: ZonedDateTime,
+    ) {
+        companion object {
+            fun from(productListViewModel: ProductListViewModel): ProductList {
+                return ProductList(
+                    productListViewModel.id,
+                    productListViewModel.name,
+                    productListViewModel.price,
+                    productListViewModel.productStatus,
+                    productListViewModel.brandName,
+                    productListViewModel.productLikeCount,
+                    productListViewModel.createdAt,
                 )
             }
         }

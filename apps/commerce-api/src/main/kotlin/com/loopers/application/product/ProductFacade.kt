@@ -2,17 +2,23 @@ package com.loopers.application.product
 
 import com.loopers.domain.brand.BrandService
 import com.loopers.domain.product.ProductService
+import com.loopers.domain.product.query.ProductQueryService
+import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
 class ProductFacade(
     private val productService: ProductService,
+    private val productQueryService: ProductQueryService,
     private val stockService: StockService,
     private val brandService: BrandService,
     private val productLikeService: ProductLikeService,
@@ -34,5 +40,14 @@ class ProductFacade(
         )
         val productLikeCount = productLikeService.getProductLikeCount(product.id)
         return ProductInfo.ProductDetail.from(product, brand, productLikeCount)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchProducts(condition: ProductSearchCondition, pageable: Pageable): Page<ProductInfo.ProductList> {
+        val searchProductsPage = productQueryService.searchProducts(condition, pageable)
+        val productList = searchProductsPage.content.map { productListViewModel ->
+            ProductInfo.ProductList.from(productListViewModel)
+        }
+        return PageImpl(productList, pageable, searchProductsPage.totalElements)
     }
 }
