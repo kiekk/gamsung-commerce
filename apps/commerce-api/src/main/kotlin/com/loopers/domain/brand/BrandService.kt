@@ -27,7 +27,8 @@ class BrandService(
 
     @Transactional(readOnly = true)
     fun searchBrands(
-        condition: BrandSearchCondition, pageRequest: PageRequest,
+        condition: BrandSearchCondition,
+        pageRequest: PageRequest,
     ): Page<BrandEntity> {
         val spec = Specification<BrandEntity> { root, query, cb ->
             val predicates = mutableListOf<Predicate>()
@@ -49,5 +50,4 @@ class BrandService(
     fun findBrandBy(brandId: Long): BrandEntity? {
         return brandRepository.findById(brandId)
     }
-
 }

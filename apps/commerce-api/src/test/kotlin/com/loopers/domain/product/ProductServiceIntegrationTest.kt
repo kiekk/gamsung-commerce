@@ -30,7 +30,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 같은 브랜드 내에서 상품명이 중복될 경우, 상품 등록에 실패한다.
     - [ ] 브랜드가 다를 경우 상품명이 동일해도 상품을 등록할 수 있다.
     - [ ] 상품명, 설명, 가격, 상품 상태가 유효한 경우, 상품을 등록한다.
@@ -131,7 +131,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 상품 ID에 해당하는 상품이 존재하지 않을 경우, null을 반환한다.
     - [ ] 상품 ID에 해당하는 상품이 존재할 경우, 해당 상품을 반환한다.
      */

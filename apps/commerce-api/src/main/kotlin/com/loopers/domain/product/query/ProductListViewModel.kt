@@ -12,5 +12,4 @@ data class ProductListViewModel @QueryProjection constructor(
     val brandName: String,
     val productLikeCount: Int,
     val createdAt: ZonedDateTime,
-) {
-}
+)

@@ -3,7 +3,6 @@ package com.loopers.domain.product.query
 import com.loopers.domain.brand.BrandRepository
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
 import com.loopers.domain.product.ProductRepository
-import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.productlike.ProductLikeCountRepository
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture.Companion.aProductLikeCount
@@ -36,7 +35,7 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 상품 목록은 페이지 번호와 페이지 크기를 기준으로 조회할 수 있다.
     - [ ] 상품 목록은 상품명으로 부분 일치 (Like) 검색할 수 있으며 대소문자를 구분하지 않는다.
     - [ ] 상품 목록은 가격 범위로 검색할 수 있다.
@@ -269,5 +268,4 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
             )
         }
     }
-
 }

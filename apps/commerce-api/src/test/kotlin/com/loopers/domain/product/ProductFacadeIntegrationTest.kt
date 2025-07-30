@@ -39,7 +39,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
 
     - [ ] 상품 등록 시 재고 수량을 입력하면 재고 수량은 입력한 수량으로 설정된다.
     - [ ] 상품 등록 시 재고 수량을 입력하지 않으면 재고 수량은 0으로 설정된다.
@@ -96,14 +96,13 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { assertThat(productInfo.price).isEqualTo(productCreateCriteria.price) },
                 { assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
                 { assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
-                { assertThat(productInfo.stockQuantity).isEqualTo(0) }, // 재고 수량이 0으로 설정됨
+                { assertThat(productInfo.stockQuantity).isEqualTo(0) },
             )
         }
-
     }
 
     /*
-    **🔗 통합 테스트**
+     **🔗 통합 테스트**
     - [ ] 상품 조회 시 상품 정보가 없으면 예외가 발생한다.
     - [ ] 상품 조회 시 브랜드 정보가 없으면 예외가 발생한다.
     - [ ] 상품은 상품 ID, 상품명, 브랜드명, 상품 가격, 상품 상태, 상품 좋아요 수 정보가 포함된다.
@@ -171,7 +170,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 상품 목록은 페이지 번호와 페이지 크기를 기준으로 조회할 수 있다.
     - [ ] 상품 목록은 상품명으로 부분 일치 (Like) 검색할 수 있으며 대소문자를 구분하지 않는다.
     - [ ] 상품 목록은 가격 범위로 검색할 수 있다.

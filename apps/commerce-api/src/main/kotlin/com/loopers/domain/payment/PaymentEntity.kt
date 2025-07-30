@@ -19,7 +19,7 @@ class PaymentEntity(
     enum class PaymentStatusType {
         PENDING,
         COMPLETED,
-        FAILED
+        FAILED,
     }
 
     enum class PaymentMethodType {

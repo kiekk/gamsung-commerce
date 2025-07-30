@@ -11,5 +11,4 @@ data class OrderCustomer(
     val email: Email,
     val mobile: Mobile,
     val address: Address,
-) {
-}
+)

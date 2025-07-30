@@ -15,5 +15,4 @@ import jakarta.persistence.UniqueConstraint
 class ProductLikeEntity(
     val userId: Long,
     val productId: Long,
-) : BaseEntity() {
-}
+) : BaseEntity()

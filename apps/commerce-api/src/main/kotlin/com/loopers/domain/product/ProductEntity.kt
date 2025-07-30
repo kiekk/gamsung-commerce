@@ -20,7 +20,7 @@ class ProductEntity(
     enum class ProductStatusType {
         ACTIVE,
         INACTIVE,
-        DELETED
+        DELETED,
     }
 
     init {

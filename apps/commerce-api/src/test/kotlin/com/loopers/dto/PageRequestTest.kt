@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest
 
 class PageRequestTest {
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 페이지 번호가 음수일 경우 예외가 발생한다.
     - [ ] 페이지 크기가 0 이하일 경우 예외가 발생한다.
      */

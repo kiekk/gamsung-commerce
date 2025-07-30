@@ -23,5 +23,4 @@ class ProductLikeRepositoryImpl(
     override fun findByUserId(userId: Long): List<ProductLikeEntity> {
         return productLikeJpaRepository.findByUserId(userId)
     }
-
 }

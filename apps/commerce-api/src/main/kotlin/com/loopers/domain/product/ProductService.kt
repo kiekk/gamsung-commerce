@@ -21,5 +21,4 @@ class ProductService(
     fun findProductBy(id: Long): ProductEntity? {
         return productRepository.findById(id)
     }
-
 }

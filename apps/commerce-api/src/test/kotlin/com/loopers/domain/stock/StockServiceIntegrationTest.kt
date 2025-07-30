@@ -26,7 +26,7 @@ class StockServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 유효한 상품 ID와 재고 수량이 주어지면 재고 등록에 성공한다.
      */
     @DisplayName("재고를 등록할 때, ")
