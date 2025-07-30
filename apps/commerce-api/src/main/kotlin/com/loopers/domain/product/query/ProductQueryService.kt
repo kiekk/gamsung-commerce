@@ -1,7 +1,7 @@
 package com.loopers.domain.product.query
 
 import com.loopers.domain.brand.QBrandEntity
-import com.loopers.domain.product.ProductSearchCondition
+import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.product.QProductEntity
 import com.loopers.domain.productlike.QProductLikeCountEntity
 import com.querydsl.core.types.dsl.BooleanExpression

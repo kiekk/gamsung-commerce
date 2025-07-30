@@ -3,7 +3,7 @@ package com.loopers.domain.product.query
 import com.loopers.domain.brand.BrandRepository
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
 import com.loopers.domain.product.ProductRepository
-import com.loopers.domain.product.ProductSearchCondition
+import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.productlike.ProductLikeCountRepository
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture.Companion.aProductLikeCount
