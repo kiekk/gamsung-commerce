@@ -1,5 +1,6 @@
 package com.loopers.domain.payment
 
+import com.loopers.domain.payment.fixture.PaymentEntityFixture.Companion.aPayment
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
@@ -22,8 +23,9 @@ class PaymentItemEntityTest {
         @Test
         fun createPaymentItemEntityWithPendingStatus() {
             // arrange
+            val payment = aPayment().build()
             val paymentItem = PaymentItemEntity(
-                1L,
+                payment,
                 1L,
                 Price(1000L),
             )
@@ -36,8 +38,9 @@ class PaymentItemEntityTest {
         @Test
         fun completePaymentItemEntity() {
             // arrange
+            val payment = aPayment().build()
             val paymentItem = PaymentItemEntity(
-                1L,
+                payment,
                 1L,
                 Price(1000L),
             )
@@ -53,8 +56,9 @@ class PaymentItemEntityTest {
         @Test
         fun failPaymentItemEntity() {
             // arrange
+            val payment = aPayment().build()
             val paymentItem = PaymentItemEntity(
-                1L,
+                payment,
                 1L,
                 Price(1000L),
             )
@@ -70,19 +74,19 @@ class PaymentItemEntityTest {
         @Test
         fun createPaymentItemEntityWithCorrectValues() {
             // arrange
-            val paymentId = 1L
+            val payment = aPayment().build()
             val orderItemId = 1L
             val amount = Price(1000L)
 
             // act
             val paymentItem = PaymentItemEntity(
-                paymentId,
+                payment,
                 orderItemId,
                 amount,
             )
 
             // assert
-            assertThat(paymentItem.paymentId).isEqualTo(paymentId)
+            assertThat(paymentItem.payment.id).isEqualTo(payment.id)
             assertThat(paymentItem.orderItemId).isEqualTo(orderItemId)
             assertThat(paymentItem.amount).isEqualTo(amount)
         }

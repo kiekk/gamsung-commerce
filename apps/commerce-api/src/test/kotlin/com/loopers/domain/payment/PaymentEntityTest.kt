@@ -1,6 +1,6 @@
 package com.loopers.domain.payment
 
-import com.loopers.domain.payment.vo.PaymentItems
+import com.loopers.domain.payment.fixture.PaymentEntityFixture.Companion.aPayment
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -22,55 +22,59 @@ class PaymentEntityTest {
         @Test
         fun totalAmountMatchesPaymentItems() {
             // arrange
-            val paymentItem1 = PaymentItemEntity(1L, 1L, Price(1000L))
-            val paymentItem2 = PaymentItemEntity(2L, 2L, Price(2000L))
+            val payment = aPayment().build()
+            val paymentItem1 = PaymentItemEntity(payment, 1L, Price(1000L))
+            val paymentItem2 = PaymentItemEntity(payment, 2L, Price(2000L))
 
             // act
-            val paymentEntity = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT, PaymentItems(listOf(paymentItem1, paymentItem2)))
+            payment.addItems(listOf(paymentItem1, paymentItem2))
 
             // assert
-            assertThat(paymentEntity.totalAmount).isEqualTo(Price(3000L))
+            assertThat(payment.totalAmount).isEqualTo(Price(3000L))
         }
 
         @DisplayName("결제 정보를 생성하면 상태는 PENDING로 초기화된다.")
         @Test
         fun initialStatusIsPending() {
             // arrange
-            val paymentItem = PaymentItemEntity(1L, 1L, Price(1000L))
+            val payment = aPayment().build()
+            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
 
             // act
-            val paymentEntity = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT, PaymentItems(listOf(paymentItem)))
+            payment.addItems(listOf(paymentItem))
 
             // assert
-            assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.PENDING)
+            assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.PENDING)
         }
 
         @DisplayName("결제 완료 처리 시 상태는 COMPLETED로 변경된다.")
         @Test
         fun completePaymentChangesStatusToCompleted() {
             // arrange
-            val paymentItem = PaymentItemEntity(1L, 1L, Price(1000L))
-            val paymentEntity = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT, PaymentItems(listOf(paymentItem)))
+            val payment = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT)
+            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
+            payment.addItems(listOf(paymentItem))
 
             // act
-            paymentEntity.status = PaymentEntity.PaymentStatusType.COMPLETED
+            payment.complete()
 
             // assert
-            assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.COMPLETED)
+            assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.COMPLETED)
         }
 
         @DisplayName("결제 실패 처리 시 상태는 FAILED로 변경된다.")
         @Test
         fun failPaymentChangesStatusToFailed() {
             // arrange
-            val paymentItem = PaymentItemEntity(1L, 1L, Price(1000L))
-            val paymentEntity = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT, PaymentItems(listOf(paymentItem)))
+            val payment = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT)
+            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
+            payment.addItems(listOf(paymentItem))
 
             // act
-            paymentEntity.status = PaymentEntity.PaymentStatusType.FAILED
+            payment.fail()
 
             // assert
-            assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.FAILED)
+            assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.FAILED)
         }
     }
 }
