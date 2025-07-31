@@ -11,11 +11,13 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ProductQueryService(
     private val queryFactory: JPAQueryFactory,
 ) {
+    @Transactional(readOnly = true)
     fun searchProducts(condition: ProductSearchCondition, pageable: Pageable): Page<ProductListViewModel> {
         val product = QProductEntity.productEntity
         val brand = QBrandEntity.brandEntity
