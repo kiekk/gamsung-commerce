@@ -1,10 +1,10 @@
-package com.loopers.domain.productlike
+package com.loopers.application.productlike
 
-import com.loopers.application.productlike.ProductLikeCriteria
-import com.loopers.application.productlike.ProductLikeFacade
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductService
+import com.loopers.domain.productlike.ProductLikeCommand
+import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.user.UserCommand
 import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService
@@ -12,7 +12,7 @@ import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -67,8 +67,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { Assertions.assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -94,8 +94,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId") },
+                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                {
+                    Assertions.assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
+                },
             )
         }
 
@@ -128,10 +130,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
             val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
             assertAll(
-                { assertThat(productLikes).hasSize(1) },
-                { assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
-                { assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
-                { assertThat(productLikeCount?.productLikeCount).isEqualTo(1) },
+                { Assertions.assertThat(productLikes).hasSize(1) },
+                { Assertions.assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
+                { Assertions.assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
+                { Assertions.assertThat(productLikeCount?.productLikeCount).isEqualTo(1) },
             )
         }
     }
@@ -166,8 +168,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { Assertions.assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -192,8 +194,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId") },
+                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                {
+                    Assertions.assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
+                },
             )
         }
 
@@ -230,8 +234,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
             val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
             assertAll(
-                { assertThat(productLikes).isEmpty() },
-                { assertThat(productLikeCount?.productLikeCount).isEqualTo(0) },
+                { Assertions.assertThat(productLikes).isEmpty() },
+                { Assertions.assertThat(productLikeCount?.productLikeCount).isEqualTo(0) },
             )
         }
     }
