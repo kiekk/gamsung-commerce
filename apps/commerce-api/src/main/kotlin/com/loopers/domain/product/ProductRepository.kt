@@ -12,4 +12,6 @@ interface ProductRepository {
     fun findById(id: Long): ProductEntity?
 
     fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest): Page<ProductEntity>
+
+    fun findByIds(productIds: List<Long>): List<ProductEntity>
 }

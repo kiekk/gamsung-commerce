@@ -26,4 +26,8 @@ class ProductRepositoryImpl(
     override fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest): Page<ProductEntity> {
         return productJpaRepository.findAll(spec, pageRequest)
     }
+
+    override fun findByIds(productIds: List<Long>): List<ProductEntity> {
+        return productJpaRepository.findAllById(productIds)
+    }
 }

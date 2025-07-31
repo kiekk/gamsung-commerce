@@ -1,6 +1,7 @@
 package com.loopers.domain.stock
 
 import com.loopers.domain.BaseEntity
+import com.loopers.domain.order.vo.Quantity
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 
@@ -23,5 +24,9 @@ class StockEntity(
     fun deductQuantity(quantity: Int) {
         require(!isQuantityLessThan(quantity)) { "차감할 재고 수량이 없습니다." }
         this.quantity -= quantity
+    }
+
+    fun invalidQuantity(quantity: Quantity) : Boolean {
+        return this.quantity < quantity.value
     }
 }

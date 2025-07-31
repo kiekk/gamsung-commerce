@@ -21,4 +21,9 @@ class ProductService(
     fun findProductBy(id: Long): ProductEntity? {
         return productRepository.findById(id)
     }
+
+    @Transactional(readOnly = true)
+    fun getProductsByIds(productIds: List<Long>) : List<ProductEntity> {
+        return productRepository.findByIds(productIds)
+    }
 }
