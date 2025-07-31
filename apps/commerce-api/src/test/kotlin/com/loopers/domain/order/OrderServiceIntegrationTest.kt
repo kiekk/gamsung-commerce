@@ -32,7 +32,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
         @Test
         fun calculatesTotalAmount_whenOrderIsCreated() {
             // arrange
-            val createdProduct = productRepository.createProduct(aProduct().build())
+            val createdProduct = productRepository.save(aProduct().build())
             val orderCommand = OrderCommand.Create(
                 1L,
                 "홍길동",

@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 
 interface ProductRepository {
-    fun createProduct(product: ProductEntity): ProductEntity
+    fun save(product: ProductEntity): ProductEntity
 
     fun findByBrandIdAndName(brandId: Long, name: String): ProductEntity?
 

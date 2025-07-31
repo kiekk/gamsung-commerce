@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 class ProductRepositoryImpl(
     private val productJpaRepository: ProductJpaRepository,
 ) : ProductRepository {
-    override fun createProduct(product: ProductEntity): ProductEntity {
+    override fun save(product: ProductEntity): ProductEntity {
         return productJpaRepository.save(product)
     }
 
