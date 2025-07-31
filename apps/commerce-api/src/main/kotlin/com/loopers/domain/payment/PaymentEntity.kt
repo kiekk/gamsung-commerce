@@ -3,6 +3,7 @@ package com.loopers.domain.payment
 import com.loopers.domain.BaseEntity
 import com.loopers.domain.payment.vo.PaymentItems
 import com.loopers.domain.vo.Price
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -17,7 +18,7 @@ class PaymentEntity(
     val orderId: Long,
     @Enumerated(EnumType.STRING)
     val method: PaymentMethodType,
-    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "payment", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private val _paymentItems: MutableList<PaymentItemEntity> = mutableListOf(),
 ) : BaseEntity() {
     val paymentItems: PaymentItems
