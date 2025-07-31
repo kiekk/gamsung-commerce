@@ -43,7 +43,7 @@ class ProductQueryService(
                 "price" -> if (sort.isAscending) product.price.value.asc() else product.price.value.desc()
                 "createdAt" -> if (sort.isAscending) product.createdAt.asc() else product.createdAt.desc()
                 "likeCount" -> if (sort.isAscending) likeCount.productLikeCount.asc() else likeCount.productLikeCount.desc()
-                else -> null
+                else -> throw CoreException(ErrorType.BAD_REQUEST, "지원하지 않는 정렬 기준입니다: ${sort.property}")
             }
         }.toTypedArray()
 

@@ -7,6 +7,8 @@ import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduc
 import com.loopers.domain.productlike.ProductLikeCountRepository
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture.Companion.aProductLikeCount
 import com.loopers.domain.vo.Price
+import com.loopers.support.error.CoreException
+import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
@@ -46,6 +49,7 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
     - [ ] 상품 목록은 등록일 내림차순으로 정렬할 수 있다.
     - [ ] 상품 목록은 좋아요 수 오름차순으로 정렬할 수 있다.
     - [ ] 상품 목록은 좋아요 수 내림차순으로 정렬할 수 있다.
+    - [ ] 잘못된 정렬 조건이 주어질 경우 400 Bad Request 에러를 반환한다.
      */
     @DisplayName("상품을 검색할 때, ")
     @Nested
@@ -266,6 +270,26 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
                 { assertThat(productsPage.content[1].name).isEqualTo(createdProduct1.name) },
                 { assertThat(productsPage.content[1].productLikeCount).isEqualTo(createdProductLikeCount1.productLikeCount) },
             )
+        }
+
+        @DisplayName("잘못된 정렬 조건이 주어질 경우 400 Bad Request 에러를 반환한다.")
+        @Test
+        fun throwsBadRequest_whenInvalidSortCondition() {
+            // arrange
+            val createdBrand = brandRepository.save(aBrand().build())
+            productRepository.createProduct(aProduct().brandId(createdBrand.id).name("상품A").build())
+            productRepository.createProduct(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val invalidSortField = "invalidField"
+
+            // act
+            val pageRequest = PageRequest.of(0, 10, Sort.by(invalidSortField).ascending())
+
+            // assert
+            val exception = assertThrows<CoreException> {
+                productQueryService.searchProducts(ProductSearchCondition(), pageRequest)
+            }
+            assertThat(exception.errorType).isEqualTo(ErrorType.BAD_REQUEST)
+            assertThat(exception.message).contains("지원하지 않는 정렬 기준입니다: $invalidSortField")
         }
     }
 }
