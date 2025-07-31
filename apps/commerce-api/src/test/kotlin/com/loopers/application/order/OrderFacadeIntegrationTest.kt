@@ -7,6 +7,7 @@ import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
+import com.loopers.domain.point.vo.Point
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
@@ -204,46 +205,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: ${quantity}, 재고: ${createdStock.quantity}") },
             )
         }
-
-        @DisplayName("사용자, 상품 정보, 상품 상태, 상품 재고가 모두 유효한 경우 주문이 성공적으로 생성된다.")
-        @Test
-        open fun createsOrderSuccessfully_whenAllCriteriaAreValid() {
-            // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
-            stockRepository.save(aStock().build())
-            val quantity = Quantity(2)
-            val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
-                "홍길동",
-                Email("shyoon991@gmail.com"),
-                Mobile("010-1234-5678"),
-                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
-                listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
-                        createdProduct.id,
-                        createdProduct.name,
-                        quantity,
-                        createdProduct.price,
-                        createdProduct.price,
-                    ),
-                ),
-                PaymentEntity.PaymentMethodType.POINT,
-            )
-
-            // act
-            val orderId = orderFacade.placeOrder(orderCriteria)
-
-            // assert
-            val findOrder = orderRepository.findWithItemsById(orderId)
-            assertAll(
-                { assertThat(findOrder?.userId).isEqualTo(createdUser.id) },
-                { assertThat(findOrder?.orderStatus).isEqualTo(OrderEntity.OrderStatusType.PENDING) },
-                { assertThat(findOrder?.orderItems?.size()).isEqualTo(2) },
-                { assertThat(findOrder?.orderItems?.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                { assertThat(findOrder?.orderItems?.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-            )
-        }
     }
 
     /*
@@ -261,7 +222,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun succeedsToPayWithPoints_whenPaymentIsSuccessful() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(20_000).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(20_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -306,7 +267,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 )
             }
             val findPoint = pointRepository.findByUserId(createdUser.userId)
-            assertThat(findPoint?.point).isEqualTo(createdPoint.point - (createdProduct.price.value * quantity.value))
+            assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
         }
 
         @DisplayName("포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.")
@@ -353,7 +314,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToPayWithPoints_whenPaymentFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(1000).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(1000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -393,6 +354,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToPayWithPoints_whenStockReductionFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(10_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)

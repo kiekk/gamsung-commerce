@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.point
 
 import com.loopers.application.point.PointCriteria
+import com.loopers.domain.point.vo.Point
 import jakarta.validation.constraints.Min
 
 class PointV1Dto {
@@ -12,7 +13,7 @@ class PointV1Dto {
         fun toCriteria(userId: String): PointCriteria.Charge {
             return PointCriteria.Charge(
                 userId,
-                point,
+                Point(point),
             )
         }
     }

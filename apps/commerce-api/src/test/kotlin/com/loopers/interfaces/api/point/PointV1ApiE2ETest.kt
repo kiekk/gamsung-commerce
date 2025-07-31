@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.point
 
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
+import com.loopers.domain.point.vo.Point
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
@@ -73,7 +74,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             assertThat(response.statusCode.is2xxSuccessful).isTrue()
             assertThat(response.body?.data).isNotNull
             assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId)
-            assertThat(response.body?.data?.point).isEqualTo(pointEntity.point)
+            assertThat(response.body?.data?.point).isEqualTo(pointEntity.point.value)
         }
 
         @DisplayName("`X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.")
