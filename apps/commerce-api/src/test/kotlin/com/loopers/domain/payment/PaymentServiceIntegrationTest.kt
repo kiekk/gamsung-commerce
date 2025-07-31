@@ -24,9 +24,10 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
     /*
     **🔗 통합 테스트**
-    - [ ] 결제가 생성되면 결제 상태가 PENDING이다.
-    - [ ] 결제가 완료되면 결제 상태가 COMPLETED로 변경된다.
-    - [ ] 결제가 실패하면 결제 상태가 FAILED로 변경된다.
+    - [ ] 결제가 생성되면 결제, 결제 항목의 상태가 PENDING이다.
+    - [ ] 결제가 완료되면 결제, 결제 항목의 상태가 COMPLETED로 변경된다.
+    - [ ] 결제가 실패하면 결제, 결제 항목의 상태가 FAILED로 변경된다.
+    - [ ] 결제가 취소되면 결제, 결제 항목의 상태가 CANCELED로 변경된다.
     - [ ] 결제가 생성되면 결제 총 금액을 계산한다.
      */
     @DisplayName("결제를 생성할 때, ")
@@ -118,6 +119,36 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.FAILED) },
                 { assertThat(paymentEntity.paymentItems.isAllFailed()).isTrue() },
+            )
+        }
+
+        @DisplayName("결제가 취소되면 결제, 결제 항목의 상태가 CANCELED로 변경된다.")
+        @Test
+        fun paymentStatusIsCanceled_whenPaymentIsCanceled() {
+            // arrange
+            val command = PaymentCommand.Create(
+                1L,
+                PaymentEntity.PaymentMethodType.POINT,
+                listOf(
+                    PaymentCommand.Create.PaymentItemCommand(
+                        1L,
+                        Price(10_000),
+                    ),
+                    PaymentCommand.Create.PaymentItemCommand(
+                        2L,
+                        Price(20_000),
+                    ),
+                ),
+            )
+
+            // act
+            val paymentEntity = paymentService.createPayment(command)
+            paymentEntity.cancel()
+
+            // assert
+            assertAll(
+                { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.CANCELED) },
+                { assertThat(paymentEntity.paymentItems.isAllCanceled()).isTrue() },
             )
         }
 

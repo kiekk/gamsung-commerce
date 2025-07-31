@@ -26,6 +26,7 @@ class PaymentItemEntity(
         PENDING,
         COMPLETED,
         FAILED,
+        CANCELED,
     }
 
     fun complete() {
@@ -34,6 +35,10 @@ class PaymentItemEntity(
 
     fun fail() {
         status = PaymentItemStatusType.FAILED
+    }
+
+    fun cancel() {
+        status = PaymentItemStatusType.CANCELED
     }
 
     fun isPending(): Boolean {
@@ -46,6 +51,10 @@ class PaymentItemEntity(
 
     fun isFailed(): Boolean {
         return status == PaymentItemStatusType.FAILED
+    }
+
+    fun isCanceled(): Boolean {
+        return status == PaymentItemStatusType.CANCELED
     }
 
 }

@@ -33,4 +33,12 @@ class PaymentItems(
         return items.all { it.isFailed() }
     }
 
+    fun isAllCanceled(): Boolean {
+        return items.all { it.isCanceled() }
+    }
+
+    fun cancel() {
+        items.forEach { it.cancel() }
+    }
+
 }

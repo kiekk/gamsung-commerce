@@ -14,6 +14,7 @@ class PaymentEntityTest {
     - [ ] 결제 정볼르 생성하면 상태는 PENDING로 초기화된다.
     - [ ] 결제 완료 처리 시 상태는 COMPLETED로 변경된다.
     - [ ] 결제 실패 처리 시 상태는 FAILED로 변경된다.
+    - [ ] 결제 취소 처리 시 상태는 CANCELED로 변경된다.
      */
     @DisplayName("PaymentEntity를 생성할 때, ")
     @Nested
@@ -75,6 +76,21 @@ class PaymentEntityTest {
 
             // assert
             assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.FAILED)
+        }
+
+        @DisplayName("결제 취소 처리 시 상태는 CANCELED로 변경된다.")
+        @Test
+        fun cancelPaymentChangesStatusToCanceled() {
+            // arrange
+            val payment = PaymentEntity(1L, PaymentEntity.PaymentMethodType.POINT)
+            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
+            payment.addItems(listOf(paymentItem))
+
+            // act
+            payment.cancel()
+
+            // assert
+            assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.CANCELED)
         }
     }
 }

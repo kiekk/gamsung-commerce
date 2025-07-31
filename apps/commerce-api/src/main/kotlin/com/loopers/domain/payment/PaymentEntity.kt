@@ -36,6 +36,7 @@ class PaymentEntity(
         PENDING,
         COMPLETED,
         FAILED,
+        CANCELED,
     }
 
     enum class PaymentMethodType {
@@ -55,5 +56,10 @@ class PaymentEntity(
     fun fail() {
         status = PaymentStatusType.FAILED
         paymentItems.fail()
+    }
+
+    fun cancel() {
+        status = PaymentStatusType.CANCELED
+        paymentItems.cancel()
     }
 }
