@@ -6,7 +6,9 @@ import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduc
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
+import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,7 +21,13 @@ class OrderServiceIntegrationTest @Autowired constructor(
     private val orderService: OrderService,
     private val productRepository: ProductRepository,
     private val orderRepository: OrderRepository,
+    private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @AfterEach
+    fun tearDown() {
+        databaseCleanUp.truncateAllTables()
+    }
 
     /*
     **🔗 통합 테스트
