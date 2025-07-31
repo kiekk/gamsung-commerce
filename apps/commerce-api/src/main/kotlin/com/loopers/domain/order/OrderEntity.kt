@@ -5,6 +5,7 @@ import com.loopers.domain.order.vo.OrderCustomer
 import com.loopers.domain.order.vo.OrderItems
 import com.loopers.domain.vo.Price
 import jakarta.persistence.AttributeOverride
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
@@ -20,7 +21,7 @@ class OrderEntity(
     val userId: Long,
     @Embedded
     val orderCustomer: OrderCustomer,
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private val _orderItems: MutableList<OrderItemEntity> = mutableListOf(),
 ) : BaseEntity() {
     val orderItems: OrderItems
@@ -35,6 +36,7 @@ class OrderEntity(
         private set
 
     @Embedded
+    @AttributeOverride(name = "value", column = Column("amount"))
     var amount: Price = orderItems.amount()
         private set
 

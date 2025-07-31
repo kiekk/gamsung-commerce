@@ -13,7 +13,7 @@ class OrderRepositoryImpl(
         return orderJpaRepository.save(order)
     }
 
-    override fun findById(id: Long): OrderEntity? {
-        return orderJpaRepository.findById(id).orElse(null)
+    override fun findWithItemsById(id: Long): OrderEntity? {
+        return orderJpaRepository.findWithItemsById(id)
     }
 }

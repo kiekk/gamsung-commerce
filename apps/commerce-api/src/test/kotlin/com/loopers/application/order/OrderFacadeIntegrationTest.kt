@@ -1,6 +1,7 @@
 package com.loopers.application.order
 
 import com.loopers.domain.order.OrderEntity
+import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductRepository
@@ -13,7 +14,6 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
-import com.loopers.infrastructure.order.OrderJpaRepository
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 class OrderFacadeIntegrationTest @Autowired constructor(
@@ -33,7 +32,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
     private val stockRepository: StockRepository,
-    private val orderJpaRepository: OrderJpaRepository,
+    private val orderRepository: OrderRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -198,7 +197,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
         @DisplayName("사용자, 상품 정보, 상품 상태, 상품 재고가 모두 유효한 경우 주문이 성공적으로 생성된다.")
         @Test
-        @Transactional
         open fun createsOrderSuccessfully_whenAllCriteriaAreValid() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
@@ -226,13 +224,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(orderCriteria)
 
             // assert
-            val findOrder = orderJpaRepository.findById(orderId).get()
+            val findOrder = orderRepository.findWithItemsById(orderId)
             assertAll(
-                { assertThat(findOrder.userId).isEqualTo(createdUser.id) },
-                { assertThat(findOrder.orderStatus).isEqualTo(OrderEntity.OrderStatusType.PENDING) },
-                { assertThat(findOrder.orderItems.size()).isEqualTo(2) },
-                { assertThat(findOrder.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                { assertThat(findOrder.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                { assertThat(findOrder?.userId).isEqualTo(createdUser.id) },
+                { assertThat(findOrder?.orderStatus).isEqualTo(OrderEntity.OrderStatusType.PENDING) },
+                { assertThat(findOrder?.orderItems?.size()).isEqualTo(2) },
+                { assertThat(findOrder?.orderItems?.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                { assertThat(findOrder?.orderItems?.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
             )
         }
     }

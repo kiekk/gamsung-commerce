@@ -15,7 +15,7 @@ class OrderService(
     }
 
     @Transactional(readOnly = true)
-    fun findOrderBy(id: Long): OrderEntity? {
-        return orderRepository.findById(id)
+    fun findWithItemsById(id: Long): OrderEntity? {
+        return orderRepository.findWithItemsById(id)
     }
 }

@@ -61,7 +61,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
             val createdOrder = orderService.createOrder(orderCommand)
 
             // assert
-            val findOrder = orderRepository.findById(createdOrder.id)
+            val findOrder = orderRepository.findWithItemsById(createdOrder.id)
             assertAll(
                 { assertThat(createdOrder.id).isEqualTo(findOrder?.id) },
                 { assertThat(createdOrder.orderStatus).isEqualTo(findOrder?.orderStatus) },
