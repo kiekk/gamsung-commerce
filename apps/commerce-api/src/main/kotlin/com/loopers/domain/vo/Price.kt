@@ -11,4 +11,8 @@ data class Price(
     init {
         require(value >= 0) { "가격은 0 이상이어야 합니다." }
     }
+
+    companion object {
+        val ZERO = Price(0)
+    }
 }

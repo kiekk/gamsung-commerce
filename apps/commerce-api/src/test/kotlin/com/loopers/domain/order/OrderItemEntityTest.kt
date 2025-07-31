@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class OrderItemEntityTest {
+    /*
+     * 🧱 단위 테스트
+     - [ ] 상품 아이디가 비어있으면 예외를 발생시킨다.
+     - [ ] 상품 이름이 비어있으면 예외를 발생시킨다.
+     */
     @DisplayName("주문 아이템 엔티티를 생성할 때, ")
     @Nested
     inner class Create {
