@@ -1,0 +1,35 @@
+package com.loopers.infrastructure.payment
+
+import com.loopers.domain.payment.PaymentEntity
+import com.loopers.domain.payment.PaymentProcessor
+import com.loopers.domain.payment.PaymentProcessorCommand
+import com.loopers.domain.payment.PaymentRepository
+import com.loopers.domain.point.PointRepository
+import com.loopers.support.error.CoreException
+import com.loopers.support.error.ErrorType
+import org.springframework.stereotype.Component
+
+@Component
+class PointPaymentProcessor(
+    private val paymentRepository: PaymentRepository,
+    private val pointRepository: PointRepository,
+) : PaymentProcessor {
+
+    override fun process(command: PaymentProcessorCommand.Process) {
+        val point =
+            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
+        val payment =
+            paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다.")
+
+        if (point.cannotUsePoint(payment.totalAmount)) {
+            throw CoreException(ErrorType.BAD_REQUEST, "포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${point.point}")
+        }
+
+        point.usePoint(payment.totalAmount)
+        payment.complete()
+    }
+
+    override fun supports(method: PaymentEntity.PaymentMethodType): Boolean {
+        return method == PaymentEntity.PaymentMethodType.POINT
+    }
+}

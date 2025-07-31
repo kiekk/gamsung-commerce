@@ -1,7 +1,12 @@
 package com.loopers.application.order
 
 import com.loopers.domain.order.OrderService
+import com.loopers.domain.payment.PaymentCommand
+import com.loopers.domain.payment.PaymentProcessorCommand
+import com.loopers.domain.payment.PaymentService
+import com.loopers.domain.payment.factory.PaymentProcessorFactory
 import com.loopers.domain.product.ProductService
+import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
@@ -15,16 +20,54 @@ class OrderFacade(
     private val productService: ProductService,
     private val stockService: StockService,
     private val orderService: OrderService,
+    private val paymentService: PaymentService,
+    private val paymentProcessorFactory: PaymentProcessorFactory,
 ) {
     @Transactional
     fun placeOrder(criteria: OrderCriteria.Create): Long {
-        userService.findUserBy(criteria.userId) ?: throw CoreException(
+        val user = userService.findUserBy(criteria.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
         )
 
         validateOrderItems(criteria.orderItems)
         val createdOrder = orderService.createOrder(criteria.toCommand())
+        val createdPayment = paymentService.createPayment(
+            PaymentCommand.Create(
+                createdOrder.id,
+                criteria.paymentMethodType,
+                createdOrder.orderItems.items.map {
+                    PaymentCommand.Create.PaymentItemCommand(
+                        it.id,
+                        it.amount,
+                    )
+                },
+            ),
+        )
+
+        paymentProcessorFactory.process(
+            PaymentProcessorCommand.Process(
+                user.userId,
+                createdPayment.id,
+                criteria.paymentMethodType,
+            ),
+        )
+
+        try {
+            stockService.decreaseStocks(
+                criteria.orderItems.map {
+                    StockCommand.Decrease(
+                        it.productId,
+                        it.quantity.value,
+                    )
+                },
+            )
+
+            createdOrder.complete()
+        } catch (e: Exception) {
+            // TODO: 재고 감소 오류에 따른 주문, 결제(포인트) 롤백 처리
+            // TODO: 결제 취소, 주문 실패 상태 변경
+        }
 
         return createdOrder.id
     }
@@ -54,7 +97,7 @@ class OrderFacade(
             }
 
             val stock = stockMap[orderItem.productId]
-            if (stock == null || stock.invalidQuantity(orderItem.quantity)) {
+            if (stock == null || stock.invalidQuantity(orderItem.quantity.value)) {
                 throw CoreException(
                     ErrorType.CONFLICT,
                     "재고가 부족한 상품입니다. productId: ${orderItem.productId}, 요청 수량: ${orderItem.quantity}, 재고: ${stock?.quantity ?: 0}",

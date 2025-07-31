@@ -26,7 +26,11 @@ class StockEntity(
         this.quantity -= quantity
     }
 
-    fun invalidQuantity(quantity: Quantity) : Boolean {
-        return this.quantity < quantity.value
+    fun invalidQuantity(quantity: Int) : Boolean {
+        return this.quantity < quantity
+    }
+
+    fun decreaseQuantity(quantity: Int) {
+        this.quantity -= quantity
     }
 }

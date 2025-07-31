@@ -12,4 +12,8 @@ class PaymentRepositoryImpl(
     override fun save(payment: PaymentEntity): PaymentEntity {
         return paymentJpaRepository.save(payment)
     }
+
+    override fun findWithItemsByOrderId(orderId: Long): PaymentEntity? {
+        return paymentJpaRepository.findWithItemsByOrderId(orderId)
+    }
 }

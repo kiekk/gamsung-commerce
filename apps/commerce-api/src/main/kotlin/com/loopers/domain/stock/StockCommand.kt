@@ -12,4 +12,11 @@ class StockCommand {
             )
         }
     }
+
+    data class Decrease(
+        val productId: Long,
+        val quantity: Int,
+    ) {
+
+    }
 }

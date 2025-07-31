@@ -2,6 +2,7 @@ package com.loopers.application.order
 
 import com.loopers.domain.order.OrderCommand
 import com.loopers.domain.order.vo.Quantity
+import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
@@ -15,6 +16,7 @@ class OrderCriteria {
         val ordererMobile: Mobile,
         val ordererAddress: Address,
         val orderItems: List<OrderItemCriteria>,
+        val paymentMethodType: PaymentEntity.PaymentMethodType,
     ) {
 
         init {

@@ -1,6 +1,7 @@
 package com.loopers.domain.point
 
 import com.loopers.domain.BaseEntity
+import com.loopers.domain.vo.Price
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import jakarta.persistence.Column
@@ -22,5 +23,13 @@ class PointEntity(
             throw CoreException(ErrorType.BAD_REQUEST, "충전할 포인트는 1 이상이어야 합니다.")
         }
         this.point += point
+    }
+
+    fun usePoint(amount: Price) {
+        this.point -= amount.value
+    }
+
+    fun cannotUsePoint(amount: Price): Boolean {
+        return amount.value > point
     }
 }

@@ -1,6 +1,5 @@
 package com.loopers.domain.stock
 
-import com.loopers.domain.product.ProductEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,5 +15,18 @@ class StockService(
     @Transactional(readOnly = true)
     fun getStocksByProductIds(productIds: List<Long>): List<StockEntity> {
         return stockRepository.findByIds(productIds)
+    }
+
+    @Transactional
+    fun decreaseStocks(command: List<StockCommand.Decrease>) {
+        val decreaseCommandMap = command.associate { it.productId to it.quantity }
+        stockRepository.findByIds(command.map { it.productId })
+            .associateBy { it.productId }
+            .forEach { (productId, stock) ->
+                decreaseCommandMap[productId]?.let { quantity ->
+                    stock.invalidQuantity(quantity) && throw IllegalArgumentException("Invalid quantity for productId: $productId")
+                    stock.decreaseQuantity(quantity)
+                }
+            }
     }
 }
