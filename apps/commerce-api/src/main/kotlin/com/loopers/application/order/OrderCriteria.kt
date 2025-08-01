@@ -9,6 +9,16 @@ import com.loopers.domain.vo.Price
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderCriteria {
+    data class Get(
+        val userId: Long,
+        val orderId: Long,
+    ) {
+        init {
+            require(userId > 0) { "사용자 아이디는 0보다 커야 합니다." }
+            require(orderId > 0) { "주문 아이디는 0보다 커야 합니다." }
+        }
+    }
+
     data class Create(
         val userId: Long,
         val ordererName: String,

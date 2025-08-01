@@ -1,6 +1,9 @@
 package com.loopers.application.order
 
+import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
+import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.OrderRepository
+import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
@@ -16,6 +19,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.order.OrderJpaRepository
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
@@ -42,6 +46,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val paymentRepository: PaymentRepository,
     private val pointRepository: PointRepository,
     private val databaseCleanUp: DatabaseCleanUp,
+    private val orderJpaRepository: OrderJpaRepository,
 ) {
 
     @AfterEach
@@ -346,6 +351,99 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${createdPoint.point}") },
                 { assertThat(orderRepository.findWithItemsById(criteria.userId)).isNull() },
+            )
+        }
+    }
+
+    /*
+    **🔗 통합 테스트
+     - [ ] 사용자 정보가 존재하지 않으면 404 Not Found 예외가 발생한다.
+     - [ ] 주문 상세 조회 시 주문이 존재하지 않으면 404 Not Found 예외가 발생한다.
+     - [ ] 주문 상세 조회 시 주문이 존재하면 주문 정보가 반환되며, 주문 정보에는 주문자 정보, 주문 항목 수, 총 가격이 포함된다.
+     */
+    @DisplayName("주문 상세 조회를 할 때, ")
+    @Nested
+    inner class Get {
+        @DisplayName("사용자 정보가 존재하지 않으면 404 Not Found 예외가 발생한다.")
+        @Test
+        fun failsToGetOrder_whenUserDoesNotExist() {
+            // arrange
+            val nonExistentUserId = 999L // 존재하지 않는 사용자 ID
+            val orderCriteria = OrderCriteria.Get(nonExistentUserId, 1L)
+
+            // act
+            val exception = assertThrows<CoreException> {
+                orderFacade.getOrderById(orderCriteria)
+            }
+
+            // assert
+            assertAll(
+                { assertThat(exception).isInstanceOf(CoreException::class.java) },
+                { assertThat(exception.message).isEqualTo("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+            )
+        }
+
+        @DisplayName("주문이 존재하지 않으면 404 Not Found 예외가 발생한다.")
+        @Test
+        fun failsToGetOrder_whenOrderDoesNotExist() {
+            // arrange
+            val createdUser = userRepository.save(aUser().build())
+            val nonExistentOrderId = 999L // 존재하지 않는 주문 ID
+            val orderCriteria = OrderCriteria.Get(createdUser.id, nonExistentOrderId)
+
+            // act
+            val exception = assertThrows<CoreException> {
+                orderFacade.getOrderById(orderCriteria)
+            }
+
+            // assert
+            assertAll(
+                { assertThat(exception).isInstanceOf(CoreException::class.java) },
+                { assertThat(exception.message).isEqualTo("주문을 찾을 수 없습니다. orderId: $nonExistentOrderId") },
+            )
+        }
+
+        @DisplayName("주문이 존재하면 주문 정보가 반환되며, 주문 정보에는 주문자 정보, 주문 항목 수, 총 가격이 포함된다.")
+        @Test
+        fun returnsOrderDetail_whenOrderExists() {
+            // arrange
+            val createdUser = userRepository.save(aUser().build())
+            val createdProduct = productRepository.save(aProduct().build())
+            val order = anOrder()
+                .userId(createdUser.id)
+                .orderCustomer(
+                    anOrderCustomer()
+                        .name("홍길동")
+                        .email(Email("shyoon991@gmail.com"))
+                        .mobile(Mobile("010-1234-5678"))
+                        .address(Address("12345", "서울시 강남구 역삼동", "역삼로 123"))
+                        .build(),
+                )
+                .build()
+            order.addItems(
+                listOf(
+                    anOrderItem()
+                        .order(order)
+                        .productId(createdProduct.id)
+                        .amount(createdProduct.price)
+                        .totalPrice(createdProduct.price)
+                        .build(),
+                ),
+            )
+            orderJpaRepository.save(order)
+
+            // act
+            val orderDetail = orderFacade.getOrderById(OrderCriteria.Get(createdUser.id, order.id))
+
+            // assert
+            assertAll(
+                { assertThat(orderDetail.orderId).isEqualTo(order.id) },
+                { assertThat(orderDetail.ordererName).isEqualTo("홍길동") },
+                { assertThat(orderDetail.ordererEmail).isEqualTo(Email("shyoon991@gmail.com")) },
+                { assertThat(orderDetail.ordererMobile).isEqualTo(Mobile("010-1234-5678")) },
+                { assertThat(orderDetail.ordererAddress).isEqualTo(Address("12345", "서울시 강남구 역삼동", "역삼로 123")) },
+                { assertThat(orderDetail.orderItemCount).isEqualTo(1) },
+                { assertThat(orderDetail.totalPrice).isEqualTo(Price(createdProduct.price.value)) },
             )
         }
     }
