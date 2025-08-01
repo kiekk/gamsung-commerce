@@ -25,12 +25,4 @@ class StockEntity(
         require(!isQuantityLessThan(quantity)) { "차감할 재고 수량이 없습니다." }
         this.quantity -= quantity
     }
-
-    fun invalidQuantity(quantity: Int) : Boolean {
-        return this.quantity < quantity
-    }
-
-    fun decreaseQuantity(quantity: Int) {
-        this.quantity -= quantity
-    }
 }

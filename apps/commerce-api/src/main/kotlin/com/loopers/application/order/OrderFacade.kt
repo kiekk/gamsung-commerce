@@ -60,7 +60,7 @@ class OrderFacade(
         )
 
         try {
-            stockService.decreaseStocks(
+            stockService.deductStockQuantities(
                 criteria.orderItems.map {
                     StockCommand.Decrease(
                         it.productId,
@@ -112,7 +112,7 @@ class OrderFacade(
             }
 
             val stock = stockMap[orderItem.productId]
-            if (stock == null || stock.invalidQuantity(orderItem.quantity.value)) {
+            if (stock == null || stock.isQuantityLessThan(orderItem.quantity.value)) {
                 throw CoreException(
                     ErrorType.CONFLICT,
                     "재고가 부족한 상품입니다. productId: ${orderItem.productId}, 요청 수량: ${orderItem.quantity}, 재고: ${stock?.quantity ?: 0}",

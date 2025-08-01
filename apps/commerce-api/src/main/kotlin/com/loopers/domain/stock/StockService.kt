@@ -21,17 +21,17 @@ class StockService(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun decreaseStocks(command: List<StockCommand.Decrease>) {
+    fun deductStockQuantities(command: List<StockCommand.Decrease>) {
         val decreaseCommandMap = command.associate { it.productId to it.quantity }
         stockRepository.findByIds(command.map { it.productId })
             .associateBy { it.productId }
             .forEach { (productId, stock) ->
                 decreaseCommandMap[productId]?.let { quantity ->
-                    stock.invalidQuantity(quantity) && throw PaymentException(
+                    stock.isQuantityLessThan(quantity) && throw PaymentException(
                         ErrorType.CONFLICT,
                         "재고가 부족합니다. productId: $productId, 요청 수량: $quantity, 현재 재고: ${stock.quantity}",
                     )
-                    stock.decreaseQuantity(quantity)
+                    stock.deductQuantity(quantity)
                 }
             }
     }

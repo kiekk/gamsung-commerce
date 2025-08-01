@@ -95,7 +95,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             whenever(stockService.getStocksByProductIds(listOf(createdProduct.id))).thenReturn(
                 listOf(aStock().productId(createdProduct.id).quantity(5).build()),
             )
-            whenever(stockService.decreaseStocks(any<List<StockCommand.Decrease>>()))
+            whenever(stockService.deductStockQuantities(any<List<StockCommand.Decrease>>()))
                 .thenThrow(PaymentException(ErrorType.CONFLICT, "재고가 부족합니다."))
 
             // act
