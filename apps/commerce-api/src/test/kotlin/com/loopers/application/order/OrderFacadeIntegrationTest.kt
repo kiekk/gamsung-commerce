@@ -3,7 +3,6 @@ package com.loopers.application.order
 import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
@@ -18,6 +17,8 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
@@ -81,7 +82,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -117,7 +118,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         Price(20_000),
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -153,7 +154,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -191,7 +192,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -240,7 +241,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -260,7 +261,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val findPayment = paymentRepository.findWithItemsByOrderId(orderId)
             findPayment?.let { payment ->
                 assertAll(
-                    { assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.COMPLETED) },
+                    { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
                     { assertThat(payment.paymentItems.isAllCompleted()).isTrue() },
                     { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
@@ -292,7 +293,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -332,7 +333,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act

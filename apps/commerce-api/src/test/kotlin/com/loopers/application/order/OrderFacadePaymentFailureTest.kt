@@ -3,7 +3,6 @@ package com.loopers.application.order
 import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
@@ -21,6 +20,8 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.support.StockServiceMockConfig
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.PaymentException
 import com.loopers.utils.DatabaseCleanUp
@@ -89,7 +90,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             whenever(stockService.getStocksByProductIds(listOf(createdProduct.id))).thenReturn(
@@ -106,7 +107,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             assertThat(findPoint?.point).isEqualTo(createdPoint.point)
 
             val findPayment = paymentRepository.findWithItemsByOrderId(criteria.userId)
-            assertThat(findPayment?.status).isEqualTo(PaymentEntity.PaymentStatusType.CANCELED)
+            assertThat(findPayment?.status).isEqualTo(PaymentStatusType.CANCELED)
 
             val findOrder = orderRepository.findWithItemsById(criteria.userId)
             assertThat(findOrder?.orderStatus).isEqualTo(OrderEntity.OrderStatusType.CANCELED)

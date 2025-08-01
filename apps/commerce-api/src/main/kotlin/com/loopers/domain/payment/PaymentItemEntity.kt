@@ -2,6 +2,7 @@ package com.loopers.domain.payment
 
 import com.loopers.domain.BaseEntity
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentItemStatusType
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -21,13 +22,6 @@ class PaymentItemEntity(
     @Enumerated(EnumType.STRING)
     var status: PaymentItemStatusType = PaymentItemStatusType.PENDING
         private set
-
-    enum class PaymentItemStatusType {
-        PENDING,
-        COMPLETED,
-        FAILED,
-        CANCELED,
-    }
 
     fun complete() {
         status = PaymentItemStatusType.COMPLETED
