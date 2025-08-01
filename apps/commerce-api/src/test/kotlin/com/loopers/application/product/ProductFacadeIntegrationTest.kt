@@ -186,6 +186,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     - [ ] 상품 목록은 등록일 내림차순으로 정렬할 수 있다.
     - [ ] 상품 목록은 좋아요 수 오름차순으로 정렬할 수 있다.
     - [ ] 상품 목록은 좋아요 수 내림차순으로 정렬할 수 있다.
+    - [ ] 잘못된 정렬 조건이 주어질 경우 400 Bad Request 에러를 반환한다.
      */
     @DisplayName("상품 목록을 검색할 때, ")
     @Nested
@@ -462,6 +463,26 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                         .isEqualTo(createdProductLikeCount1.productLikeCount)
                 },
             )
+        }
+
+        @DisplayName("잘못된 정렬 조건이 주어질 경우 400 Bad Request 에러를 반환한다.")
+        @Test
+        fun throwsBadRequest_whenInvalidSortProperty() {
+            // arrange
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+
+            // act
+            val invalidSortField = "invalidProperty"
+            val pageRequest = PageRequest.of(0, 10, Sort.by(invalidSortField).ascending())
+            val exception = assertThrows<CoreException> {
+                productFacade.searchProducts(ProductSearchCondition(), pageRequest)
+            }
+
+            // assert
+            Assertions.assertThat(exception).isInstanceOf(CoreException::class.java)
+            Assertions.assertThat(exception.message).contains("지원하지 않는 정렬 기준입니다: $invalidSortField")
         }
     }
 }
