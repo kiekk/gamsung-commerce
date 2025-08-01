@@ -16,13 +16,12 @@ sequenceDiagram
     participant OrderService
     activate User
     User ->> OrderController: 주문 요청 (배송지 정보, 주문 상품 목록 및 수량)
-    deactivate User
     activate OrderController
     alt 인증 헤더(`X-USER-ID`)가 없는 경우
         OrderController -->> User: 인증 예외 (401 Unauthorized)
+        deactivate User
     end
     OrderController ->> UserService: 사용자 정보 조회
-    deactivate OrderController
     activate UserService
     alt 사용자 정보가 존재하지 않는 경우
         UserService -->> OrderController: 인증 예외 (401 Unauthorized)
@@ -31,22 +30,19 @@ sequenceDiagram
     activate OrderService
     alt 주문 상품 목록이 비어있는 경우
         OrderService -->> OrderController: 잘못된 요청 예외 (400 Bad Request)
-        deactivate OrderService
     end
-    activate OrderService
     alt 주문 불가능한 상품이 하나 이상인 경우(비활성 상태, 재고 부족 등)
         OrderService -->> OrderController: 잘못된 요청 예외 (409 Conflict)
-        deactivate OrderService
     end
     activate OrderController
     OrderController ->> OrderService: 주문 생성 요청 (사용자 ID, 배송지 정보, 주문 상품 목록)
     deactivate OrderController
-    activate OrderService
     alt 주문 생성 실패
         OrderService -->> OrderController: 주문 처리 실패 예외 (500 Internal Server Error)
     end
     OrderService ->> OrderController: 주문 생성 성공 응답 (200 OK)
     deactivate OrderService
+    deactivate OrderController
 ```
 
 ### 결제 처리 시퀀스 다이어그램
@@ -55,43 +51,34 @@ sequenceDiagram
 sequenceDiagram
     participant User
     participant OrderController
-    participant ProductService
     participant UserService
     participant PaymentService
     participant PaymentGateway
+    participant ProductService
     activate User
     User ->> OrderController: 결제 요청 (주문 ID)
-    deactivate User
     activate OrderController
     alt 인증 헤더(`X-USER-ID`)가 없는 경우
         OrderController -->> User: 인증 예외 (401 Unauthorized)
+        deactivate User
     end
     OrderController ->> UserService: 사용자 정보 조회
-    deactivate OrderController
     activate UserService
     alt 사용자 정보가 존재하지 않는 경우
         UserService -->> OrderController: 인증 예외 (401 Unauthorized)
+        deactivate UserService
     end
-    deactivate UserService
-    activate OrderController
     OrderController ->> PaymentService: 결제 요청 (주문 ID, 금액)
-    deactivate OrderController
     activate PaymentService
     PaymentService ->> PaymentGateway: 결제 처리 요청 (포인트 차감)
-    deactivate PaymentService
     activate PaymentGateway
     alt 결제 실패
         PaymentGateway -->> PaymentService: 결제 실패 응답
-        deactivate PaymentGateway
-        activate PaymentService
         PaymentService -->> OrderController: 결제 실패 응답 (오류 메시지 등)
-        deactivate PaymentService
     end
-    activate PaymentGateway
     alt 결제 성공
         PaymentGateway -->> PaymentService: 결제 승인 응답
         deactivate PaymentGateway
-        activate PaymentService
         PaymentService -->> OrderController: 결제 승인 응답 (결제 상태 등)
         deactivate PaymentService
         activate OrderController
@@ -101,13 +88,12 @@ sequenceDiagram
     activate ProductService
     alt 재고 차감 실패
         ProductService -->> OrderController: 재고 차감 실패 예외 (500 Internal Server Error)
-        deactivate ProductService
     end
-    activate ProductService
     alt 재고 차감 성공
         ProductService -->> OrderController: 결제 성공 성공 응답 (200 OK)
         deactivate ProductService
     end
+    deactivate OrderController
 ```
 
 ### 주문 완료 처리 시퀀스 다이어그램
@@ -120,35 +106,29 @@ sequenceDiagram
     participant OrderService
     activate User
     User ->> OrderController: 주문 완료 요청 (주문 ID)
-    deactivate User
     activate OrderController
     alt 인증 헤더(`X-USER-ID`)가 없는 경우
         OrderController -->> User: 인증 예외 (401 Unauthorized)
+        deactivate User
     end
     OrderController ->> UserService: 사용자 정보 조회
-    deactivate OrderController
     activate UserService
     alt 사용자 정보가 존재하지 않는 경우
         UserService -->> OrderController: 인증 예외 (401 Unauthorized)
         deactivate UserService
     end
-    activate OrderController
     OrderController ->> OrderService: 주문 정보 조회 요청 (주문 ID)
-    deactivate OrderController
     activate OrderService
     alt 주문 정보가 존재하지 않는 경우
         OrderService -->> OrderController: 주문 없음 예외 (404 Not Found)
-        deactivate OrderService
     end
-    activate OrderController
     OrderController ->> OrderService: 주문 완료 처리 요청 (주문 ID)
-    deactivate OrderController
-    activate OrderService
     alt 주문 완료 처리에 실패한 경우
         OrderService -->> OrderController: 주문 처리 실패 예외 (500 Internal Server Error)
     end
     OrderService -->> OrderController: 주문 완료 처리 성공 응답 (200 OK)
     deactivate OrderService
+    deactivate OrderController
 ```
 
 ### 주문 실패 처리 시퀀스 다이어그램
@@ -161,33 +141,27 @@ sequenceDiagram
     participant OrderService
     activate User
     User ->> OrderController: 주문 실패 요청 (주문 ID)
-    deactivate User
     activate OrderController
     alt 인증 헤더(`X-USER-ID`)가 없는 경우
         OrderController -->> User: 인증 예외 (401 Unauthorized)
+        deactivate User
     end
     OrderController ->> UserService: 사용자 정보 조회
-    deactivate OrderController
     activate UserService
     alt 사용자 정보가 존재하지 않는 경우
         UserService -->> OrderController: 인증 예외 (401 Unauthorized)
         deactivate UserService
     end
-    activate OrderController
     OrderController ->> OrderService: 주문 정보 조회 요청 (주문 ID)
-    deactivate OrderController
     activate OrderService
     alt 주문 정보가 존재하지 않는 경우
         OrderService -->> OrderController: 주문 없음 예외 (404 Not Found)
-        deactivate OrderService
     end
-    activate OrderController
-    OrderController ->> OrderService: 주문 실패 처리 요청 (주문 ID)
-    deactivate OrderController
-    activate OrderService
+    OrderController ->> OrderService: 주문 실패 처리 요청 (주문 ID) activate OrderService
     alt 주문 실패 처리에 실패한 경우
         OrderService -->> OrderController: 주문 처리 실패 예외 (500 Internal Server Error)
     end
     OrderService -->> OrderController: 주문 실패 처리 성공 응답 (200 OK)
     deactivate OrderService
+    deactivate OrderController
 ```

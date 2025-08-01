@@ -29,7 +29,7 @@ class UserV1Controller(
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
-        return userFacade.getUserInfo(userId)
+        return userFacade.getMyInfo(userId)
             .let { UserV1Dto.UserResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
