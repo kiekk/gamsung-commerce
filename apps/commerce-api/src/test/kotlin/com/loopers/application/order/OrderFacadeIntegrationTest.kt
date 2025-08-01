@@ -49,7 +49,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 존재하지 않는 사용자가 주문을 요청할 경우 예외가 발생한다.
     - [ ] 주문 항목의 productId에 해당하는 상품이 존재하지 않으면 예외가 발생한다.
     - [ ] 주문 항목의 productId에 해당하는 상품이 주문 가능한 상태가 아니면 예외가 발생한다.
@@ -202,13 +202,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: ${quantity}, 재고: ${createdStock.quantity}") },
+                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: $quantity, 재고: ${createdStock.quantity}") },
             )
         }
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 포인트로 결제에 성공하면 재고가 감소하며 결제 성공, 주문 완료 처리 된다.
     - [ ] 포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.
     - [ ] 포인트 부족 시 결제는 실패하고 주문도 실패한다.

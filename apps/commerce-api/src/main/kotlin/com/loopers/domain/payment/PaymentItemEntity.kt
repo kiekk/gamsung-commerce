@@ -56,5 +56,4 @@ class PaymentItemEntity(
     fun isCanceled(): Boolean {
         return status == PaymentItemStatusType.CANCELED
     }
-
 }

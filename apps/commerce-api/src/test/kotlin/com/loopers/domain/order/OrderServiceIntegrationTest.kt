@@ -31,7 +31,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 주문이 생성되면 주문에서 주문의 총 금액을 계산한다.
      */
     @DisplayName("주문을 생성할 때, ")
@@ -71,5 +71,4 @@ class OrderServiceIntegrationTest @Autowired constructor(
             )
         }
     }
-
 }

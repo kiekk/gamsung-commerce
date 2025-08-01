@@ -1,7 +1,6 @@
 package com.loopers.interfaces.api.point
 
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
-import com.loopers.domain.point.vo.Point
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository

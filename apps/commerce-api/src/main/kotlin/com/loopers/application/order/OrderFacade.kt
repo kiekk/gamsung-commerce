@@ -28,7 +28,6 @@ class OrderFacade(
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
-
     @Transactional(noRollbackFor = [PaymentException::class])
     fun placeOrder(criteria: OrderCriteria.Create): Long {
         val user = userService.findUserBy(criteria.userId) ?: throw CoreException(
@@ -120,6 +119,4 @@ class OrderFacade(
             }
         }
     }
-
-
 }

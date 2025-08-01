@@ -23,7 +23,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트**
+     **🔗 통합 테스트**
     - [ ] 결제가 생성되면 결제, 결제 항목의 상태가 PENDING이다.
     - [ ] 결제가 완료되면 결제, 결제 항목의 상태가 COMPLETED로 변경된다.
     - [ ] 결제가 실패하면 결제, 결제 항목의 상태가 FAILED로 변경된다.
@@ -180,8 +180,5 @@ class PaymentServiceIntegrationTest @Autowired constructor(
                 { assertThat(paymentEntity.paymentItems.totalAmount()).isEqualTo(Price(30_000)) },
             )
         }
-
     }
-
-
 }
