@@ -1,5 +1,6 @@
 package com.loopers.domain.user
 
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
 import com.loopers.support.error.CoreException
@@ -98,14 +99,7 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsMyInfo_whenRequestingMyInfo() {
             // arrange
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
 
             // act
             val myInfo = userService.findUserBy(createdUser.userId)

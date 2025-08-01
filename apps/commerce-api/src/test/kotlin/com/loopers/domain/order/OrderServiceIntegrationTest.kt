@@ -1,11 +1,12 @@
 package com.loopers.domain.order
 
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
+import com.loopers.infrastructure.order.OrderJpaRepository
+import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -19,8 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class OrderServiceIntegrationTest @Autowired constructor(
     private val orderService: OrderService,
-    private val productRepository: ProductRepository,
-    private val orderRepository: OrderRepository,
+    private val productJpaRepository: ProductJpaRepository,
+    private val orderJpaRepository: OrderJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -40,7 +41,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
         @Test
         fun calculatesTotalAmount_whenOrderIsCreated() {
             // arrange
-            val createdProduct = productRepository.save(aProduct().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val orderCommand = OrderCommand.Create(
                 1L,
                 "홍길동",
@@ -61,7 +62,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
             val createdOrder = orderService.createOrder(orderCommand)
 
             // assert
-            val findOrder = orderRepository.findWithItemsById(createdOrder.id)
+            val findOrder = orderJpaRepository.findWithItemsById(createdOrder.id)
             assertAll(
                 { assertThat(createdOrder.id).isEqualTo(findOrder?.id) },
                 { assertThat(createdOrder.orderStatus).isEqualTo(findOrder?.orderStatus) },

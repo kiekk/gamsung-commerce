@@ -1,12 +1,12 @@
 package com.loopers.domain.product.query
 
-import com.loopers.domain.brand.BrandRepository
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
-import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
-import com.loopers.domain.productlike.ProductLikeCountRepository
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture.Companion.aProductLikeCount
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -26,9 +26,9 @@ import java.math.BigDecimal
 @SpringBootTest
 class ProductQueryServiceIntegrationTest @Autowired constructor(
     private val productQueryService: ProductQueryService,
-    private val productRepository: ProductRepository,
-    private val productLikeCountRepository: ProductLikeCountRepository,
-    private val brandRepository: BrandRepository,
+    private val productJpaRepository: ProductJpaRepository,
+    private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
+    private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -58,9 +58,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductListByPageAndSize() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -78,9 +78,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPartialNameSearch() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -98,9 +98,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPriceRange() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -120,9 +120,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsEmptyList_whenNoMatchingProducts() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -136,9 +136,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceAsc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").ascending())
@@ -159,9 +159,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceDesc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").price(Price(1000)).build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").price(Price(2000)).build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").descending())
@@ -182,10 +182,10 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtAsc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
             Thread.sleep(10)
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").ascending())
@@ -204,10 +204,10 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtDesc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
             Thread.sleep(10)
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending())
@@ -226,11 +226,11 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByLikesAsc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
-            val createdProductLikeCount1 = productLikeCountRepository.save(aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
-            val createdProductLikeCount2 = productLikeCountRepository.save(aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProductLikeCount1 = productLikeCountJpaRepository.save(aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
+            val createdProductLikeCount2 = productLikeCountJpaRepository.save(aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("likeCount").ascending())
@@ -251,11 +251,11 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByLikesDesc() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            val createdProduct1 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            val createdProduct2 = productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
-            val createdProductLikeCount1 = productLikeCountRepository.save(aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
-            val createdProductLikeCount2 = productLikeCountRepository.save(aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProductLikeCount1 = productLikeCountJpaRepository.save(aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
+            val createdProductLikeCount2 = productLikeCountJpaRepository.save(aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("likeCount").descending())
@@ -276,9 +276,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
         @Test
         fun throwsBadRequest_whenInvalidSortCondition() {
             // arrange
-            val createdBrand = brandRepository.save(aBrand().build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(aBrand().build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
             val invalidSortField = "invalidField"
 
             // act

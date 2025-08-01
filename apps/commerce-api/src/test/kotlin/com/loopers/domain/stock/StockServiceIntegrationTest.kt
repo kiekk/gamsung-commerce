@@ -1,9 +1,7 @@
 package com.loopers.domain.stock
 
-import com.loopers.domain.product.ProductCommand
-import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.product.ProductService
-import com.loopers.domain.vo.Price
+import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
+import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -16,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class StockServiceIntegrationTest @Autowired constructor(
     private val stockService: StockService,
-    private val productService: ProductService,
+    private val productJpaRepository: ProductJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -36,14 +34,7 @@ class StockServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsStock_whenProductExistsAndQuantityIsValid() {
             // arrange
-            val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val createdProduct = productService.createProduct(productCreateCommand)
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val stockCreateCommand = StockCommand.Create(
                 createdProduct.id,
                 20,

@@ -3,6 +3,7 @@ package com.loopers.domain.brand.query
 import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.BrandRepository
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
+import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -21,7 +22,7 @@ import org.springframework.data.domain.Sort
 @SpringBootTest
 class BrandQueryServiceTest @Autowired constructor(
     private val brandQueryService: BrandQueryService,
-    private val brandRepository: BrandRepository,
+    private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -50,7 +51,7 @@ class BrandQueryServiceTest @Autowired constructor(
         fun findsBrands_whenPageNumberAndSizeAreValid() {
             // arrange
             repeat(11) { index ->
-                brandRepository.save(aBrand().name("브랜드${index + 1}").build())
+                brandJpaRepository.save(aBrand().name("브랜드${index + 1}").build())
                 Thread.sleep(10)
             }
 
@@ -71,10 +72,10 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenSearchingByPartialName() {
             // arrange
-            val createdBrand1 = brandRepository.save(aBrand().name("브랜드AAB").build())
-            brandRepository.save(aBrand().name("브랜드BA").build())
-            val createdBrand3 = brandRepository.save(aBrand().name("브랜드ABB").build())
-            val createdBrand4 = brandRepository.save(aBrand().name("브랜드aba").build())
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드AAB").build())
+            brandJpaRepository.save(aBrand().name("브랜드BA").build())
+            val createdBrand3 = brandJpaRepository.save(aBrand().name("브랜드ABB").build())
+            val createdBrand4 = brandJpaRepository.save(aBrand().name("브랜드aba").build())
 
             // act
             val condition = BrandSearchCondition(name = "브랜드A")
@@ -98,8 +99,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenFilteringByStatus() {
             // arrange
-            val activeBrand = brandRepository.save(aBrand().name("활성브랜드").status(BrandEntity.BrandStatusType.ACTIVE).build())
-            brandRepository.save(aBrand().name("비활성브랜드").status(BrandEntity.BrandStatusType.INACTIVE).build())
+            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").status(BrandEntity.BrandStatusType.ACTIVE).build())
+            brandJpaRepository.save(aBrand().name("비활성브랜드").status(BrandEntity.BrandStatusType.INACTIVE).build())
 
             // act
             val condition = BrandSearchCondition(status = BrandEntity.BrandStatusType.ACTIVE)
@@ -119,8 +120,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun returnsEmptyList_whenNoBrandsMatchName() {
             // arrange
-            brandRepository.save(aBrand().name("브랜드A").build())
-            brandRepository.save(aBrand().name("브랜드B").build())
+            brandJpaRepository.save(aBrand().name("브랜드A").build())
+            brandJpaRepository.save(aBrand().name("브랜드B").build())
 
             // act
             val condition = BrandSearchCondition(name = "브랜드C")
@@ -138,8 +139,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByNameAsc() {
             // arrange
-            val createdBrand1 = brandRepository.save(aBrand().name("브랜드A").build())
-            val createdBrand2 = brandRepository.save(aBrand().name("브랜드B").build())
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
 
             // act
             val condition = BrandSearchCondition()
@@ -161,8 +162,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByNameDesc() {
             // arrange
-            val createdBrand1 = brandRepository.save(aBrand().name("브랜드A").build())
-            val createdBrand2 = brandRepository.save(aBrand().name("브랜드B").build())
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
 
             // act
             val condition = BrandSearchCondition()
@@ -184,9 +185,9 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByCreatedAtAsc() {
             // arrange
-            val createdBrand1 = brandRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
             Thread.sleep(10)
-            val createdBrand2 = brandRepository.save(aBrand().name("브랜드B").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
 
             // act
             val condition = BrandSearchCondition()
@@ -208,8 +209,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenSortingByCreatedAtDesc() {
             // arrange
-            val createdBrand1 = brandRepository.save(aBrand().name("브랜드A").build())
-            val createdBrand2 = brandRepository.save(aBrand().name("브랜드B").build())
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
 
             // act
             val condition = BrandSearchCondition()
