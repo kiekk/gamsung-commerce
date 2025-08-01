@@ -2,19 +2,25 @@ package com.loopers.application.productlike
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.product.ProductService
+import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.productlike.ProductLikeCommand
 import com.loopers.domain.productlike.ProductLikeService
+import com.loopers.domain.productlike.fixture.ProductLikeEntityFixture.Companion.aProductLike
 import com.loopers.domain.user.UserCommand
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Birthday
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -30,7 +36,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val userService: UserService,
     private val productService: ProductService,
     private val productLikeService: ProductLikeService,
+    private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
+    private val productLikeJpaRepository: ProductLikeJpaRepository,
+    private val productJpaRepository: ProductJpaRepository,
 ) {
 
     @AfterEach
@@ -69,8 +78,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { Assertions.assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -96,9 +105,9 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
                 {
-                    Assertions.assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
+                    assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
                 },
             )
         }
@@ -132,10 +141,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
             val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
             assertAll(
-                { Assertions.assertThat(productLikes).hasSize(1) },
-                { Assertions.assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
-                { Assertions.assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
-                { Assertions.assertThat(productLikeCount?.productLikeCount).isEqualTo(1) },
+                { assertThat(productLikes).hasSize(1) },
+                { assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
+                { assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
+                { assertThat(productLikeCount?.productLikeCount).isEqualTo(1) },
             )
         }
     }
@@ -170,8 +179,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { Assertions.assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
             )
         }
 
@@ -196,9 +205,9 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { Assertions.assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
                 {
-                    Assertions.assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
+                    assertThat(exception.message).contains("상품을 찾을 수 없습니다. productId: $nonExistentProductId")
                 },
             )
         }
@@ -236,8 +245,72 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
             val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
             assertAll(
-                { Assertions.assertThat(productLikes).isEmpty() },
-                { Assertions.assertThat(productLikeCount?.productLikeCount).isEqualTo(0) },
+                { assertThat(productLikes).isEmpty() },
+                { assertThat(productLikeCount?.productLikeCount).isEqualTo(0) },
+            )
+        }
+    }
+
+    /*
+    **🔗 통합 테스트
+    - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 존재하지 않는 사용자의 경우 404 Not Found 에러가 발생한다.
+    - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 존재하는 사용자의 경우 해당 사용자가 좋아요한 상품 목록이 반환된다.
+    - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 해당 사용자가 좋아요한 상품이 없는 경우 빈 목록이 반환된다.
+     */
+    @DisplayName("사용자가 좋아요한 상품 목록을 조회할 때, ")
+    @Nested
+    inner class GetUserLikeProducts {
+        @DisplayName("존재하지 않는 사용자의 경우 404 Not Found 에러가 발생한다.")
+        @Test
+        fun failsToGetUserLikeProducts_whenUserNotFound() {
+            // arrange
+            val nonExistentUsername = "nonexistentuser"
+
+            // act
+            val exception = assertThrows<CoreException> {
+                productLikeFacade.getUserLikeProducts(nonExistentUsername)
+            }
+
+            // assert
+            assertAll(
+                { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
+            )
+        }
+
+        @DisplayName("존재하는 사용자의 경우 해당 사용자가 좋아요한 상품 목록이 반환된다.")
+        @Test
+        fun returnsUserLikeProducts_whenUserExists() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            repeat(10) {
+                val createdProduct = productJpaRepository.save(aProduct().name("상품$it").build())
+                productLikeJpaRepository.save(aProductLike().userId(createdUser.id).productId(createdProduct.id).build())
+            }
+
+            // act
+            val userLikeProducts = productLikeFacade.getUserLikeProducts(createdUser.username)
+
+            // assert
+            assertAll(
+                { assertThat(userLikeProducts).isNotEmpty },
+                { assertThat(userLikeProducts.size).isEqualTo(10) },
+            )
+        }
+
+        @DisplayName("해당 사용자가 좋아요한 상품이 없는 경우 빈 목록이 반환된다.")
+        @Test
+        fun returnsEmptyList_whenUserHasNoLikedProducts() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+
+            // act
+            val userLikeProducts = productLikeFacade.getUserLikeProducts(createdUser.username)
+
+            // assert
+            assertAll(
+                { assertThat(userLikeProducts).isEmpty() },
+                { assertThat(userLikeProducts.size).isEqualTo(0) },
             )
         }
     }

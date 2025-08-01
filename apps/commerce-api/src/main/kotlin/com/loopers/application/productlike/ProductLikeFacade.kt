@@ -44,4 +44,13 @@ class ProductLikeFacade(
             ),
         )
     }
+
+    @Transactional(readOnly = true)
+    fun getUserLikeProducts(username: String): List<ProductLikeInfo.UserLikeProductDetail> {
+        val user = userService.findUserBy(username)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다. username: $username")
+        val productLikes = productLikeService.getProductLikesByUserId(user.id)
+        return productService.getProductsByIds(productLikes.map { it.id })
+            .map { ProductLikeInfo.UserLikeProductDetail.from(it) }
+    }
 }
