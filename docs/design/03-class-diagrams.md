@@ -11,16 +11,19 @@ ProductLike 에서 사용자, 상품별로 좋아요를 관리하며, 좋아요 
 classDiagram
     class User {
         -Long id
-        -String userId
+        -String username
         -String name
-        -String email
-        -String birthday
+        -Email email
+        -Birthday birthday
         -GenderType Gender
     }
     class Brand {
         -Long id
         -String name
         -BrandStatus status
+        +active()
+        +inactive()
+        +close()
     }
     class Product {
         -Long id
@@ -28,21 +31,18 @@ classDiagram
         -Brand brand
         -ProductStatus status
         -String description
-        -ProductLikeCount productLikeCount
-        +getProductLikeCount()
+        +isNotActive()
     }
     class ProductLike {
         -Long id
         -Product product
         -User user
-        +create(product, user)
-        +delete(product, user)
     }
     class ProductLikeCount {
         -Product product
         -Long productLikeCount
-        +increase()
-        +decrease()
+        +increaseProductLikeCount()
+        +decreaseProductLikeCount()
     }
     Brand --> Product
     User --> ProductLike
@@ -70,19 +70,25 @@ classDiagram
         -Long id
         -String name
         -Brand brand
-        -ProductStatus status
+        -ProductStatusType status
         -Stock stock
         -Price price
         -String description
-        +availableOrder(quantity)
+    }
+%% 재고
+    class Stock {
+        -Long productId
+        -int quantity
+        +isQuantityLessThan(quantity)
+        +deductQuantity(quantity)
     }
 %% 사용자
     class User {
         -Long id
         -String userId
         -String name
-        -String email
-        -String birthday
+        -Email email
+        -Birthday birthday
         -GenderType Gender
     }
 %% 주문
@@ -90,66 +96,74 @@ classDiagram
         -Long id
         -User user
         -OrderCustomer orderCustomer
-        -OrderStatus orderStatus
+        -OrderStatusType orderStatus
         -Price totalPrice
         -Price amount
-        -List~OrderItem~ orderItems
-        +getOrderTotalPrice()
-        +getOrderAmount()
+        -OrderItems orderItems
+        +complete()
+        +cancel()
+        +addItems()
+        +getTotalPrice()
+        +getAmount()
     }
-%% 주문 상태 enum 정의
-    class OrderStatus {
-        <<enumeration>>
-        ORDER
-        PURCHASE
-        CANCEL
-    }
-%% 주문자 정보
-    class OrderCustomer {
-        -Order order
-        -String name
-        -Email email
-        -Mobile mobile
-        -Address address
+%% 주문 상품 목록
+    class OrderItems {
+        -List~OrderItem~ items
+        +getTotalPrice()
+        +getAmount()
+        +size()
     }
 %% 주문 상품
     class OrderItem {
         -Product product
         -String productName
-        -int quantity
         -Price totalPrice
         -Price amount
-        +getOrderTotalPrice()
-        +getOrderTotalAmount()
+        +getTotalPrice()
+        +getAmount()
     }
 %% 결제
     class Payment {
         -Long id
         -Order order
-        -PaymentMethod method
-        -PaymentStatus status
-        -List~PaymentItem~ paymentItems
+        -PaymentMethodType method
+        -PaymentStatusType status
+        -PaymentItems paymentItems
         -List~PaymentGatewayHistory~ histories
         -Price totalAmount
+        +complete()
+        +fail()
+        +cancel()
+        +addItems()
+        +getTotalAmount()
     }
-%% 결제 방식 enum 정의
-    class PaymentMethod {
-        <<enumeration>>
-        POINT
+%% 결제 항목 목록
+    class PaymentItems {
+        -List~PaymentItem~ items
+        +getTotalAmount()
+        +totalAmount()
+        +complete()
+        +fail()
+        +isAllPending()
+        +isAllCompleted()
+        +isAllFailed()
+        +isAllCanceled()
+        +cancel()
     }
-%% 결제 상태 enum 정의
-    class PaymentStatus {
-        <<enumeration>>
-        PURCHASE
-        CANCEL
-    }
-%% 결제 아이템
+%% 결제 항목
     class PaymentItem {
         -Long id
         -Payment payment
         -OrderItem orderItem
-        -PaymentStatus status
+        -PaymentStatusType status
         -Price amount
+        +complete()
+        +fail()
+        +cancel()
+        +isPending()
+        +isCompleted()
+        +isFailed()
+        +isCanceled()
     }
 %% 결제 히스토리
     class PaymentGatewayHistory {
@@ -159,18 +173,86 @@ classDiagram
         -String transactionId
         -String gatewayResponse
     }
+%% 주문 상태 enum 정의
+    class OrderStatusType {
+        <<enumeration>>
+        PENDING
+        COMPLETED
+        CANCELED
+    }
+%% 주문자 정보
+    class OrderCustomer {
+        <<valueobject>>
+        -Order order
+        -String name
+        -Email email
+        -Mobile mobile
+        -Address address
+    }
 
-    Order --> OrderItem
+%% 결제 방식 enum 정의
+    class PaymentMethodType {
+        <<enumeration>>
+        POINT
+    }
+%% 결제 상태 enum 정의
+    class PaymentStatusType {
+        <<enumeration>>
+        PENDING
+        COMPLETED
+        FAILED
+        CANCELED
+    }
+%% 결제 항목 상태 enum 정의
+    class PaymentStatusItemType {
+        <<enumeration>>
+        PENDING
+        COMPLETED
+        FAILED
+        CANCELED
+    }
+%% 가격
+    class Price {
+        <<valueobject>>
+        -value: Long,
+    }
+%% 이메일
+    class Email {
+        <<valueobject>>
+        -String value
+    }
+%% 전화번호
+    class Mobile {
+        <<valueobject>>
+        -String value
+    }
+%% 주소
+    class Address {
+        <<valueobject>>
+        -String zipCode
+        -String address
+        -String addressDetail
+    }
+%% 생년월일
+    class Birthday {
+        <<valueobject>>
+        -String value
+    }
+%% 수량
+    class Quantity {
+        <<valueobject>>
+        -int value
+    }
+
+    Product --> Stock
+    Order --> OrderItems
+    OrderItems --> OrderItem
     OrderItem --> Product
     Order --> User
-    Order --> OrderCustomer
     Order --> Payment
     Payment --> PaymentItem
     PaymentItem --> OrderItem
     Payment --> PaymentGatewayHistory
-    Payment --> PaymentMethod
-    Payment --> PaymentStatus
-    Order --> OrderStatus
 ```
 
 ## 상품-주문-결제 클래스 다이어그램 V2
