@@ -222,7 +222,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun succeedsToPayWithPoints_whenPaymentIsSuccessful() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(20_000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(20_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -266,7 +266,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
             }
-            val findPoint = pointRepository.findByUserId(createdUser.userId)
+            val findPoint = pointRepository.findByUserId(createdUser.id)
             assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
         }
 
@@ -314,7 +314,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToPayWithPoints_whenPaymentFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(1000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)

@@ -13,8 +13,8 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "member")
 class UserEntity(
-    @Column(name = "userId", unique = true, nullable = false)
-    val userId: String,
+    @Column(name = "username", unique = true, nullable = false)
+    val username: String,
     val name: String,
     @Column(name = "email", unique = true, nullable = false)
     val email: Email,
@@ -24,11 +24,11 @@ class UserEntity(
 ) : BaseEntity() {
 
     init {
-        (userId.length > 10 || !userId.matches(USER_ID_PATTERN)) &&
+        (username.length > 10 || !username.matches(USERNAME_PATTERN)) &&
                 throw IllegalArgumentException("ID는 영문 및 숫자 10자 이내여야 합니다.")
     }
 
     companion object {
-        private val USER_ID_PATTERN = "^[a-zA-Z0-9]{1,10}$".toRegex()
+        private val USERNAME_PATTERN = "^[a-zA-Z0-9]{1,10}$".toRegex()
     }
 }

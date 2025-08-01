@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull
 class UserV1Dto {
     data class SignUpRequest(
         @field:NotBlank
-        val userId: String,
+        val username: String,
         @field:NotBlank
         val name: String,
         @field:NotBlank
@@ -24,7 +24,7 @@ class UserV1Dto {
         val gender: GenderType,
     ) {
         fun toSignUp(): UserCriteria.SignUp = UserCriteria.SignUp(
-            userId,
+            username,
             name,
             Email(email),
             Birthday(birthday),
@@ -33,7 +33,7 @@ class UserV1Dto {
     }
 
     data class UserResponse(
-        val userId: String,
+        val username: String,
         val name: String,
         val email: String,
         val birthday: String,
@@ -41,7 +41,7 @@ class UserV1Dto {
     ) {
         companion object {
             fun from(info: UserInfo): UserResponse = UserResponse(
-                info.userId,
+                info.username,
                 info.name,
                 info.email.value,
                 info.birthday.value,

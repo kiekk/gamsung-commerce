@@ -71,7 +71,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
         fun failsToPayWithPoints_whenStockReductionFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(10_000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -103,7 +103,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             orderFacade.placeOrder(criteria)
 
             // assert
-            val findPoint = pointRepository.findByUserId(createdUser.userId)
+            val findPoint = pointRepository.findByUserId(createdUser.id)
             assertThat(findPoint?.point).isEqualTo(createdPoint.point)
 
             val findPayment = paymentRepository.findWithItemsByOrderId(criteria.userId)

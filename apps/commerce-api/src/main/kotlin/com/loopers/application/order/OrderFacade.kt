@@ -52,7 +52,7 @@ class OrderFacade(
 
         paymentProcessorFactory.process(
             PaymentProcessorCommand.Process(
-                user.userId,
+                user.id,
                 createdPayment.id,
                 criteria.paymentMethodType,
             ),
@@ -74,7 +74,7 @@ class OrderFacade(
             // 재고 감소 오류에 따른 결제 취소, 포인트 복구
             paymentProcessorFactory.cancel(
                 PaymentProcessorCommand.Cancel(
-                    user.userId,
+                    user.id,
                     createdPayment.id,
                     criteria.paymentMethodType,
                 ),

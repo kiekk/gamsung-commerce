@@ -72,7 +72,7 @@ class UserV1ApiE2ETest @Autowired constructor(
             assertAll(
                 { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
                 { assertThat(response.body?.data).isNotNull() },
-                { assertThat(response.body?.data?.userId).isEqualTo("user123") },
+                { assertThat(response.body?.data?.username).isEqualTo("user123") },
                 { assertThat(response.body?.data?.name).isEqualTo("soono") },
                 { assertThat(response.body?.data?.gender).isEqualTo(GenderType.M) },
             )
@@ -121,7 +121,7 @@ class UserV1ApiE2ETest @Autowired constructor(
             // arrange
             val userEntity = userJpaRepository.save(aUser().build())
             val httpHeaders = HttpHeaders()
-            httpHeaders.set("X-USER-ID", userEntity.userId)
+            httpHeaders.set("X-USER-ID", userEntity.username)
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
@@ -132,7 +132,7 @@ class UserV1ApiE2ETest @Autowired constructor(
             assertAll(
                 { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
                 { assertThat(response.body?.data).isNotNull() },
-                { assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId) },
+                { assertThat(response.body?.data?.username).isEqualTo(userEntity.username) },
                 { assertThat(response.body?.data?.name).isEqualTo(userEntity.name) },
             )
         }

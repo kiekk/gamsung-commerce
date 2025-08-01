@@ -105,11 +105,11 @@ class UserServiceIntegrationTest @Autowired constructor(
             val createdUser = userJpaRepository.save(aUser().build())
 
             // act
-            val myInfo = userService.findUserBy(createdUser.userId)
+            val myInfo = userService.findUserBy(createdUser.username)
 
             // assert
             assertThat(myInfo).isNotNull
-            assertThat(myInfo?.userId).isEqualTo(createdUser.userId)
+            assertThat(myInfo?.username).isEqualTo(createdUser.username)
             assertThat(myInfo?.name).isEqualTo(createdUser.name)
             assertThat(myInfo?.email).isEqualTo(createdUser.email)
             assertThat(myInfo?.birthday).isEqualTo(createdUser.birthday)

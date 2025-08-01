@@ -10,20 +10,20 @@ class PointV1Dto {
         @field:Min(value = 1, message = "포인트는 1 이상이어야 합니다.")
         val point: Long,
     ) {
-        fun toCriteria(userId: String): PointCriteria.Charge {
+        fun toCriteria(username: String): PointCriteria.Charge {
             return PointCriteria.Charge(
-                userId,
+                username,
                 Point(point),
             )
         }
     }
 
     data class PointResponse(
-        val userId: String,
+        val userId: Long,
         val point: Long,
     ) {
         companion object {
-            fun from(userId: String, point: Long): PointResponse = PointResponse(
+            fun from(userId: Long, point: Long): PointResponse = PointResponse(
                 userId,
                 point,
             )

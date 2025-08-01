@@ -6,7 +6,7 @@ import com.loopers.domain.vo.Email
 import com.loopers.support.enums.user.GenderType
 
 class UserInfo(
-    val userId: String,
+    val username: String,
     val name: String,
     val email: Email,
     val birthday: Birthday,
@@ -16,7 +16,7 @@ class UserInfo(
     companion object {
         fun from(userEntity: UserEntity): UserInfo {
             return UserInfo(
-                userEntity.userId,
+                userEntity.username,
                 userEntity.name,
                 userEntity.email,
                 userEntity.birthday,

@@ -16,7 +16,7 @@ class PointService(
     }
 
     @Transactional(readOnly = true)
-    fun getPoint(userId: String): PointEntity? {
+    fun getPointBy(userId: Long): PointEntity? {
         return pointRepository.findByUserId(userId)
     }
 }

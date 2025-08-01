@@ -7,7 +7,7 @@ import com.loopers.support.enums.user.GenderType
 
 class UserCriteria {
     data class SignUp(
-        val userId: String,
+        val username: String,
         val name: String,
         val email: Email,
         val birthday: Birthday,
@@ -15,12 +15,12 @@ class UserCriteria {
     ) {
 
         init {
-            (userId.length > 10 || !userId.matches(USER_ID_PATTERN)) &&
+            (username.length > 10 || !username.matches(USERNAME_PATTERN)) &&
                     throw IllegalArgumentException("ID는 영문 및 숫자 10자 이내여야 합니다.")
         }
 
         fun toCommand(): UserCommand.Create = UserCommand.Create(
-            userId,
+            username,
             name,
             email,
             birthday,
@@ -28,7 +28,7 @@ class UserCriteria {
         )
 
         companion object {
-            private val USER_ID_PATTERN = "^[a-zA-Z0-9]{1,10}$".toRegex()
+            private val USERNAME_PATTERN = "^[a-zA-Z0-9]{1,10}$".toRegex()
         }
     }
 }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -55,14 +56,14 @@ class PointV1ApiE2ETest @Autowired constructor(
         @Test
         fun returnsPoints_whenGetPointsIsSuccessful() {
             // arrange
-            val userEntity = userJpaRepository.save(aUser().build())
-            val pointEntity = pointJpaRepository.save(
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdPoint = pointJpaRepository.save(
                 aPoint()
-                    .userId(userEntity.userId)
+                    .userId(createdUser.id)
                     .build(),
             )
             val httpHeaders = HttpHeaders()
-            httpHeaders.set("X-USER-ID", userEntity.userId)
+            httpHeaders.set("X-USER-ID", createdUser.username)
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
@@ -70,10 +71,12 @@ class PointV1ApiE2ETest @Autowired constructor(
             val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, responseType)
 
             // assert
-            assertThat(response.statusCode.is2xxSuccessful).isTrue()
-            assertThat(response.body?.data).isNotNull
-            assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId)
-            assertThat(response.body?.data?.point).isEqualTo(pointEntity.point.value)
+            assertAll(
+                { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
+                { assertThat(response.body?.data).isNotNull },
+                { assertThat(response.body?.data?.userId).isEqualTo(createdUser.id) },
+                { assertThat(response.body?.data?.point).isEqualTo(createdPoint.point.value) },
+            )
         }
 
         @DisplayName("`X-USER-ID` 헤더가 없을 경우, `400 Bad Request` 응답을 반환한다.")
@@ -106,7 +109,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             val point = 1000L
             val userEntity = userJpaRepository.save(aUser().build())
             val httpHeaders = HttpHeaders()
-            httpHeaders.set("X-USER-ID", userEntity.userId)
+            httpHeaders.set("X-USER-ID", userEntity.username)
             httpHeaders.contentType = MediaType.APPLICATION_JSON
             val requestBody = PointV1Dto.ChargeRequest(point)
             val httpEntity = HttpEntity(requestBody, httpHeaders)
@@ -116,10 +119,12 @@ class PointV1ApiE2ETest @Autowired constructor(
             val response = testRestTemplate.exchange(ENDPOINT_CHARGE, HttpMethod.POST, httpEntity, responseType)
 
             // assert
-            assertThat(response.statusCode.is2xxSuccessful).isTrue()
-            assertThat(response.body?.data).isNotNull
-            assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId)
-            assertThat(response.body?.data?.point).isEqualTo(point)
+            assertAll(
+                { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
+                { assertThat(response.body?.data).isNotNull },
+                { assertThat(response.body?.data?.userId).isEqualTo(userEntity.id) },
+                { assertThat(response.body?.data?.point).isEqualTo(point) },
+            )
         }
 
         @DisplayName("존재하지 않는 유저로 요청할 경우, `404 Not Found` 응답을 반환한다.")
