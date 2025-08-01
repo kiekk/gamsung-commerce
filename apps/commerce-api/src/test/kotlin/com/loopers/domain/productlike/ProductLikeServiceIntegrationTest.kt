@@ -1,12 +1,9 @@
 package com.loopers.domain.productlike
 
-import com.loopers.domain.product.ProductCommand
-import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.product.ProductService
-import com.loopers.domain.user.UserCommand
-import com.loopers.domain.user.UserEntity
-import com.loopers.domain.user.UserService
-import com.loopers.domain.vo.Price
+import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -21,8 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest
 class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeService: ProductLikeService,
     private val databaseCleanUp: DatabaseCleanUp,
-    private val productService: ProductService,
-    private val userService: UserService,
+    private val productJpaRepository: ProductJpaRepository,
+    private val userJpaRepository: UserJpaRepository,
 ) {
 
     @AfterEach
@@ -42,22 +39,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun likesProductSuccessfully() {
             // arrange
-            val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
-            val createdProduct = productService.createProduct(productCreateCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val productLikeCommand = ProductLikeCommand.Like(
                 createdUser.id,
                 createdProduct.id,
@@ -81,22 +64,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun doesNotAllowDuplicateLikes() {
             // arrange
-            val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
-            val createdProduct = productService.createProduct(productCreateCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val productLikeCommand = ProductLikeCommand.Like(
                 createdUser.id,
                 createdProduct.id,
@@ -131,22 +100,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun unlikesProductSuccessfully() {
             // arrange
-            val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
-            val createdProduct = productService.createProduct(productCreateCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             productLikeService.like(
                 ProductLikeCommand.Like(
                     createdUser.id,
@@ -175,22 +130,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
         @Test
         fun doesNotAllowDuplicateUnlikes() {
             // arrange
-            val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
-            val createdProduct = productService.createProduct(productCreateCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             productLikeService.like(
                 ProductLikeCommand.Like(
                     createdUser.id,

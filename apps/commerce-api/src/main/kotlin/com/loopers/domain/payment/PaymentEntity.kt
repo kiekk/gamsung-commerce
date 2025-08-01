@@ -3,6 +3,8 @@ package com.loopers.domain.payment
 import com.loopers.domain.BaseEntity
 import com.loopers.domain.payment.vo.PaymentItems
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
@@ -31,17 +33,6 @@ class PaymentEntity(
     @Embedded
     var totalAmount: Price = paymentItems.totalAmount()
         private set
-
-    enum class PaymentStatusType {
-        PENDING,
-        COMPLETED,
-        FAILED,
-        CANCELED,
-    }
-
-    enum class PaymentMethodType {
-        POINT,
-    }
 
     fun addItems(paymentItems: List<PaymentItemEntity>) {
         _paymentItems.addAll(paymentItems)

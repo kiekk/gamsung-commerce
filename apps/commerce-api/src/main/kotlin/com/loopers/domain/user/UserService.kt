@@ -18,7 +18,7 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
-    fun findUserBy(userId: String): UserEntity? {
-        return userRepository.findByUserId(userId)
+    fun findUserBy(username: String): UserEntity? {
+        return userRepository.findByUsername(username)
     }
 }

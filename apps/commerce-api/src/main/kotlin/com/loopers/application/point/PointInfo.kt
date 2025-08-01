@@ -3,6 +3,6 @@ package com.loopers.application.point
 import com.loopers.domain.point.vo.Point
 
 class PointInfo(
-    val userId: String,
+    val userId: Long,
     val point: Point,
 )

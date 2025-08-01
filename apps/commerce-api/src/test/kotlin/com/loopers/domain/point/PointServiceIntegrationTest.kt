@@ -4,7 +4,9 @@ import com.loopers.application.point.PointCriteria
 import com.loopers.application.point.PointFacade
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.vo.Point
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -20,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class PointServiceIntegrationTest @Autowired constructor(
     private val pointFacade: PointFacade,
+    private val userJpaRepository: UserJpaRepository,
     private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
@@ -43,17 +46,16 @@ class PointServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsPoints_whenUserExists() {
             // arrange
-            val pointEntity = pointJpaRepository.save(
-                aPoint().build(),
-            )
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).build())
 
             // act
-            val userPoints = pointFacade.getPoint(pointEntity.userId)
+            val userPoints = pointFacade.getPointBy(createdUser.username)
 
             // assert
             assertThat(userPoints).isNotNull
-            assertThat(userPoints?.userId).isEqualTo(pointEntity.userId)
-            assertThat(userPoints?.point).isEqualTo(pointEntity.point)
+            assertThat(userPoints?.userId).isEqualTo(createdPoint.userId)
+            assertThat(userPoints?.point).isEqualTo(createdPoint.point)
         }
 
         @Test
@@ -63,7 +65,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "non-existent-user-id"
 
             // act
-            val userPoints = pointFacade.getPoint(nonExistentUserId)
+            val userPoints = pointFacade.getPointBy(nonExistentUserId)
 
             // assert
             assertThat(userPoints).isNull()

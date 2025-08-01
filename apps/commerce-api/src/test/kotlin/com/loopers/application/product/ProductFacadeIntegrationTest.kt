@@ -1,14 +1,14 @@
 package com.loopers.application.product
 
-import com.loopers.domain.brand.BrandRepository
 import com.loopers.domain.brand.fixture.BrandEntityFixture
-import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture
 import com.loopers.domain.product.query.ProductSearchCondition
-import com.loopers.domain.productlike.ProductLikeCountRepository
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions
@@ -27,9 +27,9 @@ import java.math.BigDecimal
 @SpringBootTest
 class ProductFacadeIntegrationTest @Autowired constructor(
     private val productFacade: ProductFacade,
-    private val productRepository: ProductRepository,
-    private val brandRepository: BrandRepository,
-    private val productLikeCountRepository: ProductLikeCountRepository,
+    private val productJpaRepository: ProductJpaRepository,
+    private val brandJpaRepository: BrandJpaRepository,
+    private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -56,7 +56,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
                 10,
             )
 
@@ -83,7 +83,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -132,7 +132,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun throwsExceptionWhenBrandNotFound() {
             // arrange
-            val createdProduct = productRepository.save(ProductEntityFixture.Companion.aProduct().build())
+            val createdProduct = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().build())
 
             // act
             val exception = assertThrows<CoreException> {
@@ -150,10 +150,11 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductWithBrandAndLikes() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).build())
-            val createdProductLikeCount = productLikeCountRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct.id).productLikeCount(20).build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).build())
+            val createdProductLikeCount = productLikeCountJpaRepository.save(
+                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct.id).productLikeCount(20).build(),
+            )
 
             // act
             val productInfo = productFacade.getProduct(createdProduct.id)
@@ -193,9 +194,9 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductListByPageAndSize() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -216,9 +217,9 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPartialNameSearch() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -239,23 +240,27 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsByPriceRange() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").price(
-                    Price(1000)
-                ).build())
-            productRepository.save(
+                    Price(1000),
+                ).build(),
+            )
+            productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").price(
-                    Price(2000)
-                ).build())
+                    Price(2000),
+                ).build(),
+            )
 
             // act
             val pageRequest = PageRequest.of(0, 10)
             val productsPage = productFacade.searchProducts(
                 ProductSearchCondition(
                     minPrice = BigDecimal(500.0),
-                    maxPrice = BigDecimal(1500.0)
-                ), pageRequest)
+                    maxPrice = BigDecimal(1500.0),
+                ),
+                pageRequest,
+            )
 
             // assert
             assertAll(
@@ -271,9 +276,9 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsEmptyList_whenNoMatchingProducts() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
-            productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10)
@@ -287,15 +292,17 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceAsc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").price(
-                    Price(1000)
-                ).build())
-            val createdProduct2 = productRepository.save(
+                    Price(1000),
+                ).build(),
+            )
+            val createdProduct2 = productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").price(
-                    Price(2000)
-                ).build())
+                    Price(2000),
+                ).build(),
+            )
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").ascending())
@@ -316,15 +323,17 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByPriceDesc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").price(
-                    Price(1000)
-                ).build())
-            val createdProduct2 = productRepository.save(
+                    Price(1000),
+                ).build(),
+            )
+            val createdProduct2 = productJpaRepository.save(
                 ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").price(
-                    Price(2000)
-                ).build())
+                    Price(2000),
+                ).build(),
+            )
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("price").descending())
@@ -345,10 +354,10 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtAsc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
             Thread.sleep(10)
-            val createdProduct2 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProduct2 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").ascending())
@@ -367,10 +376,10 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByCreatedAtDesc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
             Thread.sleep(10)
-            val createdProduct2 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProduct2 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending())
@@ -389,13 +398,15 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByLikesAsc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
-            val createdProduct2 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
-            val createdProductLikeCount1 = productLikeCountRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
-            val createdProductLikeCount2 = productLikeCountRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdProduct2 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProductLikeCount1 = productLikeCountJpaRepository.save(
+                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build(),
+            )
+            val createdProductLikeCount2 = productLikeCountJpaRepository.save(
+                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build(),
+            )
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("likeCount").ascending())
@@ -422,13 +433,15 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsProductsSortedByLikesDesc() {
             // arrange
-            val createdBrand = brandRepository.save(BrandEntityFixture.Companion.aBrand().build())
-            val createdProduct1 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
-            val createdProduct2 = productRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
-            val createdProductLikeCount1 = productLikeCountRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build())
-            val createdProductLikeCount2 = productLikeCountRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build())
+            val createdBrand = brandJpaRepository.save(BrandEntityFixture.Companion.aBrand().build())
+            val createdProduct1 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품A").build())
+            val createdProduct2 = productJpaRepository.save(ProductEntityFixture.Companion.aProduct().brandId(createdBrand.id).name("상품B").build())
+            val createdProductLikeCount1 = productLikeCountJpaRepository.save(
+                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build(),
+            )
+            val createdProductLikeCount2 = productLikeCountJpaRepository.save(
+                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build(),
+            )
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("likeCount").descending())

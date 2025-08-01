@@ -1,7 +1,11 @@
 package com.loopers.domain.user
 
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
+import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -48,9 +52,9 @@ class UserServiceIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
+                GenderType.M,
             )
             val spyUserRepository = spy(UserRepositoryImpl(userJpaRepository))
             val userServiceWithSpy = UserService(spyUserRepository)
@@ -69,9 +73,9 @@ class UserServiceIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
+                GenderType.M,
             )
             userService.save(userSignUpCommand)
 
@@ -98,21 +102,14 @@ class UserServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsMyInfo_whenRequestingMyInfo() {
             // arrange
-            val userSignUpCommand = UserCommand.Create(
-                "userId123",
-                "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
-                UserEntity.GenderType.M,
-            )
-            val createdUser = userService.save(userSignUpCommand)
+            val createdUser = userJpaRepository.save(aUser().build())
 
             // act
-            val myInfo = userService.findUserBy(createdUser.userId)
+            val myInfo = userService.findUserBy(createdUser.username)
 
             // assert
             assertThat(myInfo).isNotNull
-            assertThat(myInfo?.userId).isEqualTo(createdUser.userId)
+            assertThat(myInfo?.username).isEqualTo(createdUser.username)
             assertThat(myInfo?.name).isEqualTo(createdUser.name)
             assertThat(myInfo?.email).isEqualTo(createdUser.email)
             assertThat(myInfo?.birthday).isEqualTo(createdUser.birthday)

@@ -40,5 +40,4 @@ class PaymentItems(
     fun cancel() {
         items.forEach { it.cancel() }
     }
-
 }

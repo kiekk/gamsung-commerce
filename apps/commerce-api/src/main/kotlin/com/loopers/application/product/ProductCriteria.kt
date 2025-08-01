@@ -1,8 +1,8 @@
 package com.loopers.application.product
 
 import com.loopers.domain.product.ProductCommand
-import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 
 class ProductCriteria {
     data class Create(
@@ -10,7 +10,7 @@ class ProductCriteria {
         val name: String,
         val price: Price,
         val description: String?,
-        val status: ProductEntity.ProductStatusType,
+        val status: ProductStatusType,
         val quantity: Int? = 0,
     ) {
 

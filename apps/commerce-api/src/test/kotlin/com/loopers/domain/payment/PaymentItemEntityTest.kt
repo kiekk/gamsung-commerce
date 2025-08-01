@@ -2,6 +2,7 @@ package com.loopers.domain.payment
 
 import com.loopers.domain.payment.fixture.PaymentEntityFixture.Companion.aPayment
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentItemStatusType
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -32,7 +33,7 @@ class PaymentItemEntityTest {
             )
 
             // assert
-            Assertions.assertThat(paymentItem.status).isEqualTo(PaymentItemEntity.PaymentItemStatusType.PENDING)
+            Assertions.assertThat(paymentItem.status).isEqualTo(PaymentItemStatusType.PENDING)
         }
 
         @DisplayName("결제 항목은 결제가 완료되면 상태가 COMPLETED로 변경된다.")
@@ -50,7 +51,7 @@ class PaymentItemEntityTest {
             paymentItem.complete()
 
             // assert
-            assertThat(paymentItem.status).isEqualTo(PaymentItemEntity.PaymentItemStatusType.COMPLETED)
+            assertThat(paymentItem.status).isEqualTo(PaymentItemStatusType.COMPLETED)
         }
 
         @DisplayName("결제 항목은 결제가 실패하면 상태가 FAILED로 변경된다.")
@@ -68,7 +69,7 @@ class PaymentItemEntityTest {
             paymentItem.fail()
 
             // assert
-            assertThat(paymentItem.status).isEqualTo(PaymentItemEntity.PaymentItemStatusType.FAILED)
+            assertThat(paymentItem.status).isEqualTo(PaymentItemStatusType.FAILED)
         }
 
         @DisplayName("결제 항목은 결제가 취소되면 상태가 CANCELED로 변경된다.")
@@ -86,7 +87,7 @@ class PaymentItemEntityTest {
             paymentItem.cancel()
 
             // assert
-            assertThat(paymentItem.status).isEqualTo(PaymentItemEntity.PaymentItemStatusType.CANCELED)
+            assertThat(paymentItem.status).isEqualTo(PaymentItemStatusType.CANCELED)
         }
 
         @DisplayName("결제 항목은 정상적으로 생성되면 결제 ID, 주문 항목 ID, 금액이 올바르게 설정된다.")

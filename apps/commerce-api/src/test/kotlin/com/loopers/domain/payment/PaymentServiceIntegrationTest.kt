@@ -1,6 +1,8 @@
 package com.loopers.domain.payment
 
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -23,7 +25,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트**
+     **🔗 통합 테스트**
     - [ ] 결제가 생성되면 결제, 결제 항목의 상태가 PENDING이다.
     - [ ] 결제가 완료되면 결제, 결제 항목의 상태가 COMPLETED로 변경된다.
     - [ ] 결제가 실패하면 결제, 결제 항목의 상태가 FAILED로 변경된다.
@@ -39,7 +41,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             // arrange
             val command = PaymentCommand.Create(
                 1L,
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
                 listOf(
                     PaymentCommand.Create.PaymentItemCommand(
                         1L,
@@ -57,7 +59,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.PENDING) },
+                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.PENDING) },
                 { assertThat(paymentEntity.paymentItems.isAllPending()).isTrue() },
             )
         }
@@ -68,7 +70,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             // arrange
             val command = PaymentCommand.Create(
                 1L,
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
                 listOf(
                     PaymentCommand.Create.PaymentItemCommand(
                         1L,
@@ -87,7 +89,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.COMPLETED) },
+                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.COMPLETED) },
                 { assertThat(paymentEntity.paymentItems.isAllCompleted()).isTrue() },
             )
         }
@@ -98,7 +100,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             // arrange
             val command = PaymentCommand.Create(
                 1L,
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
                 listOf(
                     PaymentCommand.Create.PaymentItemCommand(
                         1L,
@@ -117,7 +119,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.FAILED) },
+                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.FAILED) },
                 { assertThat(paymentEntity.paymentItems.isAllFailed()).isTrue() },
             )
         }
@@ -128,7 +130,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             // arrange
             val command = PaymentCommand.Create(
                 1L,
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
                 listOf(
                     PaymentCommand.Create.PaymentItemCommand(
                         1L,
@@ -147,7 +149,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentEntity.PaymentStatusType.CANCELED) },
+                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.CANCELED) },
                 { assertThat(paymentEntity.paymentItems.isAllCanceled()).isTrue() },
             )
         }
@@ -158,7 +160,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             // arrange
             val command = PaymentCommand.Create(
                 1L,
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
                 listOf(
                     PaymentCommand.Create.PaymentItemCommand(
                         1L,
@@ -180,8 +182,5 @@ class PaymentServiceIntegrationTest @Autowired constructor(
                 { assertThat(paymentEntity.paymentItems.totalAmount()).isEqualTo(Price(30_000)) },
             )
         }
-
     }
-
-
 }

@@ -23,7 +23,7 @@ class ProductService(
     }
 
     @Transactional(readOnly = true)
-    fun getProductsByIds(productIds: List<Long>) : List<ProductEntity> {
+    fun getProductsByIds(productIds: List<Long>): List<ProductEntity> {
         return productRepository.findByIds(productIds)
     }
 }

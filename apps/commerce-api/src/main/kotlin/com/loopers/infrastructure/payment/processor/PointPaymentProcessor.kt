@@ -1,11 +1,11 @@
-package com.loopers.infrastructure.payment
+package com.loopers.infrastructure.payment.processor
 
-import com.loopers.domain.payment.PaymentEntity
-import com.loopers.domain.payment.PaymentProcessor
-import com.loopers.domain.payment.PaymentProcessorCommand
 import com.loopers.domain.payment.PaymentRepository
+import com.loopers.domain.payment.processor.PaymentProcessor
+import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
+import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.springframework.stereotype.Component
@@ -49,7 +49,7 @@ class PointPaymentProcessor(
         payment.cancel()
     }
 
-    override fun supports(method: PaymentEntity.PaymentMethodType): Boolean {
-        return method == PaymentEntity.PaymentMethodType.POINT
+    override fun supports(method: PaymentMethodType): Boolean {
+        return method == PaymentMethodType.POINT
     }
 }

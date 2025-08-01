@@ -12,7 +12,7 @@ import jakarta.persistence.Table
 @Table(name = "point")
 class PointEntity(
     @Column(name = "user_id", nullable = false, unique = true)
-    val userId: String,
+    val userId: Long,
     point: Point = Point.ZERO,
 ) : BaseEntity() {
     var point: Point = point

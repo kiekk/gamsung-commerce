@@ -1,9 +1,7 @@
 package com.loopers.application.order
 
-import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
@@ -21,6 +19,9 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.support.StockServiceMockConfig
+import com.loopers.support.enums.order.OrderStatusType
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.PaymentException
 import com.loopers.utils.DatabaseCleanUp
@@ -59,7 +60,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 결제 성공 후 재고 감소에 실패하면 포인트는 원복하고 결제/주문은 실패한다.
      */
     @DisplayName("결제 성공 후 재고 감소에 실패할 때, 포인트는")
@@ -70,7 +71,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
         fun failsToPayWithPoints_whenStockReductionFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(10_000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -89,7 +90,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             whenever(stockService.getStocksByProductIds(listOf(createdProduct.id))).thenReturn(
@@ -102,15 +103,14 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             orderFacade.placeOrder(criteria)
 
             // assert
-            val findPoint = pointRepository.findByUserId(createdUser.userId)
+            val findPoint = pointRepository.findByUserId(createdUser.id)
             assertThat(findPoint?.point).isEqualTo(createdPoint.point)
 
             val findPayment = paymentRepository.findWithItemsByOrderId(criteria.userId)
-            assertThat(findPayment?.status).isEqualTo(PaymentEntity.PaymentStatusType.CANCELED)
+            assertThat(findPayment?.status).isEqualTo(PaymentStatusType.CANCELED)
 
             val findOrder = orderRepository.findWithItemsById(criteria.userId)
-            assertThat(findOrder?.orderStatus).isEqualTo(OrderEntity.OrderStatusType.CANCELED)
+            assertThat(findOrder?.orderStatus).isEqualTo(OrderStatusType.CANCELED)
         }
     }
-
 }

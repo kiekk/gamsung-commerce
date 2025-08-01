@@ -1,10 +1,10 @@
 package com.loopers.domain.brand.query
 
-import com.loopers.domain.brand.BrandEntity
+import com.loopers.support.enums.brand.BrandStatusType
 
 class BrandSearchCondition(
     val name: String? = null,
-    val status: BrandEntity.BrandStatusType? = null,
+    val status: BrandStatusType? = null,
 ) {
 
     init {

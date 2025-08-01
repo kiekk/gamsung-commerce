@@ -8,7 +8,7 @@ class PaymentService(
     private val paymentRepository: PaymentRepository,
 ) {
     @Transactional
-    fun createPayment(command: PaymentCommand.Create) : PaymentEntity {
+    fun createPayment(command: PaymentCommand.Create): PaymentEntity {
         val payment = command.toPaymentEntity()
         payment.addItems(command.toPaymentItemEntities(payment))
         return paymentRepository.save(payment)

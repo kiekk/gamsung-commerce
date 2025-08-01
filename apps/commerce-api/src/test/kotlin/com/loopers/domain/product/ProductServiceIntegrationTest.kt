@@ -1,9 +1,12 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.brand.BrandCommand
-import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.BrandService
+import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
+import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -21,6 +24,8 @@ import kotlin.test.Test
 class ProductServiceIntegrationTest @Autowired constructor(
     private val productService: ProductService,
     private val brandService: BrandService,
+    private val productJpaRepository: ProductJpaRepository,
+    private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -42,14 +47,14 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateProduct_whenNameIsDuplicate() {
             // arrange
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val productCreateCommand = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                createdProduct.brandId,
+                createdProduct.name,
+                createdProduct.price,
+                createdProduct.description,
+                ProductStatusType.ACTIVE,
             )
-            productService.createProduct(productCreateCommand)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -67,29 +72,21 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun createsProduct_whenBrandIsDifferent() {
             // arrange
-            val brandCreateCommand1 = BrandCommand.Create(
-                "브랜드A",
-                BrandEntity.BrandStatusType.ACTIVE,
-            )
-            val brandCreateCommand2 = BrandCommand.Create(
-                "브랜드B",
-                BrandEntity.BrandStatusType.ACTIVE,
-            )
-            val createdBrand1 = brandService.createBrand(brandCreateCommand1)
-            val createdBrand2 = brandService.createBrand(brandCreateCommand2)
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
             val productCreateCommand1 = ProductCommand.Create(
                 createdBrand1.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val productCreateCommand2 = ProductCommand.Create(
                 createdBrand2.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -114,7 +111,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -155,14 +152,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsProduct_whenProductExists() {
             // arrange
-            val productCreateProduct = ProductCommand.Create(
-                1L,
-                "상품A",
-                Price(1000),
-                "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
-            )
-            val createdProduct = productService.createProduct(productCreateProduct)
+            val createdProduct = productJpaRepository.save(aProduct().build())
 
             // act
             val product = productService.findProductBy(createdProduct.id)

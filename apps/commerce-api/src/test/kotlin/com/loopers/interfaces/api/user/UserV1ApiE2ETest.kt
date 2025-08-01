@@ -1,9 +1,9 @@
 package com.loopers.interfaces.api.user
 
-import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
+import com.loopers.support.enums.user.GenderType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -56,7 +56,7 @@ class UserV1ApiE2ETest @Autowired constructor(
                 "soono",
                 "soono@example.com",
                 "1000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
 
             // act
@@ -72,9 +72,9 @@ class UserV1ApiE2ETest @Autowired constructor(
             assertAll(
                 { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
                 { assertThat(response.body?.data).isNotNull() },
-                { assertThat(response.body?.data?.userId).isEqualTo("user123") },
+                { assertThat(response.body?.data?.username).isEqualTo("user123") },
                 { assertThat(response.body?.data?.name).isEqualTo("soono") },
-                { assertThat(response.body?.data?.gender).isEqualTo(UserEntity.GenderType.M) },
+                { assertThat(response.body?.data?.gender).isEqualTo(GenderType.M) },
             )
         }
 
@@ -121,7 +121,7 @@ class UserV1ApiE2ETest @Autowired constructor(
             // arrange
             val userEntity = userJpaRepository.save(aUser().build())
             val httpHeaders = HttpHeaders()
-            httpHeaders.set("X-USER-ID", userEntity.userId)
+            httpHeaders.set("X-USER-ID", userEntity.username)
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
@@ -132,7 +132,7 @@ class UserV1ApiE2ETest @Autowired constructor(
             assertAll(
                 { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
                 { assertThat(response.body?.data).isNotNull() },
-                { assertThat(response.body?.data?.userId).isEqualTo(userEntity.userId) },
+                { assertThat(response.body?.data?.username).isEqualTo(userEntity.username) },
                 { assertThat(response.body?.data?.name).isEqualTo(userEntity.name) },
             )
         }

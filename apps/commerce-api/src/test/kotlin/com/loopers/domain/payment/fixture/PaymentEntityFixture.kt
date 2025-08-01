@@ -1,7 +1,7 @@
 package com.loopers.domain.payment.fixture
 
 import com.loopers.domain.payment.PaymentEntity
-import com.loopers.domain.payment.PaymentEntity.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentMethodType
 
 class PaymentEntityFixture {
     var orderId: Long = 1L
@@ -19,6 +19,4 @@ class PaymentEntityFixture {
         orderId,
         method,
     )
-
-
 }

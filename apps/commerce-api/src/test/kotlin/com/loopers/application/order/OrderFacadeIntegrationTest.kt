@@ -1,14 +1,11 @@
 package com.loopers.application.order
 
-import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
-import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.stock.StockRepository
@@ -19,6 +16,10 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.order.OrderStatusType
+import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -49,7 +50,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 존재하지 않는 사용자가 주문을 요청할 경우 예외가 발생한다.
     - [ ] 주문 항목의 productId에 해당하는 상품이 존재하지 않으면 예외가 발생한다.
     - [ ] 주문 항목의 productId에 해당하는 상품이 주문 가능한 상태가 아니면 예외가 발생한다.
@@ -81,7 +82,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -117,7 +118,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         Price(20_000),
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -137,7 +138,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToCreateOrder_whenProductIsNotAvailable() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().status(ProductEntity.ProductStatusType.INACTIVE).build())
+            val createdProduct = productRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
                 "홍길동",
@@ -153,7 +154,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -191,7 +192,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -202,13 +203,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: ${quantity}, 재고: ${createdStock.quantity}") },
+                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: $quantity, 재고: ${createdStock.quantity}") },
             )
         }
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 포인트로 결제에 성공하면 재고가 감소하며 결제 성공, 주문 완료 처리 된다.
     - [ ] 포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.
     - [ ] 포인트 부족 시 결제는 실패하고 주문도 실패한다.
@@ -221,7 +222,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun succeedsToPayWithPoints_whenPaymentIsSuccessful() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(20_000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(20_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -240,7 +241,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -251,7 +252,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             findOrder?.let { order ->
                 assertAll(
                     { assertThat(order.userId).isEqualTo(createdUser.id) },
-                    { assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.COMPLETED) },
+                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
                     { assertThat(order.orderItems.size()).isEqualTo(2) },
                     { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                     { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
@@ -260,12 +261,12 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val findPayment = paymentRepository.findWithItemsByOrderId(orderId)
             findPayment?.let { payment ->
                 assertAll(
-                    { assertThat(payment.status).isEqualTo(PaymentEntity.PaymentStatusType.COMPLETED) },
+                    { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
                     { assertThat(payment.paymentItems.isAllCompleted()).isTrue() },
                     { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
             }
-            val findPoint = pointRepository.findByUserId(createdUser.userId)
+            val findPoint = pointRepository.findByUserId(createdUser.id)
             assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
         }
 
@@ -292,7 +293,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act
@@ -313,7 +314,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToPayWithPoints_whenPaymentFails() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(1000)).build())
+            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             stockRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -332,7 +333,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.price,
                     ),
                 ),
-                PaymentEntity.PaymentMethodType.POINT,
+                PaymentMethodType.POINT,
             )
 
             // act

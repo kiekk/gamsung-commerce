@@ -1,8 +1,8 @@
 package com.loopers.application.productlike
 
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.productlike.ProductLikeCommand
 import com.loopers.domain.productlike.ProductLikeService
-import com.loopers.domain.product.ProductService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType

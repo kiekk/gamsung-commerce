@@ -22,7 +22,7 @@ class PointV1Controller(
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
-        return pointFacade.getPoint(userId)
+        return pointFacade.getPointBy(userId)
             ?.let { PointV1Dto.PointResponse.from(it.userId, it.point.value) }
             .let { ApiResponse.success(it) }
     }
@@ -38,7 +38,7 @@ class PointV1Controller(
         return pointFacade.chargePoint(request.toCriteria(userId))
             ?.let {
                 PointV1Dto.PointResponse.from(
-                    userId,
+                    it.userId,
                     it.point.value,
                 )
             }

@@ -2,9 +2,9 @@ package com.loopers.application.order
 
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.payment.PaymentCommand
-import com.loopers.domain.payment.PaymentProcessorCommand
+import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.PaymentService
-import com.loopers.domain.payment.factory.PaymentProcessorFactory
+import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
 import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
@@ -27,7 +27,6 @@ class OrderFacade(
 ) {
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
-
 
     @Transactional(noRollbackFor = [PaymentException::class])
     fun placeOrder(criteria: OrderCriteria.Create): Long {
@@ -53,7 +52,7 @@ class OrderFacade(
 
         paymentProcessorFactory.process(
             PaymentProcessorCommand.Process(
-                user.userId,
+                user.id,
                 createdPayment.id,
                 criteria.paymentMethodType,
             ),
@@ -75,7 +74,7 @@ class OrderFacade(
             // 재고 감소 오류에 따른 결제 취소, 포인트 복구
             paymentProcessorFactory.cancel(
                 PaymentProcessorCommand.Cancel(
-                    user.userId,
+                    user.id,
                     createdPayment.id,
                     criteria.paymentMethodType,
                 ),
@@ -120,6 +119,4 @@ class OrderFacade(
             }
         }
     }
-
-
 }

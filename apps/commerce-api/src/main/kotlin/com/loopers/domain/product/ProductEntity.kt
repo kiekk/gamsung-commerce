@@ -2,6 +2,7 @@ package com.loopers.domain.product
 
 import com.loopers.domain.BaseEntity
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
@@ -16,12 +17,6 @@ class ProductEntity(
     val price: Price,
     val status: ProductStatusType = ProductStatusType.ACTIVE,
 ) : BaseEntity() {
-
-    enum class ProductStatusType {
-        ACTIVE,
-        INACTIVE,
-        DELETED,
-    }
 
     init {
         !name.matches(PRODUCT_NAME_REGEX) && throw IllegalArgumentException("상품명은 한글, 영문, 숫자 20자 이내로 입력해야 합니다.")

@@ -1,6 +1,8 @@
 package com.loopers.domain.user
 
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -58,7 +60,7 @@ class UserTest {
 
             // act
             val result = assertThrows<IllegalArgumentException> {
-                aUser().email(invalidEmail).build()
+                aUser().email(Email(invalidEmail)).build()
             }
 
             // assert
@@ -81,7 +83,7 @@ class UserTest {
 
             // act
             val result = assertThrows<IllegalArgumentException> {
-                aUser().birthday(invalidBirthday).build()
+                aUser().birthday(Birthday(invalidBirthday)).build()
             }
 
             // assert

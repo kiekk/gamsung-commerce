@@ -1,11 +1,12 @@
 package com.loopers.domain.payment
 
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentMethodType
 
 class PaymentCommand {
     data class Create(
         val orderId: Long,
-        val method: PaymentEntity.PaymentMethodType,
+        val method: PaymentMethodType,
         val paymentItems: List<PaymentItemCommand>,
     ) {
         init {
@@ -34,6 +35,5 @@ class PaymentCommand {
                 )
             }
         }
-
     }
 }
