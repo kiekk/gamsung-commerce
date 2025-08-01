@@ -32,4 +32,8 @@ class PointEntity(
     fun cannotUsePoint(pointToUser: Point): Boolean {
         return pointToUser.value > point.value
     }
+
+    fun refundPoint(point: Point) {
+        this.point = Point(this.point.value + point.value)
+    }
 }

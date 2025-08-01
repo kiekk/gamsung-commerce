@@ -47,6 +47,7 @@ class PointEntityTest {
     - [ ] 포인트를 사용하면 포인트가 차감된다.
     - [ ] 포인트 사용이 가능하면 true를 반환한다.
     - [ ] 포인트 사용이 불가능하면 false를 반환한다.
+    - [ ] 포인트를 환불하면 환불된 포인트만큼 포인트가 증가한다.
      */
     @DisplayName("Point 객체를 사용할 때, ")
     @Nested
@@ -91,6 +92,20 @@ class PointEntityTest {
 
             // assert
             assertThat(result).isTrue()
+        }
+
+        @DisplayName("포인트를 환불하면 환불된 포인트만큼 포인트가 증가한다.")
+        @ParameterizedTest
+        @ValueSource(longs = [100, 200, 300])
+        fun refundPoint(refundAmount: Long) {
+            // arrange
+            val pointEntity = aPoint().point(Point(500)).build()
+
+            // act
+            pointEntity.refundPoint(Point(refundAmount))
+
+            // assert
+            assertThat(pointEntity.point).isEqualTo(Point(500 + refundAmount))
         }
     }
 }
