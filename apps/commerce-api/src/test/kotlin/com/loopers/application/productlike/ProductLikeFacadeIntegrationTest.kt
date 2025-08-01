@@ -6,6 +6,8 @@ import com.loopers.domain.productlike.ProductLikeCommand
 import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.user.UserCommand
 import com.loopers.domain.user.UserService
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Price
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.enums.user.GenderType
@@ -79,8 +81,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
@@ -115,8 +117,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
@@ -179,8 +181,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
@@ -214,8 +216,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)

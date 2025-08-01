@@ -1,6 +1,8 @@
 package com.loopers.domain.user
 
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
 import com.loopers.support.enums.user.GenderType
@@ -50,8 +52,8 @@ class UserServiceIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             val spyUserRepository = spy(UserRepositoryImpl(userJpaRepository))
@@ -71,8 +73,8 @@ class UserServiceIntegrationTest @Autowired constructor(
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
                 "soono",
-                "shyoon991@gmail.com",
-                "2000-01-01",
+                Email("shyoon991@gmail.com"),
+                Birthday("2000-01-01"),
                 GenderType.M,
             )
             userService.save(userSignUpCommand)

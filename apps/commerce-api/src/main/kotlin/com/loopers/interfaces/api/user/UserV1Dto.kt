@@ -2,6 +2,8 @@ package com.loopers.interfaces.api.user
 
 import com.loopers.application.user.UserCriteria
 import com.loopers.application.user.UserInfo
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
 import com.loopers.support.enums.user.GenderType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -24,8 +26,8 @@ class UserV1Dto {
         fun toSignUp(): UserCriteria.SignUp = UserCriteria.SignUp(
             userId,
             name,
-            email,
-            birthday,
+            Email(email),
+            Birthday(birthday),
             gender,
         )
     }
@@ -41,8 +43,8 @@ class UserV1Dto {
             fun from(info: UserInfo): UserResponse = UserResponse(
                 info.userId,
                 info.name,
-                info.email,
-                info.birthday,
+                info.email.value,
+                info.birthday.value,
                 info.gender,
             )
         }
