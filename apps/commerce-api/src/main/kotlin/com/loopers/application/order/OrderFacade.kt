@@ -2,9 +2,9 @@ package com.loopers.application.order
 
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.payment.PaymentCommand
-import com.loopers.domain.payment.PaymentProcessorCommand
+import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.PaymentService
-import com.loopers.domain.payment.factory.PaymentProcessorFactory
+import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
 import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService

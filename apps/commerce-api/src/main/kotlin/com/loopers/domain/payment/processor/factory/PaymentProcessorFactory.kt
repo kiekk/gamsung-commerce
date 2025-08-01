@@ -1,7 +1,7 @@
-package com.loopers.domain.payment.factory
+package com.loopers.domain.payment.processor.factory
 
-import com.loopers.domain.payment.PaymentProcessor
-import com.loopers.domain.payment.PaymentProcessorCommand
+import com.loopers.domain.payment.processor.PaymentProcessor
+import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import org.springframework.stereotype.Component
 
 @Component
