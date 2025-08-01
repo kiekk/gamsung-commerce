@@ -6,4 +6,10 @@ class PaymentProcessorCommand {
         val paymentId: Long,
         val paymentMethod: PaymentEntity.PaymentMethodType,
     )
+
+    data class Cancel(
+        val userId: String,
+        val paymentId: Long,
+        val paymentMethod: PaymentEntity.PaymentMethodType,
+    )
 }

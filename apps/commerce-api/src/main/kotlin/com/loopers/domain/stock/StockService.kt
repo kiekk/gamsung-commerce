@@ -1,6 +1,9 @@
 package com.loopers.domain.stock
 
+import com.loopers.support.error.ErrorType
+import com.loopers.support.error.payment.PaymentException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -17,14 +20,17 @@ class StockService(
         return stockRepository.findByIds(productIds)
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun decreaseStocks(command: List<StockCommand.Decrease>) {
         val decreaseCommandMap = command.associate { it.productId to it.quantity }
         stockRepository.findByIds(command.map { it.productId })
             .associateBy { it.productId }
             .forEach { (productId, stock) ->
                 decreaseCommandMap[productId]?.let { quantity ->
-                    stock.invalidQuantity(quantity) && throw IllegalArgumentException("Invalid quantity for productId: $productId")
+                    stock.invalidQuantity(quantity) && throw PaymentException(
+                        ErrorType.CONFLICT,
+                        "재고가 부족합니다. productId: $productId, 요청 수량: $quantity, 현재 재고: ${stock.quantity}",
+                    )
                     stock.decreaseQuantity(quantity)
                 }
             }

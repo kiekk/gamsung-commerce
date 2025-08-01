@@ -12,4 +12,9 @@ class PaymentProcessorFactory(
         return processors.find { it.supports(command.paymentMethod) }?.process(command)
             ?: throw IllegalArgumentException("지원하지 않는 결제 방법입니다: ${command.paymentMethod}")
     }
+
+    fun cancel(command: PaymentProcessorCommand.Cancel) {
+        return processors.find { it.supports(command.paymentMethod) }?.cancel(command)
+            ?: throw IllegalArgumentException("지원하지 않는 결제 방법입니다: ${command.paymentMethod}")
+    }
 }

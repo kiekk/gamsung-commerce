@@ -212,7 +212,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     - [ ] 포인트로 결제에 성공하면 재고가 감소하며 결제 성공, 주문 완료 처리 된다.
     - [ ] 포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.
     - [ ] 포인트 부족 시 결제는 실패하고 주문도 실패한다.
-    - [ ] 결제 성공 후 재고 감소에 실패하면 포인트는 원복하고 결제/주문은 실패한다.
      */
     @DisplayName("주문을 결제할 때, ")
     @Nested
@@ -347,49 +346,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 { assertThat(exception.message).isEqualTo("포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${createdPoint.point}") },
                 { assertThat(orderRepository.findWithItemsById(criteria.userId)).isNull() },
             )
-        }
-
-        @DisplayName("결제 성공 후 재고 감소에 실패하면 포인트는 원복하고 결제/주문은 실패한다.")
-        @Test
-        fun failsToPayWithPoints_whenStockReductionFails() {
-            // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.userId).point(Point(10_000)).build())
-            val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
-            stockRepository.save(aStock().build())
-            val quantity = Quantity(2)
-            val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
-                "홍길동",
-                Email("shyoon991@gmail.com"),
-                Mobile("010-1234-5678"),
-                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
-                listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
-                        createdProduct.id,
-                        createdProduct.name,
-                        quantity,
-                        createdProduct.price,
-                        createdProduct.price,
-                    ),
-                ),
-                PaymentEntity.PaymentMethodType.POINT,
-            )
-            val orderId = orderFacade.placeOrder(orderCriteria)
-            val paymentAmount = createdProduct.price.value * quantity.value
-
-            // act
-//            val exception = assertThrows<CoreException> {
-//                orderFacade.payOrderWithPoints(orderId, paymentAmount)
-//            }
-//
-//            // assert
-//            assertAll(
-//                { assertThat(exception).isInstanceOf(CoreException::class.java) },
-//                { assertThat(exception.message).isEqualTo("재고 감소에 실패했습니다. orderId: $orderId, productId: ${createdProduct.id}, 요청 수량: ${quantity.value}") },
-//            )
-//            val findOrder = orderJpaRepository.findById(orderId).orElse(null)
-//            assertThat(findOrder).isNull() // 주문이 생성되지 않아야 함
         }
     }
 }

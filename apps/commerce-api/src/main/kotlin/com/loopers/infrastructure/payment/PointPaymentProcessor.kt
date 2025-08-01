@@ -9,6 +9,7 @@ import com.loopers.domain.point.vo.Point
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PointPaymentProcessor(
@@ -16,6 +17,7 @@ class PointPaymentProcessor(
     private val pointRepository: PointRepository,
 ) : PaymentProcessor {
 
+    @Transactional
     override fun process(command: PaymentProcessorCommand.Process) {
         val point =
             pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
@@ -31,6 +33,20 @@ class PointPaymentProcessor(
 
         point.usePoint(Point(payment.totalAmount.value))
         payment.complete()
+    }
+
+    @Transactional
+    override fun cancel(command: PaymentProcessorCommand.Cancel) {
+        val point =
+            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
+        val payment =
+            paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(
+                ErrorType.NOT_FOUND,
+                "결제 정보를 찾을 수 없습니다.",
+            )
+
+        point.refundPoint(Point(payment.totalAmount.value))
+        payment.cancel()
     }
 
     override fun supports(method: PaymentEntity.PaymentMethodType): Boolean {

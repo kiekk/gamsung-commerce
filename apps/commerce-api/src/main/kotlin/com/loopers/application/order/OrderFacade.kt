@@ -11,6 +11,8 @@ import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import com.loopers.support.error.payment.PaymentException
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,7 +25,11 @@ class OrderFacade(
     private val paymentService: PaymentService,
     private val paymentProcessorFactory: PaymentProcessorFactory,
 ) {
-    @Transactional
+
+    private val log = LoggerFactory.getLogger(OrderFacade::class.java)
+
+
+    @Transactional(noRollbackFor = [PaymentException::class])
     fun placeOrder(criteria: OrderCriteria.Create): Long {
         val user = userService.findUserBy(criteria.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
@@ -63,10 +69,19 @@ class OrderFacade(
                 },
             )
 
-            createdOrder.complete()
-        } catch (e: Exception) {
-            // TODO: 재고 감소 오류에 따른 주문, 결제(포인트) 롤백 처리
-            // TODO: 결제 취소, 주문 실패 상태 변경
+            orderService.completeOrder(createdOrder.id)
+        } catch (e: PaymentException) {
+            log.error(e.message, e)
+            // 재고 감소 오류에 따른 결제 취소, 포인트 복구
+            paymentProcessorFactory.cancel(
+                PaymentProcessorCommand.Cancel(
+                    user.userId,
+                    createdPayment.id,
+                    criteria.paymentMethodType,
+                ),
+            )
+            // 주문 취소 상태 변경
+            orderService.cancelOrder(createdOrder.id)
         }
 
         return createdOrder.id

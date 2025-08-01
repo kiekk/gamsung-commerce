@@ -17,7 +17,7 @@ class OrderEntityTest {
     - [ ] 주문 아이템 목록에서 주문의 총 금액을 계산한다.
     - [ ] 주문 생성 시 상태는 PENDING이다.
     - [ ] 주문을 완료 처리하면 상태는 COMPLETED가 된다
-    - [ ] 주문을 취소하면 상태는 CANCELLED가 된다
+    - [ ] 주문을 취소하면 상태는 CANCELED가 된다
      */
     @DisplayName("주문 엔티티를 생성 할 때, ")
     @Nested
@@ -26,8 +26,6 @@ class OrderEntityTest {
         @Test
         fun calculatesTotalPriceFromProductList() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
                 .build()
@@ -62,7 +60,6 @@ class OrderEntityTest {
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
                 .build()
-
             order.addItems(
                 listOf(
                     anOrderItem()
@@ -84,8 +81,6 @@ class OrderEntityTest {
         @Test
         fun canChangeOrderToCompletedStatus() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
                 .build()
@@ -109,12 +104,10 @@ class OrderEntityTest {
             assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.COMPLETED)
         }
 
-        @DisplayName("주문을 취소하면 상태는 CANCELLED가 된다")
+        @DisplayName("주문을 취소하면 상태는 CANCELED가 된다")
         @Test
-        fun canChangeOrderToCancelledStatus() {
+        fun canChangeOrderToCanceledStatus() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
                 .build()
