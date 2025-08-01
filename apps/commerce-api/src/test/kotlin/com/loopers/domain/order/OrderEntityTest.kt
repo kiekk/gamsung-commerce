@@ -4,6 +4,7 @@ import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.order.OrderStatusType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -74,7 +75,7 @@ class OrderEntityTest {
             )
 
             // assert
-            assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.PENDING)
+            assertThat(order.orderStatus).isEqualTo(OrderStatusType.PENDING)
         }
 
         @DisplayName("주문을 완료 처리하면 상태는 COMPLETED가 된다")
@@ -101,7 +102,7 @@ class OrderEntityTest {
             // act
             order.complete()
 
-            assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.COMPLETED)
+            assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED)
         }
 
         @DisplayName("주문을 취소하면 상태는 CANCELED가 된다")
@@ -129,7 +130,7 @@ class OrderEntityTest {
             order.cancel()
 
             // assert
-            assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.CANCELED)
+            assertThat(order.orderStatus).isEqualTo(OrderStatusType.CANCELED)
         }
     }
 }

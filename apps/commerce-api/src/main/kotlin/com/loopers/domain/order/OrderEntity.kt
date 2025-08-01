@@ -4,6 +4,7 @@ import com.loopers.domain.BaseEntity
 import com.loopers.domain.order.vo.OrderCustomer
 import com.loopers.domain.order.vo.OrderItems
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.order.OrderStatusType
 import jakarta.persistence.AttributeOverride
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
@@ -39,12 +40,6 @@ class OrderEntity(
     @AttributeOverride(name = "value", column = Column("amount"))
     var amount: Price = orderItems.amount()
         private set
-
-    enum class OrderStatusType {
-        PENDING,
-        COMPLETED,
-        CANCELED,
-    }
 
     fun complete() {
         orderStatus = OrderStatusType.COMPLETED

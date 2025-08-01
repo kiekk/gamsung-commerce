@@ -1,6 +1,5 @@
 package com.loopers.application.order
 
-import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.payment.PaymentRepository
@@ -17,6 +16,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.enums.product.ProductStatusType
@@ -252,7 +252,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             findOrder?.let { order ->
                 assertAll(
                     { assertThat(order.userId).isEqualTo(createdUser.id) },
-                    { assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.COMPLETED) },
+                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
                     { assertThat(order.orderItems.size()).isEqualTo(2) },
                     { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                     { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },

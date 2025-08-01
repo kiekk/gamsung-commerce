@@ -1,6 +1,5 @@
 package com.loopers.application.order
 
-import com.loopers.domain.order.OrderEntity
 import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.payment.PaymentRepository
@@ -20,6 +19,7 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.support.StockServiceMockConfig
+import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
@@ -110,7 +110,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             assertThat(findPayment?.status).isEqualTo(PaymentStatusType.CANCELED)
 
             val findOrder = orderRepository.findWithItemsById(criteria.userId)
-            assertThat(findOrder?.orderStatus).isEqualTo(OrderEntity.OrderStatusType.CANCELED)
+            assertThat(findOrder?.orderStatus).isEqualTo(OrderStatusType.CANCELED)
         }
     }
 }
