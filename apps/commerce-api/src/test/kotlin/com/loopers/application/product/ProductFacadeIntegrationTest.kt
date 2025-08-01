@@ -1,7 +1,6 @@
 package com.loopers.application.product
 
 import com.loopers.domain.brand.fixture.BrandEntityFixture
-import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.fixture.ProductEntityFixture
 import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture
@@ -9,6 +8,7 @@ import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions
@@ -56,7 +56,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
                 10,
             )
 
@@ -83,7 +83,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act

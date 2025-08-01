@@ -1,6 +1,7 @@
 package com.loopers.domain.product
 
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
@@ -39,7 +40,7 @@ class ProductEntityTest {
                     invalidProductName,
                     "Valid description.",
                     Price(1000L),
-                    ProductEntity.ProductStatusType.ACTIVE,
+                    ProductStatusType.ACTIVE,
                 )
             }
 
@@ -63,7 +64,7 @@ class ProductEntityTest {
                     "상품A",
                     longDescription,
                     Price(1000L),
-                    ProductEntity.ProductStatusType.ACTIVE,
+                    ProductStatusType.ACTIVE,
                 )
             }
 
@@ -81,7 +82,7 @@ class ProductEntityTest {
             val productName = "ValidProductName"
             val description = "This is a valid product description."
             val price = 1000L
-            val status = ProductEntity.ProductStatusType.ACTIVE
+            val status = ProductStatusType.ACTIVE
 
             // act
             val productEntity = ProductEntity(
@@ -89,7 +90,7 @@ class ProductEntityTest {
                 productName,
                 description,
                 Price(1000L),
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // assert

@@ -6,6 +6,7 @@ import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduc
 import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -52,7 +53,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 createdProduct.name,
                 createdProduct.price,
                 createdProduct.description,
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -78,14 +79,14 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val productCreateCommand2 = ProductCommand.Create(
                 createdBrand2.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -110,7 +111,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
 
             // act

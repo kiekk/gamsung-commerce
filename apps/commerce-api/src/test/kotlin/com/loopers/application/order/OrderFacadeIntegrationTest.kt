@@ -8,7 +8,6 @@ import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
-import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.stock.StockRepository
@@ -19,6 +18,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -137,7 +137,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToCreateOrder_whenProductIsNotAvailable() {
             // arrange
             val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().status(ProductEntity.ProductStatusType.INACTIVE).build())
+            val createdProduct = productRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
                 "홍길동",

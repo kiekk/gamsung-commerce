@@ -6,6 +6,7 @@ import com.loopers.domain.product.query.ProductListViewModel
 import com.loopers.domain.productlike.ProductLikeCountEntity
 import com.loopers.domain.stock.StockEntity
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 import java.time.ZonedDateTime
 
 class ProductInfo {
@@ -16,7 +17,7 @@ class ProductInfo {
         val name: String,
         val description: String?,
         val price: Price,
-        val status: ProductEntity.ProductStatusType,
+        val status: ProductStatusType,
         val stockQuantity: Int,
     ) {
         companion object {
@@ -38,7 +39,7 @@ class ProductInfo {
         val id: Long,
         val productName: String,
         val brandName: String,
-        val productStatus: ProductEntity.ProductStatusType,
+        val productStatus: ProductStatusType,
         val productPrice: Price,
         val productLikeCount: Int,
     ) {
@@ -60,7 +61,7 @@ class ProductInfo {
         val id: Long,
         val productName: String,
         val productPrice: Long,
-        val productStatus: ProductEntity.ProductStatusType,
+        val productStatus: ProductStatusType,
         val brandName: String,
         val productLikeCount: Int,
         val createdAt: ZonedDateTime,

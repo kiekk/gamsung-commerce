@@ -1,13 +1,13 @@
 package com.loopers.application.productlike
 
 import com.loopers.domain.product.ProductCommand
-import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductService
 import com.loopers.domain.productlike.ProductLikeCommand
 import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.user.UserCommand
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -54,7 +54,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(productCreateCommand)
             val nonExistentUserId = 999L
@@ -110,7 +110,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
@@ -155,7 +155,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(command)
             val nonExistentUserId = 999L
@@ -209,7 +209,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductEntity.ProductStatusType.ACTIVE,
+                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
