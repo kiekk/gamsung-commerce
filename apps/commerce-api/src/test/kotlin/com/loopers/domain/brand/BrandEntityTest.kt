@@ -1,6 +1,7 @@
 package com.loopers.domain.brand
 
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
+import com.loopers.support.enums.brand.BrandStatusType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -38,7 +39,7 @@ class BrandEntityTest {
             val result = assertThrows<IllegalArgumentException> {
                 BrandEntity(
                     invalidBrandName,
-                    BrandEntity.BrandStatusType.ACTIVE,
+                    BrandStatusType.ACTIVE,
                 )
             }
 
@@ -54,7 +55,7 @@ class BrandEntityTest {
         fun createsBrand_whenNameAndStatusAreValid() {
             // arrange
             val validBrandName = "브랜드이름"
-            val validBrandStatus = BrandEntity.BrandStatusType.ACTIVE
+            val validBrandStatus = BrandStatusType.ACTIVE
 
             // act
             val brandEntity = BrandEntity(
@@ -80,26 +81,26 @@ class BrandEntityTest {
         @Test
         fun deactivatesBrand() {
             // arrange
-            val brandEntity = aBrand().name("브랜드이름").status(BrandEntity.BrandStatusType.ACTIVE).build()
+            val brandEntity = aBrand().name("브랜드이름").status(BrandStatusType.ACTIVE).build()
 
             // act
             brandEntity.inactive()
 
             // assert
-            assertThat(brandEntity.status).isEqualTo(BrandEntity.BrandStatusType.INACTIVE)
+            assertThat(brandEntity.status).isEqualTo(BrandStatusType.INACTIVE)
         }
 
         @DisplayName("브랜드가 퇴점한 경우 브랜드 상태는 WITHDRAWN가 된다.")
         @Test
         fun withdrawsBrand() {
             // arrange
-            val brandEntity = aBrand().name("브랜드이름").status(BrandEntity.BrandStatusType.ACTIVE).build()
+            val brandEntity = aBrand().name("브랜드이름").status(BrandStatusType.ACTIVE).build()
 
             // act
             brandEntity.close()
 
             // assert
-            assertThat(brandEntity.status).isEqualTo(BrandEntity.BrandStatusType.CLOSED)
+            assertThat(brandEntity.status).isEqualTo(BrandStatusType.CLOSED)
         }
     }
 }

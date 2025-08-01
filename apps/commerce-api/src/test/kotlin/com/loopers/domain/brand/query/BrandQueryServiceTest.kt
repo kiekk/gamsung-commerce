@@ -1,8 +1,8 @@
 package com.loopers.domain.brand.query
 
-import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
 import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.support.enums.brand.BrandStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -98,11 +98,11 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenFilteringByStatus() {
             // arrange
-            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").status(BrandEntity.BrandStatusType.ACTIVE).build())
-            brandJpaRepository.save(aBrand().name("비활성브랜드").status(BrandEntity.BrandStatusType.INACTIVE).build())
+            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").status(BrandStatusType.ACTIVE).build())
+            brandJpaRepository.save(aBrand().name("비활성브랜드").status(BrandStatusType.INACTIVE).build())
 
             // act
-            val condition = BrandSearchCondition(status = BrandEntity.BrandStatusType.ACTIVE)
+            val condition = BrandSearchCondition(status = BrandStatusType.ACTIVE)
             val pageRequest = PageRequest.of(0, 10)
             val brandsPage = brandQueryService.searchBrands(condition, pageRequest)
 

@@ -2,6 +2,7 @@ package com.loopers.domain.brand
 
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
 import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.support.enums.brand.BrandStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -41,7 +42,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
-                BrandEntity.BrandStatusType.ACTIVE,
+                BrandStatusType.ACTIVE,
             )
             brandService.createBrand(brandCreateCommand)
 
@@ -63,7 +64,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
-                BrandEntity.BrandStatusType.ACTIVE,
+                BrandStatusType.ACTIVE,
             )
 
             // act

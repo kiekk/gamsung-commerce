@@ -1,6 +1,6 @@
 package com.loopers.domain.brand
 
-import com.loopers.domain.brand.BrandEntity.BrandStatusType
+import com.loopers.support.enums.brand.BrandStatusType
 
 class BrandCommand {
     data class Create(

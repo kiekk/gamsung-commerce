@@ -1,6 +1,7 @@
 package com.loopers.domain.brand
 
 import com.loopers.domain.BaseEntity
+import com.loopers.support.enums.brand.BrandStatusType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -15,12 +16,6 @@ class BrandEntity(
     @Enumerated(EnumType.STRING)
     var status: BrandStatusType,
 ) : BaseEntity() {
-
-    enum class BrandStatusType {
-        ACTIVE,
-        INACTIVE,
-        CLOSED,
-    }
 
     init {
         !name.matches(BRAND_NAME_REGEX) && throw IllegalArgumentException("브랜드명은 한글, 영문, 숫자 20자 이내로 입력해야 합니다.")
