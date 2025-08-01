@@ -1,9 +1,9 @@
 package com.loopers.interfaces.api.user
 
-import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
+import com.loopers.support.enums.user.GenderType
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -56,7 +56,7 @@ class UserV1ApiE2ETest @Autowired constructor(
                 "soono",
                 "soono@example.com",
                 "1000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
 
             // act
@@ -74,7 +74,7 @@ class UserV1ApiE2ETest @Autowired constructor(
                 { assertThat(response.body?.data).isNotNull() },
                 { assertThat(response.body?.data?.userId).isEqualTo("user123") },
                 { assertThat(response.body?.data?.name).isEqualTo("soono") },
-                { assertThat(response.body?.data?.gender).isEqualTo(UserEntity.GenderType.M) },
+                { assertThat(response.body?.data?.gender).isEqualTo(GenderType.M) },
             )
         }
 

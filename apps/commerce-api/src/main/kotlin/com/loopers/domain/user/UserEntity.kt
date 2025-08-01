@@ -1,6 +1,7 @@
 package com.loopers.domain.user
 
 import com.loopers.domain.BaseEntity
+import com.loopers.support.enums.user.GenderType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -22,11 +23,6 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     val gender: GenderType,
 ) : BaseEntity() {
-
-    enum class GenderType {
-        M,
-        F,
-    }
 
     init {
         (userId.length > 10 || !userId.matches(USER_ID_PATTERN)) &&

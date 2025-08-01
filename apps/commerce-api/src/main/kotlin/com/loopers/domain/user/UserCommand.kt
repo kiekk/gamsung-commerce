@@ -1,6 +1,6 @@
 package com.loopers.domain.user
 
-import com.loopers.domain.user.UserEntity.GenderType
+import com.loopers.support.enums.user.GenderType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.ResolverStyle

@@ -3,6 +3,7 @@ package com.loopers.domain.user
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.infrastructure.user.UserRepositoryImpl
+import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -51,7 +52,7 @@ class UserServiceIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             val spyUserRepository = spy(UserRepositoryImpl(userJpaRepository))
             val userServiceWithSpy = UserService(spyUserRepository)
@@ -72,7 +73,7 @@ class UserServiceIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             userService.save(userSignUpCommand)
 

@@ -6,9 +6,9 @@ import com.loopers.domain.product.ProductService
 import com.loopers.domain.productlike.ProductLikeCommand
 import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.user.UserCommand
-import com.loopers.domain.user.UserEntity
 import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -81,7 +81,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
@@ -117,7 +117,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
@@ -181,7 +181,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
@@ -216,7 +216,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "soono",
                 "shyoon991@gmail.com",
                 "2000-01-01",
-                UserEntity.GenderType.M,
+                GenderType.M,
             )
             val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)

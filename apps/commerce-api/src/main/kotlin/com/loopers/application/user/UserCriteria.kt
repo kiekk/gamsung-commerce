@@ -1,7 +1,7 @@
 package com.loopers.application.user
 
 import com.loopers.domain.user.UserCommand
-import com.loopers.domain.user.UserEntity
+import com.loopers.support.enums.user.GenderType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.ResolverStyle
@@ -12,7 +12,7 @@ class UserCriteria {
         val name: String,
         val email: String,
         val birthday: String,
-        val gender: UserEntity.GenderType,
+        val gender: GenderType,
     ) {
 
         init {
