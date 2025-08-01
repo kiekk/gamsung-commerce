@@ -2,8 +2,8 @@ package com.loopers.application.order
 
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.payment.PaymentCommand
-import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.PaymentService
+import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
 import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockCommand
@@ -27,6 +27,20 @@ class OrderFacade(
 ) {
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
+
+    @Transactional(readOnly = true)
+    fun getOrderById(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
+        userService.findUserBy(criteria.userId) ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
+        )
+        return orderService.findWithItemsById(criteria.orderId)?.let { orderEntity ->
+            OrderInfo.OrderDetail.from(orderEntity)
+        } ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "주문을 찾을 수 없습니다. orderId: ${criteria.orderId}",
+        )
+    }
 
     @Transactional(noRollbackFor = [PaymentException::class])
     fun placeOrder(criteria: OrderCriteria.Create): Long {
