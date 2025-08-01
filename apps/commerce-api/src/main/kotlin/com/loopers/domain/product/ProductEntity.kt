@@ -30,6 +30,10 @@ class ProductEntity(
         }
     }
 
+    fun isNotActive(): Boolean {
+        return status != ProductStatusType.ACTIVE
+    }
+
     companion object {
         private val PRODUCT_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
         private val PRODUCT_DESCRIPTION_REGEX = "^.{0,100}$".toRegex()

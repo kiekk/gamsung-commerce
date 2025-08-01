@@ -1,14 +1,26 @@
 package com.loopers.domain.order
 
 import com.loopers.domain.BaseEntity
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.vo.Price
+import jakarta.persistence.AttributeOverride
+import jakarta.persistence.Column
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 
+@Entity
+@Table(name = "order_item")
 class OrderItemEntity(
+    @ManyToOne
+    val order: OrderEntity,
     val productId: Long,
     productName: String,
-    val quantity: Quantity,
+    @Embedded
+    @AttributeOverride(name = "value", column = Column("total_price"))
     val totalPrice: Price,
+    @Embedded
+    @AttributeOverride(name = "value", column = Column("amount"))
     val amount: Price,
 ) : BaseEntity() {
 

@@ -14,11 +14,16 @@ class ProductService(
         productRepository.findByBrandIdAndName(command.brandId, command.name)?.let {
             throw CoreException(ErrorType.CONFLICT, "이미 존재하는 상품입니다: ${command.name}")
         }
-        return productRepository.createProduct(command.toEntity())
+        return productRepository.save(command.toEntity())
     }
 
     @Transactional(readOnly = true)
     fun findProductBy(id: Long): ProductEntity? {
         return productRepository.findById(id)
+    }
+
+    @Transactional(readOnly = true)
+    fun getProductsByIds(productIds: List<Long>) : List<ProductEntity> {
+        return productRepository.findByIds(productIds)
     }
 }

@@ -23,7 +23,7 @@ class PointV1Controller(
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
         return pointFacade.getPoint(userId)
-            ?.let { PointV1Dto.PointResponse.from(it.userId, it.point) }
+            ?.let { PointV1Dto.PointResponse.from(it.userId, it.point.value) }
             .let { ApiResponse.success(it) }
     }
 
@@ -39,7 +39,7 @@ class PointV1Controller(
             ?.let {
                 PointV1Dto.PointResponse.from(
                     userId,
-                    it.point,
+                    it.point.value,
                 )
             }
             .let { ApiResponse.success(it) }

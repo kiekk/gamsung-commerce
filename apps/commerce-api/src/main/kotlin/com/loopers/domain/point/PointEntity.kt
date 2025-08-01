@@ -1,6 +1,7 @@
 package com.loopers.domain.point
 
 import com.loopers.domain.BaseEntity
+import com.loopers.domain.point.vo.Point
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import jakarta.persistence.Column
@@ -12,15 +13,27 @@ import jakarta.persistence.Table
 class PointEntity(
     @Column(name = "user_id", nullable = false, unique = true)
     val userId: String,
-    point: Long = 0L,
+    point: Point = Point.ZERO,
 ) : BaseEntity() {
-    var point: Long = point
+    var point: Point = point
         private set
 
-    fun chargePoint(point: Long) {
-        if (point <= 0) {
+    fun chargePoint(point: Point) {
+        if (point.value <= 0) {
             throw CoreException(ErrorType.BAD_REQUEST, "충전할 포인트는 1 이상이어야 합니다.")
         }
-        this.point += point
+        this.point = Point(this.point.value + point.value)
+    }
+
+    fun usePoint(pointToUser: Point) {
+        this.point = Point(this.point.value - pointToUser.value)
+    }
+
+    fun cannotUsePoint(pointToUser: Point): Boolean {
+        return pointToUser.value > point.value
+    }
+
+    fun refundPoint(point: Point) {
+        this.point = Point(this.point.value + point.value)
     }
 }

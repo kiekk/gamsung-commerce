@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 class ProductRepositoryImpl(
     private val productJpaRepository: ProductJpaRepository,
 ) : ProductRepository {
-    override fun createProduct(product: ProductEntity): ProductEntity {
+    override fun save(product: ProductEntity): ProductEntity {
         return productJpaRepository.save(product)
     }
 
@@ -25,5 +25,9 @@ class ProductRepositoryImpl(
 
     override fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest): Page<ProductEntity> {
         return productJpaRepository.findAll(spec, pageRequest)
+    }
+
+    override fun findByIds(productIds: List<Long>): List<ProductEntity> {
+        return productJpaRepository.findAllById(productIds)
     }
 }

@@ -1,6 +1,7 @@
 package com.loopers.domain.stock
 
 import com.loopers.domain.BaseEntity
+import com.loopers.domain.order.vo.Quantity
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 

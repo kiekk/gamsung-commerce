@@ -3,8 +3,6 @@ package com.loopers.domain.order
 import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
-import com.loopers.domain.order.vo.OrderItems
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -19,7 +17,7 @@ class OrderEntityTest {
     - [ ] 주문 아이템 목록에서 주문의 총 금액을 계산한다.
     - [ ] 주문 생성 시 상태는 PENDING이다.
     - [ ] 주문을 완료 처리하면 상태는 COMPLETED가 된다
-    - [ ] 주문을 취소하면 상태는 CANCELLED가 된다
+    - [ ] 주문을 취소하면 상태는 CANCELED가 된다
      */
     @DisplayName("주문 엔티티를 생성 할 때, ")
     @Nested
@@ -28,27 +26,22 @@ class OrderEntityTest {
         @Test
         fun calculatesTotalPriceFromProductList() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
-                .orderItems(
-                    OrderItems(
-                        mutableListOf(
-                            anOrderItem()
-                                .quantity(Quantity(2))
-                                .price(Price(2000))
-                                .totalPrice(Price(2000))
-                                .build(),
-                            anOrderItem()
-                                .quantity(Quantity(1))
-                                .price(Price(3000))
-                                .totalPrice(Price(3000))
-                                .build(),
-                        ),
-                    ),
-                )
                 .build()
+
+            order.addItems(
+                listOf(
+                    anOrderItem()
+                        .totalPrice(Price(2000))
+                        .amount(Price(2000))
+                        .build(),
+                    anOrderItem()
+                        .totalPrice(Price(3000))
+                        .amount(Price(3000))
+                        .build(),
+                ),
+            )
 
             // assert
             assertAll(
@@ -60,29 +53,25 @@ class OrderEntityTest {
         // 영어로
         @DisplayName("주문 생성 시 상태는 PENDING이다.")
         @Test
-fun createsOrderWithPendingStatus() {
+        fun createsOrderWithPendingStatus() {
             // arrange
 
             // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
-                .orderItems(
-                    OrderItems(
-                        mutableListOf(
-                            anOrderItem()
-                                .quantity(Quantity(2))
-                                .price(Price(2000))
-                                .totalPrice(Price(2000))
-                                .build(),
-                            anOrderItem()
-                                .quantity(Quantity(1))
-                                .price(Price(3000))
-                                .totalPrice(Price(3000))
-                                .build(),
-                        ),
-                    ),
-                )
                 .build()
+            order.addItems(
+                listOf(
+                    anOrderItem()
+                        .totalPrice(Price(2000))
+                        .amount(Price(2000))
+                        .build(),
+                    anOrderItem()
+                        .totalPrice(Price(3000))
+                        .amount(Price(3000))
+                        .build(),
+                ),
+            )
 
             // assert
             assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.PENDING)
@@ -92,27 +81,22 @@ fun createsOrderWithPendingStatus() {
         @Test
         fun canChangeOrderToCompletedStatus() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
-                .orderItems(
-                    OrderItems(
-                        mutableListOf(
-                            anOrderItem()
-                                .quantity(Quantity(2))
-                                .price(Price(2000))
-                                .totalPrice(Price(2000))
-                                .build(),
-                            anOrderItem()
-                                .quantity(Quantity(1))
-                                .price(Price(3000))
-                                .totalPrice(Price(3000))
-                                .build(),
-                        ),
-                    ),
-                )
                 .build()
+
+            order.addItems(
+                listOf(
+                    anOrderItem()
+                        .totalPrice(Price(2000))
+                        .amount(Price(2000))
+                        .build(),
+                    anOrderItem()
+                        .totalPrice(Price(3000))
+                        .amount(Price(3000))
+                        .build(),
+                ),
+            )
 
             // act
             order.complete()
@@ -120,31 +104,26 @@ fun createsOrderWithPendingStatus() {
             assertThat(order.orderStatus).isEqualTo(OrderEntity.OrderStatusType.COMPLETED)
         }
 
-        @DisplayName("주문을 취소하면 상태는 CANCELLED가 된다")
+        @DisplayName("주문을 취소하면 상태는 CANCELED가 된다")
         @Test
-        fun canChangeOrderToCancelledStatus() {
+        fun canChangeOrderToCanceledStatus() {
             // arrange
-
-            // act
             val order = anOrder()
                 .orderCustomer(anOrderCustomer().build())
-                .orderItems(
-                    OrderItems(
-                        mutableListOf(
-                            anOrderItem()
-                                .quantity(Quantity(2))
-                                .price(Price(2000))
-                                .totalPrice(Price(2000))
-                                .build(),
-                            anOrderItem()
-                                .quantity(Quantity(1))
-                                .price(Price(3000))
-                                .totalPrice(Price(3000))
-                                .build(),
-                        ),
-                    ),
-                )
                 .build()
+
+            order.addItems(
+                listOf(
+                    anOrderItem()
+                        .totalPrice(Price(2000))
+                        .amount(Price(2000))
+                        .build(),
+                    anOrderItem()
+                        .totalPrice(Price(3000))
+                        .amount(Price(3000))
+                        .build(),
+                ),
+            )
 
             // act
             order.cancel()

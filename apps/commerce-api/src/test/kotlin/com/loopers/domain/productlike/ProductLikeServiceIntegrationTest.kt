@@ -21,13 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest
 class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeService: ProductLikeService,
     private val databaseCleanUp: DatabaseCleanUp,
+    private val productService: ProductService,
+    private val userService: UserService,
 ) {
-
-    @Autowired
-    private lateinit var productService: ProductService
-
-    @Autowired
-    private lateinit var userService: UserService
 
     @AfterEach
     fun tearDown() {
