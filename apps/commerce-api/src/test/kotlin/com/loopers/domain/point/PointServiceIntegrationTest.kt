@@ -55,7 +55,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             // assert
             assertThat(userPoints).isNotNull
             assertThat(userPoints?.userId).isEqualTo(createdPoint.userId)
-            assertThat(userPoints?.point).isEqualTo(createdPoint.point)
+            assertThat(userPoints?.point).isEqualTo(createdPoint.point.value)
         }
 
         @Test

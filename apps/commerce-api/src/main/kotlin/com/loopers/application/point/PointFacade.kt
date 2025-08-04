@@ -16,7 +16,7 @@ class PointFacade(
     fun getPointBy(username: String): PointInfo? {
         val user = userService.findUserBy(username) ?: return null
         return pointService.getPointBy(user.id)
-            ?.let { pointEntity -> PointInfo(pointEntity.userId, pointEntity.point) }
+            ?.let { pointEntity -> PointInfo(pointEntity.userId, pointEntity.point.value) }
     }
 
     @Transactional
@@ -26,7 +26,7 @@ class PointFacade(
             "사용자를 찾을 수 없습니다: ${criteria.username}",
         )
         return pointService.chargePoint(criteria.toCommand(user.id)).let {
-            PointInfo(it.userId, it.point)
+            PointInfo(it.userId, it.point.value)
         }
     }
 }

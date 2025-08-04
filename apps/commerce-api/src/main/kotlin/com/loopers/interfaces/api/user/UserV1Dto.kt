@@ -43,8 +43,8 @@ class UserV1Dto {
             fun from(info: UserInfo): UserResponse = UserResponse(
                 info.username,
                 info.name,
-                info.email.value,
-                info.birthday.value,
+                info.email,
+                info.birthday,
                 info.gender,
             )
         }
