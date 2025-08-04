@@ -1,6 +1,8 @@
 package com.loopers.application.point
 
+import com.loopers.domain.point.vo.Point
+
 class PointInfo(
-    val userId: String,
-    val point: Long,
+    val userId: Long,
+    val point: Point,
 )

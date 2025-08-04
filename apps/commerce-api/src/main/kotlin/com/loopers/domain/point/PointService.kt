@@ -1,5 +1,6 @@
 package com.loopers.domain.point
 
+import com.loopers.domain.point.vo.Point
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -8,14 +9,14 @@ class PointService(
     private val pointRepository: PointRepository,
 ) {
     @Transactional
-    fun chargePoint(userId: String, point: Long): PointEntity {
-        val pointEntity = pointRepository.findByUserId(userId) ?: PointEntity(userId, 0L)
-        pointEntity.chargePoint(point)
+    fun chargePoint(command: PointCommand.Charge): PointEntity {
+        val pointEntity = pointRepository.findByUserId(command.userId) ?: PointEntity(command.userId, Point.ZERO)
+        pointEntity.chargePoint(command.point)
         return pointRepository.save(pointEntity)
     }
 
     @Transactional(readOnly = true)
-    fun getPoint(userId: String): PointEntity? {
+    fun getPointBy(userId: Long): PointEntity? {
         return pointRepository.findByUserId(userId)
     }
 }

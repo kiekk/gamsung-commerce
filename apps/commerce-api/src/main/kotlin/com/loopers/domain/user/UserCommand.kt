@@ -1,0 +1,34 @@
+package com.loopers.domain.user
+
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
+import com.loopers.support.enums.user.GenderType
+
+class UserCommand {
+    data class Create(
+        val userId: String,
+        val name: String,
+        val email: Email,
+        val birthday: Birthday,
+        val gender: GenderType,
+    ) {
+        init {
+            (userId.length > 10 || !userId.matches(USER_ID_PATTERN)) &&
+                    throw IllegalArgumentException("ID는 영문 및 숫자 10자 이내여야 합니다.")
+        }
+
+        fun toEntity(): UserEntity {
+            return UserEntity(
+                userId,
+                name,
+                email,
+                birthday,
+                gender,
+            )
+        }
+
+        companion object {
+            private val USER_ID_PATTERN = "^[a-zA-Z0-9]{1,10}$".toRegex()
+        }
+    }
+}

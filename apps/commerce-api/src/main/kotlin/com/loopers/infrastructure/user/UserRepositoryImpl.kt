@@ -11,16 +11,20 @@ class UserRepositoryImpl(
     private val userJpaRepository: UserJpaRepository,
 ) : UserRepository {
     override fun save(userEntity: UserEntity): UserEntity {
-        userJpaRepository.findByUserId(userEntity.userId)?.let {
+        userJpaRepository.findByUsername(userEntity.username)?.let {
             throw CoreException(
-                errorType = ErrorType.CONFLICT,
-                customMessage = "이미 존재하는 사용자입니다: ${userEntity.userId}",
+                ErrorType.CONFLICT,
+                "이미 존재하는 사용자입니다: ${userEntity.username}",
             )
         }
         return userJpaRepository.save(userEntity)
     }
 
-    override fun findByUserId(userId: String): UserEntity? {
-        return userJpaRepository.findByUserId(userId)
+    override fun findByUsername(username: String): UserEntity? {
+        return userJpaRepository.findByUsername(username)
+    }
+
+    override fun findById(id: Long): UserEntity? {
+        return userJpaRepository.findById(id).orElse(null)
     }
 }
