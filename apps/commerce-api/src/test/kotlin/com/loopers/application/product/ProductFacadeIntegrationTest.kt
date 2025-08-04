@@ -67,7 +67,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { Assertions.assertThat(productInfo.brandId).isEqualTo(productCreateCriteria.brandId) },
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
-                { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price) },
+                { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
                 { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(productCreateCriteria.quantity) },
@@ -93,7 +93,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { Assertions.assertThat(productInfo.brandId).isEqualTo(productCreateCriteria.brandId) },
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
-                { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price) },
+                { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
                 { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(0) },
@@ -164,7 +164,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { Assertions.assertThat(productInfo.id).isEqualTo(createdProduct.id) },
                 { Assertions.assertThat(productInfo.productName).isEqualTo(createdProduct.name) },
                 { Assertions.assertThat(productInfo.brandName).isEqualTo(createdBrand.name) },
-                { Assertions.assertThat(productInfo.productPrice).isEqualTo(createdProduct.price) },
+                { Assertions.assertThat(productInfo.productPrice).isEqualTo(createdProduct.price.value) },
                 { Assertions.assertThat(productInfo.productStatus).isEqualTo(createdProduct.status) },
                 {
                     Assertions.assertThat(productInfo.productLikeCount)

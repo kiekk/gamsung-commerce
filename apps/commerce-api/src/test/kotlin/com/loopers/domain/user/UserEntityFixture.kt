@@ -6,7 +6,7 @@ import com.loopers.support.enums.user.GenderType
 
 class UserEntityFixture {
 
-    private var userId: String = "userId123"
+    private var username: String = "userId123"
     private var name: String = "soono"
     private var email: Email = Email("shyoon991@gmail.com")
     private var birthday: Birthday = Birthday("2000-01-01")
@@ -16,7 +16,7 @@ class UserEntityFixture {
         fun aUser(): UserEntityFixture = UserEntityFixture()
     }
 
-    fun userId(userId: String): UserEntityFixture = apply { this.userId = userId }
+    fun username(username: String): UserEntityFixture = apply { this.username = username }
 
     fun name(name: String): UserEntityFixture = apply { this.name = name }
 
@@ -27,7 +27,7 @@ class UserEntityFixture {
     fun gender(gender: GenderType): UserEntityFixture = apply { this.gender = gender }
 
     fun build(): UserEntity = UserEntity(
-        userId,
+        username,
         name,
         email,
         birthday,

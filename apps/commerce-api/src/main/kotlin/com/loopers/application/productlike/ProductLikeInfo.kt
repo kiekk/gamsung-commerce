@@ -1,7 +1,6 @@
 package com.loopers.application.productlike
 
 import com.loopers.domain.product.ProductEntity
-import com.loopers.domain.vo.Price
 import com.loopers.support.enums.product.ProductStatusType
 
 class ProductLikeInfo {
@@ -9,7 +8,7 @@ class ProductLikeInfo {
         val productId: Long,
         val productName: String,
         val description: String?,
-        val productPrice: Price,
+        val productPrice: Long,
         val productStatus: ProductStatusType,
     ) {
         companion object {
@@ -18,7 +17,7 @@ class ProductLikeInfo {
                     productEntity.id,
                     productEntity.name,
                     productEntity.description,
-                    productEntity.price,
+                    productEntity.price.value,
                     productEntity.status,
                 )
             }

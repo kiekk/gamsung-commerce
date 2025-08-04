@@ -356,7 +356,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
      - [ ] 사용자 정보가 존재하지 않으면 404 Not Found 예외가 발생한다.
      - [ ] 주문 상세 조회 시 주문이 존재하지 않으면 404 Not Found 예외가 발생한다.
      - [ ] 주문 상세 조회 시 주문이 존재하면 주문 정보가 반환되며, 주문 정보에는 주문자 정보, 주문 항목 수, 총 가격이 포함된다.
@@ -439,11 +439,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(orderDetail.orderId).isEqualTo(order.id) },
                 { assertThat(orderDetail.ordererName).isEqualTo("홍길동") },
-                { assertThat(orderDetail.ordererEmail).isEqualTo(Email("shyoon991@gmail.com")) },
-                { assertThat(orderDetail.ordererMobile).isEqualTo(Mobile("010-1234-5678")) },
-                { assertThat(orderDetail.ordererAddress).isEqualTo(Address("12345", "서울시 강남구 역삼동", "역삼로 123")) },
+                { assertThat(orderDetail.ordererEmail).isEqualTo("shyoon991@gmail.com") },
+                { assertThat(orderDetail.ordererMobile).isEqualTo("010-1234-5678") },
+                { assertThat(orderDetail.ordererZipCode).isEqualTo("12345") },
+                { assertThat(orderDetail.ordererAddress).isEqualTo("서울시 강남구 역삼동") },
+                { assertThat(orderDetail.ordererAddressDetail).isEqualTo("역삼로 123") },
                 { assertThat(orderDetail.orderItemCount).isEqualTo(1) },
-                { assertThat(orderDetail.totalPrice).isEqualTo(Price(createdProduct.price.value)) },
+                { assertThat(orderDetail.totalPrice).isEqualTo(createdProduct.price) },
             )
         }
     }
