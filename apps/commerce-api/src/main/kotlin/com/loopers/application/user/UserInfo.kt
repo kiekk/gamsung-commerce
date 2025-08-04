@@ -1,49 +1,26 @@
 package com.loopers.application.user
 
 import com.loopers.domain.user.UserEntity
+import com.loopers.domain.vo.Birthday
+import com.loopers.domain.vo.Email
+import com.loopers.support.enums.user.GenderType
 
 class UserInfo(
-    val userId: String,
+    val username: String,
     val name: String,
-    val email: String,
-    val birthday: String,
-    val gender: GenderResponse,
+    val email: Email,
+    val birthday: Birthday,
+    val gender: GenderType,
 ) {
-
-    enum class GenderResponse {
-        M,
-        F,
-    }
-
-    data class SignUp(
-        val userId: String,
-        val name: String,
-        val email: String,
-        val birthday: String,
-        val gender: GenderRequest,
-    ) {
-        enum class GenderRequest {
-            M,
-            F,
-        }
-
-        fun toUserEntity(): UserEntity = UserEntity(
-            userId = userId,
-            name = name,
-            email = email,
-            birthday = birthday,
-            gender = UserEntity.GenderType.valueOf(gender.name),
-        )
-    }
 
     companion object {
         fun from(userEntity: UserEntity): UserInfo {
             return UserInfo(
-                userId = userEntity.userId,
-                name = userEntity.name,
-                email = userEntity.email,
-                birthday = userEntity.birthday,
-                gender = GenderResponse.valueOf(userEntity.gender.name),
+                userEntity.username,
+                userEntity.name,
+                userEntity.email,
+                userEntity.birthday,
+                userEntity.gender,
             )
         }
     }
