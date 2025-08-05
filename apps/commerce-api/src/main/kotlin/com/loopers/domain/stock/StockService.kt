@@ -2,8 +2,10 @@ package com.loopers.domain.stock
 
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.PaymentException
+import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -17,13 +19,18 @@ class StockService(
 
     @Transactional(readOnly = true)
     fun getStocksByProductIds(productIds: List<Long>): List<StockEntity> {
-        return stockRepository.findByIds(productIds)
+        return stockRepository.findAllByProductIdsWithLock(productIds)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Retryable(
+        value = [OptimisticLockingFailureException::class],
+        maxAttempts = 5,
+        backoff = Backoff(delay = 10, multiplier = 1.0),
+    )
+    @Transactional
     fun deductStockQuantities(command: List<StockCommand.Decrease>) {
         val decreaseCommandMap = command.associate { it.productId to it.quantity }
-        stockRepository.findByIds(command.map { it.productId })
+        stockRepository.findAllByProductIdsWithLock(command.map { it.productId })
             .associateBy { it.productId }
             .forEach { (productId, stock) ->
                 decreaseCommandMap[productId]?.let { quantity ->

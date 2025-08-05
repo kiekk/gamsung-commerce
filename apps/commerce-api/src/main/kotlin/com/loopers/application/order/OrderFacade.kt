@@ -11,7 +11,6 @@ import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
-import com.loopers.support.error.payment.PaymentException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -28,6 +27,11 @@ class OrderFacade(
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
+    /*
+        TODO: 3주차에는 재고 차감 예외 발생 시 포인트 원복 및 결제/주문 실패 처리로 구현하였으나,
+        4주차에는 재고 차감 예외 발생 시 모두 롤백처리로 구현해야 하므로 해당 테스트 케이스를 주석 처리.
+        추후 다시 원복 시나리오로 구현할 경우 로직 수정 및 주석 해제 필요
+         */
     @Transactional(readOnly = true)
     fun getOrderById(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
         userService.findUserBy(criteria.userId) ?: throw CoreException(
@@ -42,7 +46,7 @@ class OrderFacade(
         )
     }
 
-    @Transactional(noRollbackFor = [PaymentException::class])
+    @Transactional
     fun placeOrder(criteria: OrderCriteria.Create): Long {
         val user = userService.findUserBy(criteria.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
@@ -72,30 +76,16 @@ class OrderFacade(
             ),
         )
 
-        try {
-            stockService.deductStockQuantities(
-                criteria.orderItems.map {
-                    StockCommand.Decrease(
-                        it.productId,
-                        it.quantity.value,
-                    )
-                },
-            )
+        stockService.deductStockQuantities(
+            criteria.orderItems.map {
+                StockCommand.Decrease(
+                    it.productId,
+                    it.quantity.value,
+                )
+            },
+        )
 
-            orderService.completeOrder(createdOrder.id)
-        } catch (e: PaymentException) {
-            log.error(e.message, e)
-            // 재고 감소 오류에 따른 결제 취소, 포인트 복구
-            paymentProcessorFactory.cancel(
-                PaymentProcessorCommand.Cancel(
-                    user.id,
-                    createdPayment.id,
-                    criteria.paymentMethodType,
-                ),
-            )
-            // 주문 취소 상태 변경
-            orderService.cancelOrder(createdOrder.id)
-        }
+        orderService.completeOrder(createdOrder.id)
 
         return createdOrder.id
     }

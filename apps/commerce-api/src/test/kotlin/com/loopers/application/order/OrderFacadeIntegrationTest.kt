@@ -2,24 +2,23 @@ package com.loopers.application.order
 
 import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
-import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
 import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
-import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
-import com.loopers.domain.product.ProductRepository
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
-import com.loopers.domain.stock.StockRepository
 import com.loopers.domain.stock.fixture.StockEntityFixture.Companion.aStock
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
-import com.loopers.domain.user.UserRepository
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.order.OrderJpaRepository
+import com.loopers.infrastructure.payment.PaymentJpaRepository
+import com.loopers.infrastructure.point.PointJpaRepository
+import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.stock.StockJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
@@ -27,24 +26,21 @@ import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import java.time.LocalDateTime
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 
 @SpringBootTest
 class OrderFacadeIntegrationTest @Autowired constructor(
     private val orderFacade: OrderFacade,
-    private val userRepository: UserRepository,
-    private val productRepository: ProductRepository,
-    private val stockRepository: StockRepository,
-    private val orderRepository: OrderRepository,
-    private val paymentRepository: PaymentRepository,
-    private val pointRepository: PointRepository,
+    private val userJpaRepository: UserJpaRepository,
+    private val productJpaRepository: ProductJpaRepository,
+    private val stockJpaRepository: StockJpaRepository,
+    private val paymentJpaRepository: PaymentJpaRepository,
+    private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
     private val orderJpaRepository: OrderJpaRepository,
 ) {
@@ -71,7 +67,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToCreateOrder_whenUserDoesNotExist() {
             // arrange
             val nonExistentUserId = 999L // 존재하지 않는 사용자 ID
-            val createdProduct = productRepository.save(aProduct().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val orderCriteria = OrderCriteria.Create(
                 nonExistentUserId,
                 "홍길동",
@@ -106,7 +102,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateOrder_whenProductDoesNotExist() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
+            val createdUser = userJpaRepository.save(aUser().build())
             val nonExistentProductId = 999L
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
@@ -142,8 +138,8 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateOrder_whenProductIsNotAvailable() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
                 "홍길동",
@@ -178,9 +174,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateOrder_whenQuantityExceedsStock() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().build())
-            val createdStock = stockRepository.save(aStock().quantity(0).build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            val createdStock = stockJpaRepository.save(aStock().quantity(0).build())
             val quantity = Quantity(2)
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
@@ -217,7 +213,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
      **🔗 통합 테스트
     - [ ] 포인트로 결제에 성공하면 재고가 감소하며 결제 성공, 주문 완료 처리 된다.
     - [ ] 포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.
-    - [ ] 포인트 부족 시 결제는 실패하고 주문도 실패한다.
+    - [ ] 포인트 부족 시 예외가 발생하고 주문 정보는 생성되지 않는다.
      */
     @DisplayName("주문을 결제할 때, ")
     @Nested
@@ -226,10 +222,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun succeedsToPayWithPoints_whenPaymentIsSuccessful() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(20_000)).build())
-            val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
-            stockRepository.save(aStock().build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(20_000)).build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
+            stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
                 createdUser.id,
@@ -253,7 +249,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            val findOrder = orderRepository.findWithItemsById(orderId)
+            val findOrder = orderJpaRepository.findWithItemsById(orderId)
             findOrder?.let { order ->
                 assertAll(
                     { assertThat(order.userId).isEqualTo(createdUser.id) },
@@ -263,7 +259,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                 )
             }
-            val findPayment = paymentRepository.findWithItemsByOrderId(orderId)
+            val findPayment = paymentJpaRepository.findWithItemsByOrderId(orderId)
             findPayment?.let { payment ->
                 assertAll(
                     { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
@@ -271,7 +267,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
             }
-            val findPoint = pointRepository.findByUserId(createdUser.id)
+            val findPoint = pointJpaRepository.findByUserId(createdUser.id)
             assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
         }
 
@@ -279,9 +275,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToPayWithPoints_whenPointInfoIsMissing() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
-            stockRepository.save(aStock().build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
+            stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
                 createdUser.id,
@@ -310,18 +306,18 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("사용자 포인트를 찾을 수 없습니다.") },
-                { assertThat(orderRepository.findWithItemsById(criteria.userId)).isNull() },
+                { assertThat(orderJpaRepository.findWithItemsById(criteria.userId)).isNull() },
             )
         }
 
-        @DisplayName("포인트 부족 시 결제는 실패하고 주문도 실패한다.")
+        @DisplayName("포인트 부족 시 예외가 발생하고 주문 정보는 생성되지 않는다.")
         @Test
         fun failsToPayWithPoints_whenPaymentFails() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
-            val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
-            stockRepository.save(aStock().build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
+            stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
                 createdUser.id,
@@ -350,7 +346,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${createdPoint.point}") },
-                { assertThat(orderRepository.findWithItemsById(criteria.userId)).isNull() },
+                { assertThat(orderJpaRepository.findWithItemsById(criteria.userId)).isNull() },
             )
         }
     }
@@ -387,7 +383,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToGetOrder_whenOrderDoesNotExist() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
+            val createdUser = userJpaRepository.save(aUser().build())
             val nonExistentOrderId = 999L // 존재하지 않는 주문 ID
             val orderCriteria = OrderCriteria.Get(createdUser.id, nonExistentOrderId)
 
@@ -407,8 +403,8 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun returnsOrderDetail_whenOrderExists() {
             // arrange
-            val createdUser = userRepository.save(aUser().build())
-            val createdProduct = productRepository.save(aProduct().build())
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
             val order = anOrder()
                 .userId(createdUser.id)
                 .orderCustomer(
@@ -449,4 +445,132 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
         }
     }
+
+    /*
+    **🔗 통합 테스트
+    - [ ] 동일한 유저가 여러 기기에서 동시에 주문해도 포인트가 중복 차감되지 않아야 한다.
+    - [ ] 동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.
+     */
+    @DisplayName("주문 결제 통시성 테스트, ")
+    @Nested
+    inner class Concurrency {
+        @DisplayName("동일한 유저가 여러 기기에서 동시에 주문해도 포인트가 중복 차감되지 않아야 한다")
+        @Test
+        fun shouldNotDeductPointsMultipleTimesWhenSameUserOrdersConcurrently() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
+            stockJpaRepository.save(aStock().productId(createdProduct.id).build())
+            val quantity = Quantity(1)
+            val criteria = OrderCriteria.Create(
+                createdUser.id,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItemCriteria(
+                        createdProduct.id,
+                        createdProduct.name,
+                        quantity,
+                        createdProduct.price,
+                        createdProduct.price,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+            )
+
+            val threadCount = 10
+            val executor = Executors.newFixedThreadPool(threadCount)
+            val latch = CountDownLatch(threadCount)
+
+            // act
+            var orderId: Long? = null
+            repeat(threadCount) {
+                executor.submit {
+                    try {
+                        orderId = orderFacade.placeOrder(criteria)
+                    } catch (e: Exception) {
+                        println("예외 발생: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val findOrder = orderJpaRepository.findWithItemsById(orderId!!)
+            assertThat(findOrder).isNotNull
+
+            val findPoint = pointJpaRepository.findByUserId(createdUser.id)
+            assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
+        }
+
+        @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.")
+        @Test
+        fun shouldNotDeductStockMoreThanAvailableWhenConcurrentOrdersArePlacedForSameProduct() {
+            // given
+            val numberOfThreads = 20
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
+            val createdStock = stockJpaRepository.save(aStock().productId(createdProduct.id).quantity(10).build())
+            val quantity = Quantity(1)
+            val userIds = mutableListOf<Long>()
+            var failureCount = 0
+            var successCount = 0
+
+            repeat(numberOfThreads) {
+                val createdUser =
+                    userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
+                pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
+                userIds.add(createdUser.id)
+            }
+
+            // when
+            repeat(numberOfThreads) {
+                val criteria = OrderCriteria.Create(
+                    userIds[it],
+                    "홍길동",
+                    Email("shyoon991@gmail.com"),
+                    Mobile("010-1234-5678"),
+                    Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                    listOf(
+                        OrderCriteria.Create.OrderItemCriteria(
+                            createdProduct.id,
+                            createdProduct.name,
+                            quantity,
+                            createdProduct.price,
+                            createdProduct.price,
+                        ),
+                    ),
+                    PaymentMethodType.POINT,
+                )
+                executor.submit {
+                    try {
+                        orderFacade.placeOrder(criteria)
+                        successCount++
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                        failureCount++
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // then
+            val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
+            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
+            println("성공한 주문 수: $successCount")
+            println("남은 재고: $remainingStock")
+            assertThat(remainingStock).isEqualTo(createdStock.quantity - successCount)
+        }
+    }
 }
+
