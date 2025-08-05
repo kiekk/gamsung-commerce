@@ -2,9 +2,6 @@ package com.loopers.infrastructure.product
 
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.product.ProductRepository
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -21,10 +18,6 @@ class ProductRepositoryImpl(
 
     override fun findById(id: Long): ProductEntity? {
         return productJpaRepository.findById(id).orElse(null)
-    }
-
-    override fun findAll(spec: Specification<ProductEntity>, pageRequest: PageRequest): Page<ProductEntity> {
-        return productJpaRepository.findAll(spec, pageRequest)
     }
 
     override fun findByIds(productIds: List<Long>): List<ProductEntity> {
