@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query
 interface StockJpaRepository : JpaRepository<StockEntity, Long> {
     fun findByProductId(productId: Long): StockEntity?
 
-    @Lock(LockModeType.OPTIMISTIC)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM StockEntity s WHERE s.productId IN :productIds")
     fun findAllProductIdsWithLock(productIds: List<Long>): List<StockEntity>
 }
