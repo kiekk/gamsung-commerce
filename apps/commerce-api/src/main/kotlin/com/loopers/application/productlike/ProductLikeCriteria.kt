@@ -1,29 +1,13 @@
 package com.loopers.application.productlike
 
-import com.loopers.domain.productlike.ProductLikeCommand
-
 class ProductLikeCriteria {
     data class Like(
-        val userId: Long,
+        val username: String,
         val productId: Long,
-    ) {
-        fun toCommand(): ProductLikeCommand.Like {
-            return ProductLikeCommand.Like(
-                userId,
-                productId,
-            )
-        }
-    }
+    )
 
     data class Unlike(
-        val userId: Long,
+        val username: String,
         val productId: Long,
-    ) {
-        fun toCommand(): ProductLikeCommand.Unlike {
-            return ProductLikeCommand.Unlike(
-                userId,
-                productId,
-            )
-        }
-    }
+    )
 }

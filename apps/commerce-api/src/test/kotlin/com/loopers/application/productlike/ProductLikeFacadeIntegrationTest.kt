@@ -68,8 +68,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(productCreateCommand)
-            val nonExistentUserId = 999L
-            val likeCommand = ProductLikeCriteria.Like(nonExistentUserId, createdProduct.id)
+            val nonExistentUsername = "nonexistentuser"
+            val likeCommand = ProductLikeCriteria.Like(nonExistentUsername, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -79,7 +79,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
@@ -96,7 +96,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
-            val likeCommand = ProductLikeCriteria.Like(createdUser.id, nonExistentProductId)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.username, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -132,7 +132,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
-            val likeCommand = ProductLikeCriteria.Like(createdUser.id, createdProduct.id)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.username, createdProduct.id)
 
             // act
             productLikeFacade.like(likeCommand)
@@ -169,8 +169,8 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(command)
-            val nonExistentUserId = 999L
-            val unlikeCommand = ProductLikeCriteria.Unlike(nonExistentUserId, createdProduct.id)
+            val nonExistentUsername = "nonexistentuser"
+            val unlikeCommand = ProductLikeCriteria.Unlike(nonExistentUsername, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -180,7 +180,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
@@ -196,7 +196,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
-            val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.id, nonExistentProductId)
+            val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.username, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -239,7 +239,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.id, createdProduct.id))
+            productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.username, createdProduct.id))
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
