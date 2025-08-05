@@ -5,6 +5,8 @@ import com.loopers.domain.vo.Price
 import com.loopers.support.enums.product.ProductStatusType
 import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Table
 
 @Entity
@@ -15,6 +17,7 @@ class ProductEntity(
     val description: String? = null,
     @Embedded
     val price: Price,
+    @Enumerated(EnumType.STRING)
     val status: ProductStatusType = ProductStatusType.ACTIVE,
 ) : BaseEntity() {
 
