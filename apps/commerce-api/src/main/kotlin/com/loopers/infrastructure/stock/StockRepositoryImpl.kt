@@ -12,8 +12,8 @@ class StockRepositoryImpl(
         return stockJpaRepository.save(stockEntity)
     }
 
-    override fun findByIds(productIds: List<Long>): List<StockEntity> {
-        return stockJpaRepository.findAllById(productIds)
+    override fun findAllByProductIdsWithLock(productIds: List<Long>): List<StockEntity> {
+        return stockJpaRepository.findAllProductIdsWithLock(productIds)
     }
 
     override fun findByProductId(productId: Long): StockEntity? {

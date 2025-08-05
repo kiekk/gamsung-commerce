@@ -20,7 +20,7 @@ class PointPaymentProcessor(
     @Transactional
     override fun process(command: PaymentProcessorCommand.Process) {
         val point =
-            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
+            pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
         val payment =
             paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(
                 ErrorType.NOT_FOUND,
@@ -38,7 +38,7 @@ class PointPaymentProcessor(
     @Transactional
     override fun cancel(command: PaymentProcessorCommand.Cancel) {
         val point =
-            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
+            pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
         val payment =
             paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(
                 ErrorType.NOT_FOUND,
