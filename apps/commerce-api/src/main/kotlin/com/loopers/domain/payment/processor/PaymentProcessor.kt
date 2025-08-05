@@ -3,7 +3,7 @@ package com.loopers.domain.payment.processor
 import com.loopers.support.enums.payment.PaymentMethodType
 
 interface PaymentProcessor {
-    fun process(command: PaymentProcessorCommand.Process)
+    fun pay(command: PaymentProcessorCommand.Pay)
 
     fun cancel(command: PaymentProcessorCommand.Cancel)
 

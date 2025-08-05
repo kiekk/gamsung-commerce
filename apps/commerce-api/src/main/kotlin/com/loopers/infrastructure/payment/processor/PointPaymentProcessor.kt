@@ -18,7 +18,7 @@ class PointPaymentProcessor(
 ) : PaymentProcessor {
 
     @Transactional
-    override fun process(command: PaymentProcessorCommand.Process) {
+    override fun pay(command: PaymentProcessorCommand.Pay) {
         val point =
             pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
         val payment =

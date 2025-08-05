@@ -70,8 +70,8 @@ class OrderFacade(
             ),
         )
 
-        paymentProcessorFactory.process(
-            PaymentProcessorCommand.Process(
+        paymentProcessorFactory.pay(
+            PaymentProcessorCommand.Pay(
                 user.id,
                 createdPayment.id,
                 criteria.paymentMethodType,
