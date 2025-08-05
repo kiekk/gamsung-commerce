@@ -1,18 +1,18 @@
 package com.loopers.domain.productlike
 
-import com.loopers.domain.BaseEntity
-import jakarta.persistence.Column
+import com.loopers.domain.BaseEntityWithoutId
 import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.Version
 
 @Entity
 @Table(name = "product_like_count")
 class ProductLikeCountEntity(
-    @Column(unique = true)
-    val productId: Long,
+    @Id
+    val productId: Long = 0L,
     var productLikeCount: Int = 0,
-) : BaseEntity() {
+) : BaseEntityWithoutId() {
     @Version
     var version: Long? = null
 

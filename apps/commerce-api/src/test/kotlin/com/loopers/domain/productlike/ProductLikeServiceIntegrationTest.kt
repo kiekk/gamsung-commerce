@@ -404,5 +404,67 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             assertThat(productLikeCount).isNotNull
             assertThat(productLikeCount?.productLikeCount).isEqualTo(numberOfThreads - successCount)
         }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도, 상품의 좋아요는 1번만 등록되어야 한다.")
+        @Test
+        fun singleUserLikesSameProductMultipleTimesWithOptimisticLock() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.likeOptimistic(ProductLikeCommand.Like(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(1)
+        }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도, 상품의 좋아요는 1번만 취소되어야 한다.")
+        @Test
+        fun singleUserUnlikesSameProductMultipleTimesWithOptimisticLock() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 1))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.unlikeOptimistic(ProductLikeCommand.Unlike(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isZero()
+        }
     }
 }

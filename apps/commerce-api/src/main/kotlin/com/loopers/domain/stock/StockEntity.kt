@@ -1,16 +1,18 @@
 package com.loopers.domain.stock
 
-import com.loopers.domain.BaseEntity
+import com.loopers.domain.BaseEntityWithoutId
 import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.persistence.Version
 
 @Entity
 @Table(name = "stock")
 class StockEntity(
-    val productId: Long,
+    @Id
+    val productId: Long = 0L,
     var quantity: Int,
-) : BaseEntity() {
+) : BaseEntityWithoutId() {
 
     @Version
     var version: Long? = null

@@ -204,7 +204,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: $quantity, 재고: ${createdStock.quantity}") },
+                { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: ${quantity.value}, 재고: ${createdStock.quantity}") },
             )
         }
     }

@@ -16,7 +16,7 @@ class ProductLikeService(
         if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
         productLikeRepository.create(command.toEntity()).let { created ->
-            productLikeCountRepository.findPessimisticLockedByProductId(created.productId)?.apply {
+            productLikeCountRepository.findByProductIdWithPessimisticLock(created.productId)?.apply {
                 increaseProductLikeCount()
             } ?: productLikeCountRepository.save(
                 ProductLikeCountEntity(created.productId, 1),
@@ -32,25 +32,20 @@ class ProductLikeService(
             productLikeRepository.deleteByUserIdAndProductId(command.userId, command.productId)
         if (deleteCount == 0) return
 
-        productLikeCountRepository.findPessimisticLockedByProductId(command.productId)?.decreaseProductLikeCount()
+        productLikeCountRepository.findByProductIdWithPessimisticLock(command.productId)?.decreaseProductLikeCount()
     }
 
     @Retryable(
         value = [OptimisticLockingFailureException::class],
         maxAttempts = 3,
-        backoff = Backoff(
-            100,
-            100,
-            1000,
-            1.5,
-        ),
+        backoff = Backoff(delay = 10, multiplier = 1.0),
     )
     @Transactional
     fun likeOptimistic(command: ProductLikeCommand.Like) {
         if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
         productLikeRepository.create(command.toEntity()).let { created ->
-            productLikeCountRepository.findOptimisticLockedByProductId(created.productId)?.apply {
+            productLikeCountRepository.findByProductIdWithOptimisticLock(created.productId)?.apply {
                 increaseProductLikeCount()
             } ?: productLikeCountRepository.save(
                 ProductLikeCountEntity(created.productId, 1),
@@ -61,12 +56,7 @@ class ProductLikeService(
     @Retryable(
         value = [OptimisticLockingFailureException::class],
         maxAttempts = 3,
-        backoff = Backoff(
-            100,
-            100,
-            1000,
-            1.5,
-        ),
+        backoff = Backoff(delay = 10, multiplier = 1.0),
     )
     @Transactional
     fun unlikeOptimistic(command: ProductLikeCommand.Unlike) {
@@ -76,7 +66,7 @@ class ProductLikeService(
             productLikeRepository.deleteByUserIdAndProductId(command.userId, command.productId)
         if (deleteCount == 0) return
 
-        productLikeCountRepository.findOptimisticLockedByProductId(command.productId)?.decreaseProductLikeCount()
+        productLikeCountRepository.findByProductIdWithOptimisticLock(command.productId)?.decreaseProductLikeCount()
     }
 
     @Transactional(readOnly = true)
