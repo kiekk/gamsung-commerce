@@ -462,6 +462,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun shouldNotDeductPointsMultipleTimesWhenSameUserOrdersConcurrently() {
             // arrange
+            val numberOfThreads = 10
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val latch = CountDownLatch(numberOfThreads)
             val createdUser = userJpaRepository.save(aUser().build())
             val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
             val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
@@ -485,13 +488,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 PaymentMethodType.POINT,
             )
 
-            val threadCount = 10
-            val executor = Executors.newFixedThreadPool(threadCount)
-            val latch = CountDownLatch(threadCount)
-
             // act
             var orderId: Long? = null
-            repeat(threadCount) {
+            repeat(numberOfThreads) {
                 executor.submit {
                     try {
                         orderId = orderFacade.placeOrder(criteria)
@@ -570,7 +569,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
             // then
             val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
-            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
+            println("락 충돌로 인한 실패 수: $failureCount")
             println("성공한 주문 수: $successCount")
             println("남은 재고: $remainingStock")
             assertThat(remainingStock).isEqualTo(createdStock.quantity - successCount)

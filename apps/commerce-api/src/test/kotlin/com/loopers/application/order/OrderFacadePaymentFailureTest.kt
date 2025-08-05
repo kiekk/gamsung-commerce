@@ -19,7 +19,9 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.support.StockServiceMockConfig
+import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.PaymentException
 import com.loopers.utils.DatabaseCleanUp
@@ -104,9 +106,9 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
-                { assertThat(paymentRepository.findWithItemsByOrderId(criteria.userId)).isNull() },
+                { assertThat(paymentRepository.findWithItemsByOrderId(criteria.userId)?.status).isEqualTo(PaymentStatusType.CANCELED) },
                 { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
-                { assertThat(orderRepository.findWithItemsById(criteria.userId)).isNull() },
+                { assertThat(orderRepository.findWithItemsById(criteria.userId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
             )
         }
     }
