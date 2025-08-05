@@ -12,8 +12,8 @@ class ProductLikeRepositoryImpl(
         return productLikeJpaRepository.save(productLike)
     }
 
-    override fun deleteByUserIdAndProductId(userId: Long, productId: Long) {
-        productLikeJpaRepository.deleteByUserIdAndProductId(userId, productId)
+    override fun deleteByUserIdAndProductId(userId: Long, productId: Long): Int {
+        return productLikeJpaRepository.deleteByUserIdAndProductId(userId, productId)
     }
 
     override fun existsByUserIdAndProductId(userId: Long, productId: Long): Boolean {

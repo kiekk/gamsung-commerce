@@ -12,6 +12,14 @@ class ProductLikeCountRepositoryImpl(
         return productLikeCountJpaRepository.findByProductId(productId)
     }
 
+    override fun findOptimisticLockedByProductId(productId: Long): ProductLikeCountEntity? {
+        return productLikeCountJpaRepository.findOptimisticLockedByProductId(productId)
+    }
+
+    override fun findPessimisticLockedByProductId(productId: Long): ProductLikeCountEntity? {
+        return productLikeCountJpaRepository.findPessimisticLockedByProductId(productId)
+    }
+
     override fun save(productLikeCountEntity: ProductLikeCountEntity): ProductLikeCountEntity {
         return productLikeCountJpaRepository.save(productLikeCountEntity)
     }
