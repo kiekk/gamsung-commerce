@@ -106,7 +106,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
-                { assertThat(paymentRepository.findWithItemsByOrderId(criteria.userId)?.status).isEqualTo(PaymentStatusType.CANCELED) },
+                { assertThat(paymentRepository.findWithItemsById(criteria.userId)?.status).isEqualTo(PaymentStatusType.CANCELED) },
                 { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
                 { assertThat(orderRepository.findWithItemsById(criteria.userId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
             )

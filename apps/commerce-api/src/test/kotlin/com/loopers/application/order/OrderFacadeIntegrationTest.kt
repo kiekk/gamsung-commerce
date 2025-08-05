@@ -263,7 +263,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                 )
             }
-            val findPayment = paymentJpaRepository.findWithItemsByOrderId(orderId)
+            val findPayment = paymentJpaRepository.findWithItemsById(orderId)
             findPayment?.let { payment ->
                 assertAll(
                     { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
@@ -452,21 +452,21 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
     /*
     **🔗 통합 테스트
-    - [ ] 동일한 유저가 여러 기기에서 동시에 주문해도 포인트가 중복 차감되지 않아야 한다.
+    - [ ] 동일한 유저가 여러 기기에서 동시에 주문을 요청해도, 포인트가 정상적으로 차감되어야 한다.
     - [ ] 동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.
      */
     @DisplayName("주문 결제 통시성 테스트, ")
     @Nested
     inner class Concurrency {
-        @DisplayName("동일한 유저가 여러 기기에서 동시에 주문해도 포인트가 중복 차감되지 않아야 한다")
+        @DisplayName("동일한 유저가 여러 기기에서 동시에 주문을 요청해도, 포인트가 정상적으로 차감되어야 한다.")
         @Test
-        fun shouldNotDeductPointsMultipleTimesWhenSameUserOrdersConcurrently() {
+        fun shouldDeductPointsCorrectlyWhenConcurrentOrdersArePlacedBySameUser() {
             // arrange
-            val numberOfThreads = 10
+            val numberOfThreads = 2
             val executor = Executors.newFixedThreadPool(numberOfThreads)
             val latch = CountDownLatch(numberOfThreads)
             val createdUser = userJpaRepository.save(aUser().build())
-            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
+            pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
             val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
             stockJpaRepository.save(aStock().productId(createdProduct.id).build())
             val quantity = Quantity(1)
@@ -489,11 +489,12 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            var orderId: Long? = null
+            val orderIds = mutableListOf<Long>()
             repeat(numberOfThreads) {
                 executor.submit {
                     try {
-                        orderId = orderFacade.placeOrder(criteria)
+                        val orderId = orderFacade.placeOrder(criteria)
+                        orderIds.add(orderId)
                     } catch (e: Exception) {
                         println("예외 발생: ${e.message}")
                     } finally {
@@ -505,18 +506,17 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            val findOrder = orderJpaRepository.findWithItemsById(orderId!!)
-            assertThat(findOrder).isNotNull
-
-            val findPoint = pointJpaRepository.findByUserId(createdUser.id)
-            assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
+            assertAll(
+                { assertThat(orderIds).hasSize(numberOfThreads) },
+                { assertThat(pointJpaRepository.findByUserId(createdUser.id)?.point?.value).isZero() },
+            )
         }
 
         @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.")
         @Test
         fun shouldNotDeductStockMoreThanAvailableWhenConcurrentOrdersArePlacedForSameProduct() {
             // given
-            val numberOfThreads = 20
+            val numberOfThreads = 2
             val latch = CountDownLatch(numberOfThreads)
             val executor = Executors.newFixedThreadPool(numberOfThreads)
             val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())

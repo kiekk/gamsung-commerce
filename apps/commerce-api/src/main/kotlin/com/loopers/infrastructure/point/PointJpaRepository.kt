@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query
 interface PointJpaRepository : JpaRepository<PointEntity, Long> {
     fun findByUserId(userId: Long): PointEntity?
 
-    @Lock(LockModeType.OPTIMISTIC)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM PointEntity p WHERE p.userId = :userId")
     fun findByUserIdWithLock(userId: Long): PointEntity?
 }
