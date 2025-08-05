@@ -4,4 +4,6 @@ interface StockRepository {
     fun save(stockEntity: StockEntity): StockEntity
 
     fun findByIds(productIds: List<Long>): List<StockEntity>
+
+    fun findByProductId(productId: Long): StockEntity?
 }
