@@ -5,7 +5,6 @@ import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
-import com.loopers.interfaces.api.example.ExampleV1Dto
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
