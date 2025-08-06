@@ -3,6 +3,7 @@ package com.loopers.application.coupon
 import com.loopers.domain.coupon.CouponEntity
 import com.loopers.domain.coupon.IssuedCouponEntity
 import com.loopers.support.enums.coupon.CouponStatusType
+import com.loopers.support.enums.coupon.CouponType
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import java.time.LocalDateTime
 
@@ -10,7 +11,7 @@ class CouponInfo {
     data class CouponDetail(
         val id: Long,
         val name: String,
-        val type: String,
+        val type: CouponType,
         val discountAmount: Long,
         val discountRate: Double,
         var status: CouponStatusType,
@@ -20,7 +21,7 @@ class CouponInfo {
                 return CouponDetail(
                     couponEntity.id,
                     couponEntity.name,
-                    couponEntity.type.name,
+                    couponEntity.type,
                     couponEntity.discountAmount.value,
                     couponEntity.discountRate.value,
                     couponEntity.status,
