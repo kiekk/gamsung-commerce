@@ -10,8 +10,10 @@ erDiagram
     PRODUCT ||--|| PRODUCT_LIKE_COUNT: "1:1"
     ORDER ||--|| PAYMENT : "1:1"
     PAYMENT ||--o{ PAYMENT_ITEM : "1:N"
-    PAYMENT ||--o{ PAYMENT_GATEWAY_HISTORY : "1:N"
     ORDER_ITEM ||--|| PAYMENT_ITEM : "1:1"
+    COUPON ||--o{ ISSUED_COUPON : "1:N"
+    ISSUED_COUPON ||--|| MEMBER : "1:1"
+    ORDER ||--|| ISSUED_COUPON : "1:1"
 
     BRAND {
         BIGINT id PK "브랜드 ID"
@@ -50,6 +52,7 @@ erDiagram
     ORDER {
         BIGINT id PK "주문 ID"
         BIGINT member_id FK "회원 ID"
+        BIGINT issued_coupon_id FK "발급 쿠폰 ID"
         VARCHAR purchase_method "주문 방법"
         VARCHAR status "주문 상태"
         VARCHAR name "주문자명"
@@ -114,12 +117,25 @@ erDiagram
         DATETIME updated_at "수정일시"
         DATETIME deleted_at "삭제일시"
     }
-
-    PAYMENT_GATEWAY_HISTORY {
-        BIGINT id PK
-        BIGINT payment_id FK
-        VARCHAR type
-        TEXT gateway_response
+    
+    COUPON {
+        BIGINT id PK "쿠폰 ID"
+        VARCHAR name "쿠폰명"
+        VARCHAR status "쿠폰 상태"
+        DECIMAL discount_amount "할인 금액"
+        DECIMAL discount_rate "할인율"
+        DATETIME created_at "등록일시"
+        DATETIME updated_at "수정일시"
+        DATETIME deleted_at "삭제일시"
+    }
+    
+    ISSUED_COUPON {
+        BIGINT id PK "발급 쿠폰 ID"
+        BIGINT member_id FK "회원 ID"
+        BIGINT coupon_id FK "쿠폰 ID"
+        VARCHAR status "발급 쿠폰 상태"
+        DATETIME issued_at "발급일시"
+        DATETIME used_at "사용일시"
         DATETIME created_at "등록일시"
         DATETIME updated_at "수정일시"
         DATETIME deleted_at "삭제일시"

@@ -89,5 +89,4 @@ class ProductLikeV1ApiE2ETest @Autowired constructor(
             assertThat(response.statusCode.is2xxSuccessful)
         }
     }
-
 }
