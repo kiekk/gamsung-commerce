@@ -2,13 +2,20 @@ package com.loopers.domain.coupon
 
 import com.loopers.domain.BaseEntity
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
+@Entity
+@Table(name = "issued_coupon")
 class IssuedCouponEntity(
     val couponId: Long,
     val userId: Long,
 ) : BaseEntity() {
 
+    @Enumerated(EnumType.STRING)
     var status: IssuedCouponStatusType
     var issuedAt: LocalDateTime? = null
     var usedAt: LocalDateTime? = null
