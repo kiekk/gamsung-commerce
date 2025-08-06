@@ -20,7 +20,7 @@ class CouponCommand {
                 name,
                 couponType,
                 discountAmount,
-                discountRate
+                discountRate,
             )
         }
 

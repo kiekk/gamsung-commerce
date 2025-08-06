@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 class IssuedCouponRepositoryImpl(
-    private val issuedCouponJpaRepository: IssuedCouponJpaRepository
+    private val issuedCouponJpaRepository: IssuedCouponJpaRepository,
 ) : IssuedCouponRepository {
     override fun save(issuedCoupon: IssuedCouponEntity): IssuedCouponEntity {
         return issuedCouponJpaRepository.save(issuedCoupon)

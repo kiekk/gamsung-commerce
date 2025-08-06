@@ -26,7 +26,7 @@ class IssuedCouponServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 쿠폰을 발급하면 발급된 쿠폰이 저장된다.
     - [ ] 발급된 쿠폰을 조회하면 해당 쿠폰 정보를 반환한다.
      */

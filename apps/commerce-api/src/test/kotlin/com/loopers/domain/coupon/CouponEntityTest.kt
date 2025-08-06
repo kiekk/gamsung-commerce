@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource
 class CouponEntityTest {
 
     /*
-    * 🧱 단위 테스트
+     * 🧱 단위 테스트
     - [ ] 쿠폰명이 `20자 이내` 형식에 맞지 않으면, Coupon 객체 생성에 실패한다.
     - [ ] 쿠폰 정보가 유효하면 Coupon 객체 생성에 성공한다.
     - [ ] 쿠폰이 생성되면 쿠폰의 상태는 ACTIVE 여야 한다.
@@ -102,16 +102,14 @@ class CouponEntityTest {
             // act & assert
             assertThat(coupon.status).isEqualTo(CouponStatusType.INACTIVE)
         }
-
     }
 
     /*
-    * 🧱 단위 테스트
+     * 🧱 단위 테스트
     - [ ] 쿠폰 타입이 '정액'인 경우 총 금액에서 할인 금액을 차감한다.
     - [ ] 쿠폰 타입이 '정률'인 경우 총 금액에서 할인 비율을 적용하여 할인 금액을 계산한다.
      */
     @DisplayName("쿠폰 할인 금액을 계산할 때, ")
     @Nested
-    inner class CalculateDiscountAmount {}
-
+    inner class CalculateDiscountAmount
 }

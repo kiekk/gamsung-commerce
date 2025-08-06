@@ -27,7 +27,7 @@ class CouponServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 쿠폰을 생성하면 쿠폰이 저장된다.
      */
     @DisplayName("쿠폰을 생성할 때, ")

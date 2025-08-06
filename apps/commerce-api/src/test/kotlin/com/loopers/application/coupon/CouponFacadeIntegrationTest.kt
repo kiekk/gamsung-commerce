@@ -35,7 +35,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 쿠폰명이 중복되면 409 Conflict 예외가 발생한다.
     - [ ] 쿠폰이 생성되면 쿠폰 정보가 반환된다.
@@ -123,7 +123,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 쿠폰이 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 쿠폰이 발급 가능한 상태가 아니면 409 Conflict 예외가 발생한다.
@@ -256,5 +256,4 @@ class CouponFacadeIntegrationTest @Autowired constructor(
             )
         }
     }
-
 }

@@ -32,5 +32,4 @@ class PercentRateCouponDiscountPolicyTest {
         // assert
         assertThat(discountAmount).isEqualTo(((totalPrice * coupon.discountRate.value) / 100).toLong())
     }
-
 }

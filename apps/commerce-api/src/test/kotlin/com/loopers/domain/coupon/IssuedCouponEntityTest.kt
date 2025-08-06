@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class IssuedCouponEntityTest {
 
     /*
-    * 🧱 단위 테스트
+     * 🧱 단위 테스트
     - [ ] 사용자 쿠폰이 생성되면 쿠폰의 상태는 ACTIVE, 발급일도 설정 되어야 한다.
     - [ ] 사용자 쿠폰이 사용되면 쿠폰의 상태는 USED, 사용일도 설정 되어야 한다.
      */

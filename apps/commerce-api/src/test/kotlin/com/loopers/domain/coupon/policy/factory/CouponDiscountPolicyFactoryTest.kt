@@ -16,7 +16,7 @@ class CouponDiscountPolicyFactoryTest @Autowired constructor(
 ) {
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 쿠폰 타입이 '정액'인 경우 총 금액에서 할인 금액을 차감한다.
     - [ ] 쿠폰 타입이 '비율'인 경우 총 금액에서 할인 금액을 차감한다.
      */
@@ -51,5 +51,4 @@ class CouponDiscountPolicyFactoryTest @Autowired constructor(
         // assert
         assertThat(discountAmount).isEqualTo(((totalPrice * coupon.discountRate.value) / 100).toLong())
     }
-
 }

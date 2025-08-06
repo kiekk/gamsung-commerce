@@ -42,7 +42,7 @@ class CouponV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ]  쿠폰 생성이 성공할 경우, 생성된 쿠폰 정보를 응답으로 반환한다.
      */
     @DisplayName("POST /api/v1/coupons")
@@ -82,7 +82,7 @@ class CouponV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ]  쿠폰 발급이 성공할 경우, 발급된 쿠폰 정보를 응답으로 반환한다.
      */
     @DisplayName("POST /api/v1/coupons/{couponId}/issue")
@@ -117,5 +117,4 @@ class CouponV1ApiE2ETest @Autowired constructor(
             )
         }
     }
-
 }
