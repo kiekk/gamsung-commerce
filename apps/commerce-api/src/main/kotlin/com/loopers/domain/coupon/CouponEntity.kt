@@ -35,6 +35,10 @@ class CouponEntity(
         status = CouponStatusType.INACTIVE
     }
 
+    fun isNotActive(): Boolean {
+        return status != CouponStatusType.ACTIVE
+    }
+
     companion object {
         private val NAME_PATTERN = "^(?!\\s*$).{1,20}$".toRegex()
     }
