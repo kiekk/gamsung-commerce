@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon
 
+import com.loopers.domain.coupon.fixture.CouponEntityFixture.Companion.aCoupon
 import com.loopers.domain.vo.PercentRate
 import com.loopers.domain.vo.Price
 import com.loopers.support.enums.coupon.CouponStatusType
@@ -40,12 +41,7 @@ class CouponEntityTest {
 
             // act
             val exception = assertThrows<IllegalArgumentException> {
-                CouponEntity(
-                    invalidCouponName,
-                    CouponType.FIXED,
-                    Price(1000),
-                    PercentRate(10.0),
-                )
+                aCoupon().name(invalidCouponName).build()
             }
 
             // assert
@@ -62,12 +58,12 @@ class CouponEntityTest {
             val validCouponName = "ValidCoupon123"
 
             // act
-            val coupon = CouponEntity(
-                validCouponName,
-                CouponType.FIXED,
-                Price(1000),
-                PercentRate(10.0),
-            )
+            val coupon = aCoupon()
+                .name(validCouponName)
+                .type(CouponType.FIXED)
+                .discountAmount(Price(1000))
+                .discountRate(PercentRate(10.0))
+                .build()
 
             // assert
             assertThat(coupon.name).isEqualTo(validCouponName)
@@ -80,12 +76,12 @@ class CouponEntityTest {
         @Test
         fun couponShouldBeActiveWhenCreated() {
             // arrange
-            val coupon = CouponEntity(
-                "ActiveCoupon",
-                CouponType.FIXED,
-                Price(1000),
-                PercentRate(10.0),
-            )
+            val coupon = aCoupon()
+                .name("ActiveCoupon")
+                .type(CouponType.FIXED)
+                .discountAmount(Price(1000))
+                .discountRate(PercentRate(10.0))
+                .build()
 
             // act & assert
             assertThat(coupon.status).isEqualTo(CouponStatusType.ACTIVE)
@@ -95,12 +91,12 @@ class CouponEntityTest {
         @Test
         fun couponShouldBeInactiveWhenDisabled() {
             // arrange
-            val coupon = CouponEntity(
-                "InactiveCoupon",
-                CouponType.FIXED,
-                Price(1000),
-                PercentRate(10.0),
-            )
+            val coupon = aCoupon()
+                .name("InactiveCoupon")
+                .type(CouponType.FIXED)
+                .discountAmount(Price(1000))
+                .discountRate(PercentRate(10.0))
+                .build()
             coupon.inactive()
 
             // act & assert

@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon
 
+import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anIssuedCoupon
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.utils.DatabaseCleanUp
@@ -56,7 +57,7 @@ class IssuedCouponServiceIntegrationTest @Autowired constructor(
         @Test
         fun returnsIssuedCoupon_whenIssuedCouponExists() {
             // arrange
-            val createdIssuedCoupon = issuedCouponJpaRepository.save(IssuedCouponEntity(1L, 1L))
+            val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().build())
 
             // act
             val findIssuedCoupon = issuedCouponService.findIssuedCouponById(createdIssuedCoupon.id)

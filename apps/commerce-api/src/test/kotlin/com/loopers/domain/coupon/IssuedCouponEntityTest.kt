@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon
 
+import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anIssuedCoupon
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
@@ -25,7 +26,10 @@ class IssuedCouponEntityTest {
             val userId = 1L
 
             // act
-            val issuedCoupon = IssuedCouponEntity(couponId, userId)
+            val issuedCoupon = anIssuedCoupon()
+                .userId(userId)
+                .couponId(couponId)
+                .build()
 
             // assert
             assertAll(
@@ -42,7 +46,10 @@ class IssuedCouponEntityTest {
             // arrange
             val couponId = 1L
             val userId = 1L
-            val issuedCoupon = IssuedCouponEntity(couponId, userId)
+            val issuedCoupon = anIssuedCoupon()
+                .userId(userId)
+                .couponId(couponId)
+                .build()
 
             // act
             issuedCoupon.use()
