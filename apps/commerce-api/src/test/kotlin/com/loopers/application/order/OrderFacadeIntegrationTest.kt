@@ -1,7 +1,7 @@
 package com.loopers.application.order
 
-import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
-import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
+import com.loopers.domain.order.fixture.OrderEntityFixture.Companion.anOrder
+import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint

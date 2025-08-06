@@ -1,10 +1,11 @@
-package com.loopers.domain.order
+package com.loopers.domain.order.fixture
 
-import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
+import com.loopers.domain.order.OrderEntity
+import com.loopers.domain.order.OrderItemEntity
 import com.loopers.domain.vo.Price
 
 class OrderItemEntityFixture {
-    private var order: OrderEntity = anOrder().build()
+    private var order: OrderEntity = OrderEntityFixture.Companion.anOrder().build()
     private var productId = 1L
     private var productName = "상품A"
     private var totalPrice = Price(1000L)
