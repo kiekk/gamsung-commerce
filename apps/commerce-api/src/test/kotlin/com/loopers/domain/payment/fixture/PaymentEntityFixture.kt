@@ -22,6 +22,6 @@ class PaymentEntityFixture {
     fun build(): PaymentEntity = PaymentEntity(
         orderId,
         method,
-        totalPrice
+        totalPrice,
     )
 }

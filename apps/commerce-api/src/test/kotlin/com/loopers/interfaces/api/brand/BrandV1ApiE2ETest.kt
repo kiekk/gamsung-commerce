@@ -41,7 +41,7 @@ class BrandV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 브랜드 생성이 성공할 경우, 생성된 브랜드 정보를 응답으로 반환한다.
     - [ ] 브랜드명이 중복될 경우, 브랜드 등록에 실패한다.
@@ -128,7 +128,7 @@ class BrandV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 존재하는 브랜드를 조회할 경우, 브랜드 정보를 응답으로 반환한다.
     - [ ] 존재하지 않는 브랜드를 조회할 경우, 404 Not Found 예외
      */
@@ -170,5 +170,4 @@ class BrandV1ApiE2ETest @Autowired constructor(
             assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
         }
     }
-
 }

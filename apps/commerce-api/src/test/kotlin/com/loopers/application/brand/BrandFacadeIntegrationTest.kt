@@ -34,7 +34,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 브랜드를 생성할 때, 브랜드가 생성되면 브랜드 정보가 반환된다.
      */
     @DisplayName("브랜드를 생성할 때, ")
@@ -63,7 +63,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 브랜드를 조회할 때, 존재하는 브랜드 ID로 조회하면 브랜드 정보가 반환된다.
     - [ ] 존재하지 않는 브랜드 ID로 조회하면 404 Not Found 예외가 발생한다.
      */
@@ -321,5 +321,4 @@ class BrandFacadeIntegrationTest @Autowired constructor(
             assertThat(exception.message).contains("지원하지 않는 정렬 기준입니다: $invalidSortField")
         }
     }
-
 }

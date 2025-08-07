@@ -10,11 +10,13 @@ class IssuedCouponValidationService(
 ) {
 
     fun validate(issuedCouponId: Long) {
-        val issuedCoupon = (issuedCouponRepository.findByIdWithPessimisticLock(issuedCouponId)
+        val issuedCoupon = (
+            issuedCouponRepository.findByIdWithPessimisticLock(issuedCouponId)
             ?: throw CoreException(
                 ErrorType.NOT_FOUND,
                 "존재하지 않는 사용자 쿠폰입니다. issuedCouponId: $issuedCouponId",
-            ))
+            )
+        )
 
         if (issuedCoupon.isUsed()) {
             throw CoreException(
