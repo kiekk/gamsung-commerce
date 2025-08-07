@@ -20,7 +20,6 @@ class ProductV1Dto {
                 name,
                 Price(price),
                 description,
-                status,
             )
         }
     }

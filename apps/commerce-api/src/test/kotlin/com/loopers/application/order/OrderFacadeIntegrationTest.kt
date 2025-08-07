@@ -25,7 +25,6 @@ import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
-import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -145,7 +144,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         fun failsToCreateOrder_whenProductIsNotAvailable() {
             // arrange
             val createdUser = userJpaRepository.save(aUser().build())
-            val createdProduct = productJpaRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
+            val createdProduct = productJpaRepository.save(aProduct().build().apply { inactive() })
             val orderCriteria = OrderCriteria.Create(
                 createdUser.id,
                 "홍길동",

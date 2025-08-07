@@ -61,7 +61,6 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductStatusType.ACTIVE,
                 10,
             )
 
@@ -74,7 +73,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
                 { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
-                { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
+                { Assertions.assertThat(productInfo.status).isEqualTo(ProductStatusType.ACTIVE) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(productCreateCriteria.quantity) },
             )
         }
@@ -90,7 +89,6 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -102,7 +100,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
                 { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
-                { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
+                { Assertions.assertThat(productInfo.status).isEqualTo(ProductStatusType.ACTIVE) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(0) },
             )
         }

@@ -2,7 +2,6 @@ package com.loopers.domain.product
 
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.infrastructure.product.ProductJpaRepository
-import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
@@ -59,7 +58,7 @@ class ProductValidationServiceTest @Autowired constructor(
         @Test
         fun throwsException_whenProductIsInactive() {
             // arrange
-            val inactiveProduct = productJpaRepository.save(aProduct().status(ProductStatusType.INACTIVE).build())
+            val inactiveProduct = productJpaRepository.save(aProduct().build().apply { inactive() })
 
             // act
             val exception = assertThrows<CoreException> {

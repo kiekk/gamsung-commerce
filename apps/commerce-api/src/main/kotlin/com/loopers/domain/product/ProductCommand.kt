@@ -9,7 +9,6 @@ class ProductCommand {
         val name: String,
         val price: Price,
         val description: String?,
-        val status: ProductStatusType,
     ) {
 
         init {
@@ -27,7 +26,6 @@ class ProductCommand {
                 name,
                 description,
                 price,
-                status,
             )
         }
 

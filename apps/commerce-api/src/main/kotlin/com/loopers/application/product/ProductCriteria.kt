@@ -11,7 +11,6 @@ class ProductCriteria {
         val name: String,
         val price: Price,
         val description: String?,
-        val status: ProductStatusType,
         val quantity: Int? = 0,
     ) {
 
@@ -33,7 +32,6 @@ class ProductCriteria {
                 name,
                 price,
                 description,
-                status,
             )
         }
 
