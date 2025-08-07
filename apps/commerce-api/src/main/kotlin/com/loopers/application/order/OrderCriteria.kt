@@ -7,22 +7,20 @@ import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
-import com.loopers.domain.vo.Price
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderCriteria {
     data class Get(
-        val userId: Long,
+        val username: String,
         val orderId: Long,
     ) {
         init {
-            require(userId > 0) { "사용자 아이디는 0보다 커야 합니다." }
             require(orderId > 0) { "주문 아이디는 0보다 커야 합니다." }
         }
     }
 
     data class Create(
-        val userId: Long,
+        val username: String,
         val ordererName: String,
         val ordererEmail: Email,
         val ordererMobile: Mobile,
@@ -37,7 +35,7 @@ class OrderCriteria {
             require(orderItems.isNotEmpty()) { "주문 항목은 최소 하나 이상이어야 합니다." }
         }
 
-        fun toOrderCommand(products: List<ProductEntity>, discountAmount: Long): OrderCommand.Create {
+        fun toOrderCommand(userId: Long, products: List<ProductEntity>, discountAmount: Long): OrderCommand.Create {
             return OrderCommand.Create(
                 userId,
                 ordererName,
@@ -60,7 +58,6 @@ class OrderCriteria {
 
         data class OrderItem(
             val productId: Long,
-            val productName: String,
             val quantity: Quantity,
         ) {
             init {
@@ -68,11 +65,13 @@ class OrderCriteria {
             }
 
             fun toOrderItemCommand(products: List<ProductEntity>): OrderCommand.Create.OrderItemCommand {
+                val product =
+                    products.find { it.id == productId } ?: throw IllegalArgumentException("상품을 찾을 수 없습니다. productId: $productId")
                 return OrderCommand.Create.OrderItemCommand(
                     productId,
-                    productName,
+                    product.name,
                     quantity,
-                    products.find { it.id == productId }?.price ?: Price.ZERO,
+                    product.price,
                 )
             }
         }

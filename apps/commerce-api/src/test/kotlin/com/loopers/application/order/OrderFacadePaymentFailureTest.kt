@@ -21,7 +21,6 @@ import com.loopers.domain.vo.Price
 import com.loopers.support.StockServiceMockConfig
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
-import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.StockDeductionFailedException
 import com.loopers.utils.DatabaseCleanUp
@@ -77,7 +76,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             val createdStock = stockRepository.save(aStock().productId(createdProduct.id).build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -85,7 +84,6 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -99,14 +97,13 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                 .thenThrow(StockDeductionFailedException(ErrorType.CONFLICT, "재고가 부족합니다."))
 
             // act
-            orderFacade.placeOrder(criteria)
+            val orderId = orderFacade.placeOrder(criteria)
 
             // assert
             assertAll(
+                { assertThat(orderRepository.findWithItemsById(orderId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
                 { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
-                { assertThat(paymentRepository.findWithItemsById(criteria.userId)?.status).isEqualTo(PaymentStatusType.CANCELED) },
                 { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
-                { assertThat(orderRepository.findWithItemsById(criteria.userId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
             )
         }
     }

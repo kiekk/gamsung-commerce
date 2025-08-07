@@ -35,10 +35,10 @@ class OrderFacade(
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
     @Transactional(readOnly = true)
-    fun getOrderById(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
-        userService.findUserBy(criteria.userId) ?: throw CoreException(
+    fun getOrder(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
+        userService.findUserBy(criteria.username) ?: throw CoreException(
             ErrorType.NOT_FOUND,
-            "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
+            "사용자를 찾을 수 없습니다. username: ${criteria.username}",
         )
         return orderService.findWithItemsById(criteria.orderId)?.let { orderEntity ->
             OrderInfo.OrderDetail.from(orderEntity)
@@ -50,9 +50,9 @@ class OrderFacade(
 
     @Transactional
     fun placeOrder(criteria: OrderCriteria.Create): Long {
-        val user = userService.findUserBy(criteria.userId) ?: throw CoreException(
+        val user = userService.findUserBy(criteria.username) ?: throw CoreException(
             ErrorType.NOT_FOUND,
-            "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
+            "사용자를 찾을 수 없습니다. username: ${criteria.username}",
         )
 
         orderValidator.validate(criteria)
@@ -65,7 +65,7 @@ class OrderFacade(
             orderTotalPriceCalculator.calculateTotalPrice(criteria.orderItems, products),
         )
 
-        val createdOrder = orderService.createOrder(criteria.toOrderCommand(products, discountAmount))
+        val createdOrder = orderService.createOrder(criteria.toOrderCommand(user.id, products, discountAmount))
         val createdPayment = paymentService.createPayment(
             PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
         )

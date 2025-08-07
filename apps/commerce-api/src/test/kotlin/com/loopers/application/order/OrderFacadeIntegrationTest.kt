@@ -75,10 +75,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToCreateOrder_whenUserDoesNotExist() {
             // arrange
-            val nonExistentUserId = 999L // 존재하지 않는 사용자 ID
+            val nonExistentUsername = "nonExistentUser"
             val createdProduct = productJpaRepository.save(aProduct().build())
             val orderCriteria = OrderCriteria.Create(
-                nonExistentUserId,
+                nonExistentUsername,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -86,7 +86,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         Quantity(2),
                     ),
                 ),
@@ -101,7 +100,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).isEqualTo("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
@@ -112,7 +111,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdUser = userJpaRepository.save(aUser().build())
             val nonExistentProductId = 999L
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -120,7 +119,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         nonExistentProductId,
-                        "존재하지 않는 상품",
                         Quantity(2),
                     ),
                 ),
@@ -146,7 +144,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdUser = userJpaRepository.save(aUser().build())
             val createdProduct = productJpaRepository.save(aProduct().build().apply { inactive() })
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -154,7 +152,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         Quantity(2),
                     ),
                 ),
@@ -182,7 +179,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdStock = stockJpaRepository.save(aStock().quantity(0).build())
             val quantity = Quantity(2)
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -190,7 +187,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -219,7 +215,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val nonExistIssuedCouponId: Long = 999L
             val quantity = Quantity(2)
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -227,7 +223,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -263,7 +258,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     .build().apply { use() },
             )
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -271,7 +266,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -303,7 +297,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdCoupon = couponJpaRepository.save(aCoupon().build())
             val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().couponId(createdCoupon.id).userId(createdUser.id).build())
             val orderCriteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -311,7 +305,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -353,7 +346,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -361,7 +354,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -394,7 +386,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -402,7 +394,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -418,7 +409,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("사용자 포인트를 찾을 수 없습니다.") },
-                { assertThat(orderJpaRepository.findWithItemsById(criteria.userId)).isNull() },
+                { assertThat(orderJpaRepository.findAll()).isEmpty() },
             )
         }
 
@@ -432,7 +423,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -440,7 +431,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -456,7 +446,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${createdPoint.point}") },
-                { assertThat(orderJpaRepository.findWithItemsById(criteria.userId)).isNull() },
+                { assertThat(orderJpaRepository.findAll()).isEmpty() },
             )
         }
     }
@@ -474,18 +464,18 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @Test
         fun failsToGetOrder_whenUserDoesNotExist() {
             // arrange
-            val nonExistentUserId = 999L // 존재하지 않는 사용자 ID
-            val orderCriteria = OrderCriteria.Get(nonExistentUserId, 1L)
+            val nonExistentUsername = "nonExistentUser"
+            val orderCriteria = OrderCriteria.Get(nonExistentUsername, 1L)
 
             // act
             val exception = assertThrows<CoreException> {
-                orderFacade.getOrderById(orderCriteria)
+                orderFacade.getOrder(orderCriteria)
             }
 
             // assert
             assertAll(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).isEqualTo("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
@@ -495,11 +485,11 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             // arrange
             val createdUser = userJpaRepository.save(aUser().build())
             val nonExistentOrderId = 999L // 존재하지 않는 주문 ID
-            val orderCriteria = OrderCriteria.Get(createdUser.id, nonExistentOrderId)
+            val orderCriteria = OrderCriteria.Get(createdUser.username, nonExistentOrderId)
 
             // act
             val exception = assertThrows<CoreException> {
-                orderFacade.getOrderById(orderCriteria)
+                orderFacade.getOrder(orderCriteria)
             }
 
             // assert
@@ -538,7 +528,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             orderJpaRepository.save(order)
 
             // act
-            val orderDetail = orderFacade.getOrderById(OrderCriteria.Get(createdUser.id, order.id))
+            val orderDetail = orderFacade.getOrder(OrderCriteria.Get(createdUser.username, order.id))
 
             // assert
             assertAll(
@@ -579,7 +569,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().couponId(createdCoupon.id).userId(createdUser.id).build())
             val quantity = Quantity(1)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -587,7 +577,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -632,7 +621,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             stockJpaRepository.save(aStock().productId(createdProduct.id).build())
             val quantity = Quantity(1)
             val criteria = OrderCriteria.Create(
-                createdUser.id,
+                createdUser.username,
                 "홍길동",
                 Email("shyoon991@gmail.com"),
                 Mobile("010-1234-5678"),
@@ -640,7 +629,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCriteria.Create.OrderItem(
                         createdProduct.id,
-                        createdProduct.name,
                         quantity,
                     ),
                 ),
@@ -681,7 +669,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
             val createdStock = stockJpaRepository.save(aStock().productId(createdProduct.id).quantity(10).build())
             val quantity = Quantity(1)
-            val userIds = mutableListOf<Long>()
+            val usernames = mutableListOf<String>()
             var failureCount = 0
             var successCount = 0
 
@@ -689,13 +677,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 val createdUser =
                     userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
                 pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
-                userIds.add(createdUser.id)
+                usernames.add(createdUser.username)
             }
 
             // when
             repeat(numberOfThreads) {
                 val criteria = OrderCriteria.Create(
-                    userIds[it],
+                    usernames[it],
                     "홍길동",
                     Email("shyoon991@gmail.com"),
                     Mobile("010-1234-5678"),
@@ -703,7 +691,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     listOf(
                         OrderCriteria.Create.OrderItem(
                             createdProduct.id,
-                            createdProduct.name,
                             quantity,
                         ),
                     ),
