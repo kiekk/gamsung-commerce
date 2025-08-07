@@ -1,7 +1,7 @@
 package com.loopers.domain.stock
 
 import com.loopers.support.error.ErrorType
-import com.loopers.support.error.payment.PaymentException
+import com.loopers.support.error.payment.StockDeductionFailedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -27,7 +27,7 @@ class StockService(
             .associateBy { it.productId }
             .forEach { (productId, stock) ->
                 decreaseCommandMap[productId]?.let { quantity ->
-                    stock.isQuantityLessThan(quantity) && throw PaymentException(
+                    stock.isQuantityLessThan(quantity) && throw StockDeductionFailedException(
                         ErrorType.CONFLICT,
                         "재고가 부족합니다. productId: $productId, 요청 수량: $quantity, 현재 재고: ${stock.quantity}",
                     )

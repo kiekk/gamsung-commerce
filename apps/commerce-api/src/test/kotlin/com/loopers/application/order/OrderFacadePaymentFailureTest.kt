@@ -23,7 +23,7 @@ import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.ErrorType
-import com.loopers.support.error.payment.PaymentException
+import com.loopers.support.error.payment.StockDeductionFailedException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -96,7 +96,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                 listOf(aStock().productId(createdProduct.id).quantity(5).build()),
             )
             whenever(stockService.deductStockQuantities(any<List<StockCommand.Deduct>>()))
-                .thenThrow(PaymentException(ErrorType.CONFLICT, "재고가 부족합니다."))
+                .thenThrow(StockDeductionFailedException(ErrorType.CONFLICT, "재고가 부족합니다."))
 
             // act
             orderFacade.placeOrder(criteria)

@@ -13,7 +13,7 @@ import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
-import com.loopers.support.error.payment.PaymentException
+import com.loopers.support.error.payment.StockDeductionFailedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -82,7 +82,7 @@ class OrderFacade(
         try {
             stockService.deductStockQuantities(criteria.toStockDeductCommands())
             orderService.completeOrder(createdOrder.id)
-        } catch (e: PaymentException) {
+        } catch (e: StockDeductionFailedException) {
             log.error(e.message, e)
             // 재고 감소 오류에 따른 결제 취소, 포인트 복구
             paymentProcessorFactory.cancel(
