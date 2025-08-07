@@ -16,7 +16,7 @@ class OrderValidator(
         criteria.orderItems.forEach { orderItem ->
             productValidationService.validate(orderItem.productId)
             stockValidationService.validate(orderItem.productId, orderItem.quantity.value)
-            criteria.issuedCouponId?.let { issuedCouponValidationService.validate(it) }
         }
+        criteria.issuedCouponId?.let { issuedCouponValidationService.validate(it) }
     }
 }
