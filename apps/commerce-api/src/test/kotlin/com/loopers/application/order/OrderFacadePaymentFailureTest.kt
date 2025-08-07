@@ -83,7 +83,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -95,7 +95,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             whenever(stockService.getStocksByProductIds(listOf(createdProduct.id))).thenReturn(
                 listOf(aStock().productId(createdProduct.id).quantity(5).build()),
             )
-            whenever(stockService.deductStockQuantities(any<List<StockCommand.Decrease>>()))
+            whenever(stockService.deductStockQuantities(any<List<StockCommand.Deduct>>()))
                 .thenThrow(PaymentException(ErrorType.CONFLICT, "재고가 부족합니다."))
 
             // act

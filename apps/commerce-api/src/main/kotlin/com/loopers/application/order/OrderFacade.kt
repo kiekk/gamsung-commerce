@@ -9,7 +9,6 @@ import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
 import com.loopers.domain.product.ProductService
-import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
@@ -67,7 +66,7 @@ class OrderFacade(
             orderTotalPriceCalculator.calculateTotalPrice(criteria.orderItems, products),
         )
 
-        val createdOrder = orderService.createOrder(criteria.toCommand(products, discountAmount))
+        val createdOrder = orderService.createOrder(criteria.toOrderCommand(products, discountAmount))
         val createdPayment = paymentService.createPayment(
             PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
         )
@@ -76,19 +75,12 @@ class OrderFacade(
             PaymentProcessorCommand.Pay(
                 user.id,
                 createdPayment.id,
-                criteria.paymentMethodType,
+                createdPayment.method,
             ),
         )
 
         try {
-            stockService.deductStockQuantities(
-                criteria.orderItems.map {
-                    StockCommand.Decrease(
-                        it.productId,
-                        it.quantity.value,
-                    )
-                },
-            )
+            stockService.deductStockQuantities(criteria.toStockDeductCommands())
             orderService.completeOrder(createdOrder.id)
         } catch (e: PaymentException) {
             log.error(e.message, e)
@@ -97,7 +89,7 @@ class OrderFacade(
                 PaymentProcessorCommand.Cancel(
                     user.id,
                     createdPayment.id,
-                    criteria.paymentMethodType,
+                    createdPayment.method,
                 ),
             )
             // 주문 취소 상태 변경

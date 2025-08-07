@@ -21,7 +21,7 @@ class StockService(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun deductStockQuantities(command: List<StockCommand.Decrease>) {
+    fun deductStockQuantities(command: List<StockCommand.Deduct>) {
         val decreaseCommandMap = command.associate { it.productId to it.quantity }
         stockRepository.findAllByProductIdsWithLock(command.map { it.productId })
             .associateBy { it.productId }

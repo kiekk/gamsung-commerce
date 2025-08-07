@@ -85,7 +85,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
@@ -119,7 +119,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         nonExistentProductId,
                         "존재하지 않는 상품",
                         Quantity(2),
@@ -153,7 +153,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
@@ -189,7 +189,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -226,7 +226,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -270,7 +270,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -310,7 +310,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -361,7 +361,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -402,7 +402,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -440,7 +440,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -587,7 +587,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -640,7 +640,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
@@ -703,7 +703,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     Mobile("010-1234-5678"),
                     Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                     listOf(
-                        OrderCriteria.Create.OrderItemCriteria(
+                        OrderCriteria.Create.OrderItem(
                             createdProduct.id,
                             createdProduct.name,
                             quantity,

@@ -3,6 +3,7 @@ package com.loopers.application.order
 import com.loopers.domain.order.OrderCommand
 import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.product.ProductEntity
+import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
@@ -26,7 +27,7 @@ class OrderCriteria {
         val ordererEmail: Email,
         val ordererMobile: Mobile,
         val ordererAddress: Address,
-        val orderItems: List<OrderItemCriteria>,
+        val orderItems: List<OrderItem>,
         val paymentMethodType: PaymentMethodType,
         val issuedCouponId: Long? = null,
     ) {
@@ -36,19 +37,28 @@ class OrderCriteria {
             require(orderItems.isNotEmpty()) { "주문 항목은 최소 하나 이상이어야 합니다." }
         }
 
-        fun toCommand(products: List<ProductEntity>, discountAmount: Long): OrderCommand.Create {
+        fun toOrderCommand(products: List<ProductEntity>, discountAmount: Long): OrderCommand.Create {
             return OrderCommand.Create(
                 userId,
                 ordererName,
                 ordererEmail,
                 ordererMobile,
                 ordererAddress,
-                orderItems.map { it.toCommand(products) },
+                orderItems.map { it.toOrderItemCommand(products) },
                 discountAmount,
             )
         }
 
-        data class OrderItemCriteria(
+        fun toStockDeductCommands(): List<StockCommand.Deduct> {
+            return orderItems.map {
+                StockCommand.Deduct(
+                    it.productId,
+                    it.quantity.value,
+                )
+            }
+        }
+
+        data class OrderItem(
             val productId: Long,
             val productName: String,
             val quantity: Quantity,
@@ -57,7 +67,7 @@ class OrderCriteria {
                 require(productId > 0) { "상품 아이디는 0보다 커야 합니다." }
             }
 
-            fun toCommand(products: List<ProductEntity>): OrderCommand.Create.OrderItemCommand {
+            fun toOrderItemCommand(products: List<ProductEntity>): OrderCommand.Create.OrderItemCommand {
                 return OrderCommand.Create.OrderItemCommand(
                     productId,
                     productName,
