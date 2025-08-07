@@ -4,7 +4,6 @@ import com.loopers.application.brand.BrandCriteria
 import com.loopers.application.brand.BrandInfo
 import com.loopers.support.enums.brand.BrandStatusType
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 
 class BrandV1Dto {
     data class QueryRequest(
@@ -22,14 +21,11 @@ class BrandV1Dto {
     data class CreateRequest(
         @field:NotBlank(message = "브랜드명은 필수 입력값입니다.")
         val name: String,
-        @field:NotNull(message = "상태는 필수 입력값입니다.")
-        val status: BrandStatusType,
     ) {
         fun toCriteria(username: String): BrandCriteria.Create {
             return BrandCriteria.Create(
                 username,
                 name,
-                status,
             )
         }
     }

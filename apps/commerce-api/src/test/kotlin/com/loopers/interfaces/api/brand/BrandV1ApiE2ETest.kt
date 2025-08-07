@@ -57,7 +57,6 @@ class BrandV1ApiE2ETest @Autowired constructor(
             val nonExistentUsername = "nonExistentUser"
             val createRequest = BrandV1Dto.CreateRequest(
                 "TestBrand",
-                BrandStatusType.ACTIVE,
             )
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", nonExistentUsername)
@@ -82,7 +81,6 @@ class BrandV1ApiE2ETest @Autowired constructor(
             val createdUser = userJpaRepository.save(aUser().build())
             val createRequest = BrandV1Dto.CreateRequest(
                 "TestBrand",
-                BrandStatusType.ACTIVE,
             )
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", createdUser.username)
@@ -96,7 +94,7 @@ class BrandV1ApiE2ETest @Autowired constructor(
             assertAll(
                 { assertThat(response.statusCode.is2xxSuccessful).isTrue() },
                 { assertThat(response.body?.data?.name).isEqualTo(createRequest.name) },
-                { assertThat(response.body?.data?.status).isEqualTo(createRequest.status) },
+                { assertThat(response.body?.data?.status).isEqualTo(BrandStatusType.ACTIVE) },
             )
         }
 
@@ -108,7 +106,6 @@ class BrandV1ApiE2ETest @Autowired constructor(
             val createdBrand = brandJpaRepository.save(aBrand().build())
             val createRequest = BrandV1Dto.CreateRequest(
                 createdBrand.name,
-                BrandStatusType.ACTIVE,
             )
             val httpHeaders = HttpHeaders()
             httpHeaders.set("X-USER-ID", createdUser.username)
