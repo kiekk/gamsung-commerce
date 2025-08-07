@@ -3,17 +3,14 @@ package com.loopers.application.order
 import com.loopers.domain.coupon.CouponEntity
 import com.loopers.domain.coupon.CouponService
 import com.loopers.domain.coupon.IssuedCouponService
-import com.loopers.domain.coupon.IssuedCouponValidationService
 import com.loopers.domain.coupon.policy.factory.CouponDiscountPolicyFactory
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
-import com.loopers.domain.product.ProductValidationService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
-import com.loopers.domain.stock.StockValidationService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -29,9 +26,7 @@ class OrderFacade(
     private val orderService: OrderService,
     private val paymentService: PaymentService,
     private val paymentProcessorFactory: PaymentProcessorFactory,
-    private val productValidationService: ProductValidationService,
-    private val stockValidationService: StockValidationService,
-    private val issuedCouponValidationService: IssuedCouponValidationService,
+    private val orderValidator: OrderValidator,
     private val issuedCouponService: IssuedCouponService,
     private val couponService: CouponService,
     private val couponDiscountPolicyFactory: CouponDiscountPolicyFactory,
@@ -60,11 +55,7 @@ class OrderFacade(
             "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
         )
 
-        criteria.orderItems.forEach { orderItem ->
-            productValidationService.validate(orderItem.productId)
-            stockValidationService.validate(orderItem.productId, orderItem.quantity.value)
-            criteria.issuedCouponId?.let { issuedCouponValidationService.validate(it) }
-        }
+        orderValidator.validate(criteria)
 
         var coupon: CouponEntity? = null
         criteria.issuedCouponId?.let {
@@ -75,7 +66,7 @@ class OrderFacade(
             }
         }
 
-        var discountAmount: Long = 0L
+        var discountAmount = 0L
         coupon?.let {
             val totalAmount = criteria.orderItems.map { it.amount.value }.sumOf { it }
             discountAmount = couponDiscountPolicyFactory.calculateDiscountAmount(coupon, totalAmount)
