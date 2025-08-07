@@ -31,4 +31,8 @@ class IssuedCouponEntity(
         status = IssuedCouponStatusType.USED
         usedAt = LocalDateTime.now()
     }
+
+    fun isUsed(): Boolean {
+        return status == IssuedCouponStatusType.USED
+    }
 }

@@ -1,7 +1,7 @@
 package com.loopers.domain.order.vo
 
 import com.loopers.domain.order.OrderItemEntity
-import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
+import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll

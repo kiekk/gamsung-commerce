@@ -1,8 +1,10 @@
 package com.loopers.domain.coupon
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class IssuedCouponService(
     private val issuedCouponRepository: IssuedCouponRepository,
 ) {
@@ -12,6 +14,10 @@ class IssuedCouponService(
     }
 
     fun findIssuedCouponById(id: Long): IssuedCouponEntity? {
-        return issuedCouponRepository.findById(id)
+        return issuedCouponRepository.findByIdWithPessimisticLock(id)
+    }
+
+    fun useIssuedCoupon(id: Long) {
+        issuedCouponRepository.getById(id).use()
     }
 }

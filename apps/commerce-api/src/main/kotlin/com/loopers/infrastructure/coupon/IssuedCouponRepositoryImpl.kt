@@ -12,7 +12,11 @@ class IssuedCouponRepositoryImpl(
         return issuedCouponJpaRepository.save(issuedCoupon)
     }
 
-    override fun findById(id: Long): IssuedCouponEntity? {
-        return issuedCouponJpaRepository.findById(id).orElse(null)
+    override fun findByIdWithPessimisticLock(id: Long): IssuedCouponEntity? {
+        return issuedCouponJpaRepository.findByIdWithPessimisticLock(id)
+    }
+
+    override fun getById(id: Long): IssuedCouponEntity {
+        return issuedCouponJpaRepository.getReferenceById(id)
     }
 }

@@ -15,6 +15,7 @@ class OrderCommand {
         val ordererMobile: Mobile,
         val ordererAddress: Address,
         val orderItems: List<OrderItemCommand>,
+        val discountAmount: Long = 0L,
     ) {
 
         init {
@@ -43,6 +44,7 @@ class OrderCommand {
                     ordererMobile,
                     ordererAddress,
                 ),
+                Price(discountAmount),
             )
         }
 
