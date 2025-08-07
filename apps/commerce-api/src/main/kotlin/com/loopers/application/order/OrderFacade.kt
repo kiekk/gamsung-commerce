@@ -1,8 +1,9 @@
 package com.loopers.application.order
 
-import com.loopers.domain.coupon.IssuedCouponDiscountCalculator
+import com.loopers.domain.coupon.IssuedCouponDiscountAmountCalculator
 import com.loopers.domain.coupon.IssuedCouponService
 import com.loopers.domain.order.OrderService
+import com.loopers.domain.order.OrderTotalPriceCalculator
 import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
@@ -28,8 +29,10 @@ class OrderFacade(
     private val paymentProcessorFactory: PaymentProcessorFactory,
     private val orderValidator: OrderValidator,
     private val issuedCouponService: IssuedCouponService,
-    private val issuedCouponDiscountCalculator: IssuedCouponDiscountCalculator,
+    private val issuedCouponDiscountAmountCalculator: IssuedCouponDiscountAmountCalculator,
 ) {
+    private val orderTotalPriceCalculator: OrderTotalPriceCalculator = OrderTotalPriceCalculator()
+
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
@@ -57,13 +60,11 @@ class OrderFacade(
         orderValidator.validate(criteria)
 
         val products = productService.getProductsByIds(criteria.orderItems.map { it.productId })
-        val totalPrice = criteria.orderItems.map { orderItem ->
-            products.find { product -> product.id == orderItem.productId }?.price?.value?.times(orderItem.quantity.value) ?: 0L
-        }.sumOf { it }
         issuedCouponService.useIssuedCoupon(criteria.issuedCouponId)
-        val discountAmount = issuedCouponDiscountCalculator.calculate(
+
+        val discountAmount = issuedCouponDiscountAmountCalculator.calculateDiscountAmount(
             criteria.issuedCouponId,
-            totalPrice,
+            orderTotalPriceCalculator.calculateTotalPrice(criteria.orderItems, products),
         )
 
         val createdOrder = orderService.createOrder(criteria.toCommand(products, discountAmount))

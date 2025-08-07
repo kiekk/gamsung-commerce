@@ -4,12 +4,12 @@ import com.loopers.domain.coupon.policy.factory.CouponDiscountPolicyFactory
 import org.springframework.stereotype.Component
 
 @Component
-class IssuedCouponDiscountCalculator(
+class IssuedCouponDiscountAmountCalculator(
     private val couponRepository: CouponRepository,
     private val issuedCouponRepository: IssuedCouponRepository,
     private val couponDiscountPolicyFactory: CouponDiscountPolicyFactory,
 ) {
-    fun calculate(issuedCouponId: Long?, totalPrice: Long): Long {
+    fun calculateDiscountAmount(issuedCouponId: Long?, totalPrice: Long): Long {
         if (issuedCouponId == null) {
             return 0L
         }
