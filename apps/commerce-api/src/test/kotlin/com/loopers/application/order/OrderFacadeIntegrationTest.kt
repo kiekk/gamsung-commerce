@@ -479,7 +479,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
             // act
             val exception = assertThrows<CoreException> {
-                orderFacade.getOrderById(orderCriteria)
+                orderFacade.getOrder(orderCriteria)
             }
 
             // assert
@@ -499,7 +499,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
             // act
             val exception = assertThrows<CoreException> {
-                orderFacade.getOrderById(orderCriteria)
+                orderFacade.getOrder(orderCriteria)
             }
 
             // assert
@@ -538,7 +538,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             orderJpaRepository.save(order)
 
             // act
-            val orderDetail = orderFacade.getOrderById(OrderCriteria.Get(createdUser.id, order.id))
+            val orderDetail = orderFacade.getOrder(OrderCriteria.Get(createdUser.id, order.id))
 
             // assert
             assertAll(

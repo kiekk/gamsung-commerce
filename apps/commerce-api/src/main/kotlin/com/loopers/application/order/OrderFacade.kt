@@ -35,7 +35,7 @@ class OrderFacade(
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
     @Transactional(readOnly = true)
-    fun getOrderById(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
+    fun getOrder(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
         userService.findUserBy(criteria.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
