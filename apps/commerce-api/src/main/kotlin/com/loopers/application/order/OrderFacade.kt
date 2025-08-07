@@ -1,9 +1,7 @@
 package com.loopers.application.order
 
-import com.loopers.domain.coupon.CouponEntity
-import com.loopers.domain.coupon.CouponService
+import com.loopers.domain.coupon.IssuedCouponDiscountCalculator
 import com.loopers.domain.coupon.IssuedCouponService
-import com.loopers.domain.coupon.policy.factory.CouponDiscountPolicyFactory
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
@@ -28,8 +26,7 @@ class OrderFacade(
     private val paymentProcessorFactory: PaymentProcessorFactory,
     private val orderValidator: OrderValidator,
     private val issuedCouponService: IssuedCouponService,
-    private val couponService: CouponService,
-    private val couponDiscountPolicyFactory: CouponDiscountPolicyFactory,
+    private val issuedCouponDiscountCalculator: IssuedCouponDiscountCalculator,
 ) {
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
@@ -57,20 +54,12 @@ class OrderFacade(
 
         orderValidator.validate(criteria)
 
-        var coupon: CouponEntity? = null
-        criteria.issuedCouponId?.let {
-            val issuedCoupon = issuedCouponService.findIssuedCouponById(it)
-            issuedCouponService.useIssuedCoupon(it)
-            issuedCoupon?.let {
-                coupon = couponService.findCouponById(it.couponId)
-            }
-        }
+        issuedCouponService.useIssuedCoupon(criteria.issuedCouponId)
+        val discountAmount = issuedCouponDiscountCalculator.calculate(
+            criteria.issuedCouponId,
+            criteria.orderItems.map { it.amount.value }.sumOf { it },
+        )
 
-        var discountAmount = 0L
-        coupon?.let {
-            val totalAmount = criteria.orderItems.map { it.amount.value }.sumOf { it }
-            discountAmount = couponDiscountPolicyFactory.calculateDiscountAmount(coupon, totalAmount)
-        }
         val createdOrder = orderService.createOrder(criteria.toCommand(discountAmount))
         val createdPayment = paymentService.createPayment(
             PaymentCommand.Create(
