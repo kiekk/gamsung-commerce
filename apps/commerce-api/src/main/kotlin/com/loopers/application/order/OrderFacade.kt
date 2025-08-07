@@ -62,16 +62,7 @@ class OrderFacade(
 
         val createdOrder = orderService.createOrder(criteria.toCommand(discountAmount))
         val createdPayment = paymentService.createPayment(
-            PaymentCommand.Create(
-                createdOrder.id,
-                criteria.paymentMethodType,
-                createdOrder.orderItems.items.map {
-                    PaymentCommand.Create.PaymentItemCommand(
-                        it.id,
-                        it.amount,
-                    )
-                },
-            ),
+            PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
         )
 
         paymentProcessorFactory.pay(

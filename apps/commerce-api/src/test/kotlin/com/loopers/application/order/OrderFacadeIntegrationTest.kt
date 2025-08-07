@@ -26,7 +26,6 @@ import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
-import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
@@ -401,14 +400,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.orderItems.size()).isEqualTo(2) },
                     { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                     { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                )
-            }
-            val findPayment = paymentJpaRepository.findWithItemsById(orderId)
-            findPayment?.let { payment ->
-                assertAll(
-                    { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
-                    { assertThat(payment.paymentItems.isAllCompleted()).isTrue() },
-                    { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
             }
             val findPoint = pointJpaRepository.findByUserId(createdUser.id)

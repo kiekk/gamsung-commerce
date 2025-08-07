@@ -14,6 +14,6 @@ class PaymentRepositoryImpl(
     }
 
     override fun findWithItemsById(id: Long): PaymentEntity? {
-        return paymentJpaRepository.findWithItemsById(id)
+        return paymentJpaRepository.findById(id).orElse(null)
     }
 }
