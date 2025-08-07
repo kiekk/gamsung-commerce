@@ -1,7 +1,9 @@
 package com.loopers.application.brand
 
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.brand.BrandJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.brand.BrandStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -22,6 +24,7 @@ import org.springframework.data.domain.Sort
 class BrandFacadeIntegrationTest @Autowired constructor(
     private val brandFacade: BrandFacade,
     private val brandJpaRepository: BrandJpaRepository,
+    private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -41,7 +44,9 @@ class BrandFacadeIntegrationTest @Autowired constructor(
         @Test
         fun createBrand() {
             // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
             val criteria = BrandCriteria.Create(
+                createdUser.username,
                 "TestBrand",
                 BrandStatusType.ACTIVE,
             )

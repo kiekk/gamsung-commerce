@@ -6,6 +6,7 @@ import com.loopers.support.enums.brand.BrandStatusType
 
 class BrandCriteria {
     data class Create(
+        val username: String,
         val name: String,
         val status: BrandStatusType,
     ) {
