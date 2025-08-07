@@ -1,7 +1,6 @@
 package com.loopers.domain.product
 
 import com.loopers.domain.vo.Price
-import com.loopers.support.enums.product.ProductStatusType
 
 class ProductCommand {
     data class Create(

@@ -52,7 +52,7 @@ class OrderV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 주문 ID가 존재하지 않으면 404 Not Found 예외가 발생
     - [ ] 주문 조회가 성공할 경우, 주문 상세 정보를 응답으로 반환한다.
@@ -124,7 +124,7 @@ class OrderV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 주문이 성공적으로 생성되면, 주문 ID를 응답으로 반환한다.
      */

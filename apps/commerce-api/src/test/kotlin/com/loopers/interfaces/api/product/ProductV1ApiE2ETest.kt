@@ -44,7 +44,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 상품 생성이 성공할 경우, 생성된 상품 정보를 응답으로 반환한다.
     - [ ] 상품명이 중복될 경우, 상품 등록에 실패한다.
@@ -134,7 +134,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 상품 ID로 상품 조회 시, 해당 상품이 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 상품 ID로 상품 조회 시, 해당 상품이 존재하면 상품 정보를 응답으로 반환한다.
      */
@@ -181,5 +181,4 @@ class ProductV1ApiE2ETest @Autowired constructor(
             )
         }
     }
-
 }

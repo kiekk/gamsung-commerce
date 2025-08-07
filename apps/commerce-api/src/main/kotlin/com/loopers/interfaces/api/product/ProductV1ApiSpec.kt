@@ -24,5 +24,4 @@ interface ProductV1ApiSpec {
         @Schema(name = "상품 ID", description = "조회할 상품의 ID")
         productId: Long,
     ): ApiResponse<ProductV1Dto.ProductDetailResponse>
-
 }
