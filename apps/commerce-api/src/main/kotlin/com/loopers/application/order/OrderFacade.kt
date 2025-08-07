@@ -32,7 +32,6 @@ class OrderFacade(
 ) {
     private val orderTotalPriceCalculator: OrderTotalPriceCalculator = OrderTotalPriceCalculator()
 
-
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
     @Transactional(readOnly = true)

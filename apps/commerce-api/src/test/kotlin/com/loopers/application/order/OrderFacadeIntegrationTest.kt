@@ -332,7 +332,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.amount).isEqualTo(Price(order.totalPrice.value - order.discountPrice.value)) },
                 )
             }
-
         }
     }
 
