@@ -13,7 +13,7 @@ interface BrandV1ApiSpec {
         summary = "브랜드 생성",
         description = "요청한 정보로 브랜드를 생성합니다.",
     )
-    fun createCoupon(
+    fun createBrand(
         @Schema(name = "브랜드 생성 정보", description = "생성할 브랜드 정보")
         request: BrandV1Dto.CreateRequest,
         httpServletRequest: HttpServletRequest,

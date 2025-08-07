@@ -22,7 +22,7 @@ class BrandV1Controller(
 ) : BrandV1ApiSpec {
 
     @PostMapping("")
-    override fun createCoupon(
+    override fun createBrand(
         @RequestBody request: BrandV1Dto.CreateRequest,
         httpServletRequest: HttpServletRequest,
     ): ApiResponse<BrandV1Dto.BrandResponse> {
