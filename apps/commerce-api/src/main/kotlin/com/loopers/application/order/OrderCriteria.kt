@@ -27,6 +27,7 @@ class OrderCriteria {
         val ordererAddress: Address,
         val orderItems: List<OrderItemCriteria>,
         val paymentMethodType: PaymentMethodType,
+        val issuedCouponId: Long? = null
     ) {
 
         init {
@@ -34,7 +35,7 @@ class OrderCriteria {
             require(orderItems.isNotEmpty()) { "주문 항목은 최소 하나 이상이어야 합니다." }
         }
 
-        fun toCommand(): OrderCommand.Create {
+        fun toCommand(discountAmount: Long): OrderCommand.Create {
             return OrderCommand.Create(
                 userId,
                 ordererName,
@@ -42,6 +43,7 @@ class OrderCriteria {
                 ordererMobile,
                 ordererAddress,
                 orderItems.map { it.toCommand() },
+                discountAmount,
             )
         }
 

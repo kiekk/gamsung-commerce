@@ -1,5 +1,7 @@
 package com.loopers.application.order
 
+import com.loopers.domain.coupon.fixture.CouponEntityFixture.Companion.aCoupon
+import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anIssuedCoupon
 import com.loopers.domain.order.fixture.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
@@ -13,12 +15,15 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.infrastructure.coupon.CouponJpaRepository
+import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository
 import com.loopers.infrastructure.payment.PaymentJpaRepository
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.stock.StockJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
+import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
@@ -47,6 +52,8 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
     private val orderJpaRepository: OrderJpaRepository,
+    private val couponJpaRepository: CouponJpaRepository,
+    private val issuedCouponJpaRepository: IssuedCouponJpaRepository,
 ) {
 
     @AfterEach
@@ -60,11 +67,13 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     - [ ] 주문 항목의 productId에 해당하는 상품이 존재하지 않으면 예외가 발생한다.
     - [ ] 주문 항목의 productId에 해당하는 상품이 주문 가능한 상태가 아니면 예외가 발생한다.
     - [ ] 주문 항목의 수량이 상품의 재고를 초과하면 예외가 발생한다.
-    - [ ] 사용자, 상품 정보, 상품 상태, 상품 재고가 모두 유효한 경우 주문이 성공적으로 생성된다.
+    - [ ] 쿠폰 적용 시, 쿠폰이 존재하지 않으면 404 Not Found 예외가 발생한다.
+    - [ ] 쿠폰 적용 시, 쿠폰이 이미 사용한 상태라면 409 Conflict 예외가 발생한다.
+    - [ ] 쿠폰 적용 시, 쿠폰이 유효하면 쿠폰 할인 금액만큼 주문 금액이 할인된다.
      */
     @DisplayName("주문을 생성할 때, ")
     @Nested
-    open inner class Create {
+    inner class Create {
 
         @DisplayName("존재하지 않는 사용자가 주문을 요청할 경우 예외가 발생한다.")
         @Test
@@ -210,6 +219,137 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 { assertThat(exception).isInstanceOf(CoreException::class.java) },
                 { assertThat(exception.message).isEqualTo("재고가 부족한 상품입니다. productId: ${createdProduct.id}, 요청 수량: ${quantity.value}, 재고: ${createdStock.quantity}") },
             )
+        }
+
+        @DisplayName("쿠폰 적용 시, 쿠폰이 존재하지 않으면 404 Not Found 예외가 발생한다.")
+        @Test
+        fun failsToCreateOrder_whenCouponDoesNotExist() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().build())
+            val nonExistIssuedCouponId: Long = 999L
+            val quantity = Quantity(2)
+            val orderCriteria = OrderCriteria.Create(
+                createdUser.id,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItemCriteria(
+                        createdProduct.id,
+                        createdProduct.name,
+                        quantity,
+                        createdProduct.price,
+                        createdProduct.price,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+                nonExistIssuedCouponId,
+            )
+
+            // act
+            val exception = assertThrows<CoreException> {
+                orderFacade.placeOrder(orderCriteria)
+            }
+
+            // assert
+            assertAll(
+                { assertThat(exception).isInstanceOf(CoreException::class.java) },
+                { assertThat(exception.message).isEqualTo("존재하지 않는 사용자 쿠폰입니다. issuedCouponId: $nonExistIssuedCouponId") },
+            )
+        }
+
+        @DisplayName("쿠폰 적용 시, 쿠폰이 이미 사용한 상태라면 409 Conflict 예외가 발생한다.")
+        @Test
+        fun failsToCreateOrder_whenCouponAlreadyUsed() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().build())
+            val quantity = Quantity(2)
+            val createdCoupon = couponJpaRepository.save(aCoupon().build())
+            val createdIssuedCoupon = issuedCouponJpaRepository.save(
+                anIssuedCoupon()
+                    .couponId(createdCoupon.id)
+                    .userId(createdUser.id)
+                    .build().apply { use() },
+            )
+            val orderCriteria = OrderCriteria.Create(
+                createdUser.id,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItemCriteria(
+                        createdProduct.id,
+                        createdProduct.name,
+                        quantity,
+                        createdProduct.price,
+                        createdProduct.price,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+                createdIssuedCoupon.id,
+            )
+
+            // act
+            val exception = assertThrows<CoreException> {
+                orderFacade.placeOrder(orderCriteria)
+            }
+
+            // assert
+            assertAll(
+                { assertThat(exception).isInstanceOf(CoreException::class.java) },
+                { assertThat(exception.message).isEqualTo("이미 사용한 사용자 쿠폰입니다. issuedCouponId: ${createdIssuedCoupon.id}, 상태: ${createdIssuedCoupon.status}") },
+            )
+        }
+
+        @DisplayName("쿠폰 적용 시, 쿠폰이 유효하면 쿠폰 할인 금액만큼 주문 금액이 할인된다.")
+        @Test
+        fun succeedsToCreateOrder_whenCouponIsValid() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().build())
+            val quantity = Quantity(2)
+            val createdCoupon = couponJpaRepository.save(aCoupon().build())
+            val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().couponId(createdCoupon.id).userId(createdUser.id).build())
+            val orderCriteria = OrderCriteria.Create(
+                createdUser.id,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItemCriteria(
+                        createdProduct.id,
+                        createdProduct.name,
+                        quantity,
+                        createdProduct.price,
+                        createdProduct.price,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+                createdIssuedCoupon.id,
+            )
+
+            // act
+            val orderId = orderFacade.placeOrder(orderCriteria)
+
+            // assert
+            val findOrder = orderJpaRepository.findWithItemsById(orderId)
+
+            findOrder?.let { order ->
+                assertAll(
+                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
+                    { assertThat(order.amount).isEqualTo(Price(order.totalPrice.value - order.discountPrice.value)) },
+                )
+            }
+
         }
     }
 
@@ -452,13 +592,71 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
     /*
      **🔗 통합 테스트
-    - [ ] 동일한 유저가 여러 기기에서 동시에 주문을 요청해도, 포인트가 정상적으로 차감되어야 한다.
+    - [ ] 동일한 쿠폰으로 여러 기기에서 동시에 주문해도, 쿠폰은 단 한번만 사용되어야 한다.
+    - [ ] 동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.
     - [ ] 동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.
      */
     @DisplayName("주문 결제 통시성 테스트, ")
     @Nested
     inner class Concurrency {
-        @DisplayName("동일한 유저가 여러 기기에서 동시에 주문을 요청해도, 포인트가 정상적으로 차감되어야 한다.")
+        @DisplayName("동일한 쿠폰으로 여러 기기에서 동시에 주문해도, 쿠폰은 단 한번만 사용되어야 한다.")
+        @Test
+        fun shouldUseCouponOnlyOnceWhenConcurrentOrdersArePlacedWithSameCoupon() {
+            // arrange
+            val numberOfThreads = 2
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val latch = CountDownLatch(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000L)).build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(5_000L)).build())
+            stockJpaRepository.save(aStock().productId(createdProduct.id).build())
+            val createdCoupon = couponJpaRepository.save(aCoupon().build())
+            val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().couponId(createdCoupon.id).userId(createdUser.id).build())
+            val quantity = Quantity(1)
+            val criteria = OrderCriteria.Create(
+                createdUser.id,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItemCriteria(
+                        createdProduct.id,
+                        createdProduct.name,
+                        quantity,
+                        createdProduct.price,
+                        createdProduct.price,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+                createdIssuedCoupon.id,
+            )
+
+            // act
+            val orderIds = mutableListOf<Long>()
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        val orderId = orderFacade.placeOrder(criteria)
+                        orderIds.add(orderId)
+                    } catch (e: Exception) {
+                        println("예외 발생: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            assertAll(
+                { assertThat(orderIds).hasSize(1) },
+                { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().status).isEqualTo(IssuedCouponStatusType.USED) },
+            )
+        }
+
+        @DisplayName("동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
         @Test
         fun shouldDeductPointsCorrectlyWhenConcurrentOrdersArePlacedBySameUser() {
             // arrange
