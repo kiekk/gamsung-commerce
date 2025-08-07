@@ -87,8 +87,6 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,

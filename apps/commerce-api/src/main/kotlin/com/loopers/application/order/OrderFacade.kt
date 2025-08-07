@@ -7,6 +7,7 @@ import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class OrderFacade(
     private val userService: UserService,
+    private val productService: ProductService,
     private val stockService: StockService,
     private val orderService: OrderService,
     private val paymentService: PaymentService,
@@ -54,13 +56,17 @@ class OrderFacade(
 
         orderValidator.validate(criteria)
 
+        val products = productService.getProductsByIds(criteria.orderItems.map { it.productId })
+        val totalPrice = criteria.orderItems.map { orderItem ->
+            products.find { product -> product.id == orderItem.productId }?.price?.value?.times(orderItem.quantity.value) ?: 0L
+        }.sumOf { it }
         issuedCouponService.useIssuedCoupon(criteria.issuedCouponId)
         val discountAmount = issuedCouponDiscountCalculator.calculate(
             criteria.issuedCouponId,
-            criteria.orderItems.map { it.amount.value }.sumOf { it },
+            totalPrice,
         )
 
-        val createdOrder = orderService.createOrder(criteria.toCommand(discountAmount))
+        val createdOrder = orderService.createOrder(criteria.toCommand(products, discountAmount))
         val createdPayment = paymentService.createPayment(
             PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
         )

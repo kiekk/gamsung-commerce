@@ -18,7 +18,6 @@ import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository
-import com.loopers.infrastructure.payment.PaymentJpaRepository
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.stock.StockJpaRepository
@@ -47,7 +46,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val userJpaRepository: UserJpaRepository,
     private val productJpaRepository: ProductJpaRepository,
     private val stockJpaRepository: StockJpaRepository,
-    private val paymentJpaRepository: PaymentJpaRepository,
     private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
     private val orderJpaRepository: OrderJpaRepository,
@@ -91,8 +89,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -127,8 +123,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         nonExistentProductId,
                         "존재하지 않는 상품",
                         Quantity(2),
-                        Price(20_000),
-                        Price(20_000),
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -163,8 +157,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -201,8 +193,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -240,8 +230,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -286,8 +274,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -328,8 +314,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -381,8 +365,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -399,7 +381,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
                     { assertThat(order.orderItems.size()).isEqualTo(2) },
                     { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                    { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
                 )
             }
             val findPoint = pointJpaRepository.findByUserId(createdUser.id)
@@ -425,8 +406,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -465,8 +444,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -557,7 +534,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         .order(order)
                         .productId(createdProduct.id)
                         .amount(createdProduct.price)
-                        .totalPrice(createdProduct.price)
                         .build(),
                 ),
             )
@@ -615,8 +591,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -670,8 +644,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -735,8 +707,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                             createdProduct.id,
                             createdProduct.name,
                             quantity,
-                            createdProduct.price,
-                            createdProduct.price,
                         ),
                     ),
                     PaymentMethodType.POINT,

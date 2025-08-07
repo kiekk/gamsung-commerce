@@ -8,7 +8,6 @@ class OrderItemEntityFixture {
     private var order: OrderEntity = OrderEntityFixture.Companion.anOrder().build()
     private var productId = 1L
     private var productName = "상품A"
-    private var totalPrice = Price(1000L)
     private var amount = Price(1000L)
 
     companion object {
@@ -23,13 +22,10 @@ class OrderItemEntityFixture {
 
     fun amount(amount: Price): OrderItemEntityFixture = apply { this.amount = amount }
 
-    fun totalPrice(totalPrice: Price): OrderItemEntityFixture = apply { this.totalPrice = totalPrice }
-
     fun build(): OrderItemEntity = OrderItemEntity(
         order,
         productId,
         productName,
-        totalPrice,
         amount,
     )
 }

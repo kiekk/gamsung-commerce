@@ -27,7 +27,6 @@ class OrderCommand {
             val productId: Long,
             val productName: String,
             val quantity: Quantity,
-            val totalPrice: Price,
             val amount: Price,
         ) {
             init {
@@ -55,7 +54,6 @@ class OrderCommand {
                         order,
                         command.productId,
                         command.productName,
-                        command.totalPrice,
                         command.amount,
                     )
                 }
