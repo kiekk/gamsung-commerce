@@ -7,6 +7,7 @@ import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
+import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.springframework.data.domain.Page
@@ -22,10 +23,15 @@ class ProductFacade(
     private val stockService: StockService,
     private val brandService: BrandService,
     private val productLikeService: ProductLikeService,
+    private val userService: UserService,
 ) {
 
     @Transactional
     fun createProduct(criteria: ProductCriteria.Create): ProductInfo.ProductResult {
+        userService.findUserBy(criteria.username) ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "사용자를 찾을 수 없습니다. username: ${criteria.username}",
+        )
         val createdProduct = productService.createProduct(criteria.toCommand())
         val createdStock = stockService.createStock(StockCommand.Create(createdProduct.id, criteria.quantity ?: 0))
         return ProductInfo.ProductResult.from(createdProduct, createdStock)

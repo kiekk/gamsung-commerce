@@ -15,7 +15,6 @@ import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
-import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -65,7 +64,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(productCreateCommand)
             val nonExistentUsername = "nonexistentuser"
@@ -121,7 +119,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
@@ -166,7 +163,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(command)
             val nonExistentUsername = "nonexistentuser"
@@ -220,7 +216,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",

@@ -4,10 +4,12 @@ import com.loopers.domain.brand.fixture.BrandEntityFixture
 import com.loopers.domain.product.fixture.ProductEntityFixture
 import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.productlike.fixture.ProductLikeCountEntityFixture
+import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
+import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
@@ -30,6 +32,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     private val productJpaRepository: ProductJpaRepository,
     private val brandJpaRepository: BrandJpaRepository,
     private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
+    private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
 
@@ -51,12 +54,13 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun createsProductWithStock_whenProductCommandIsValid() {
             // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
             val productCreateCriteria = ProductCriteria.Create(
+                createdUser.username,
                 1L,
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductStatusType.ACTIVE,
                 10,
             )
 
@@ -69,7 +73,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
                 { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
-                { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
+                { Assertions.assertThat(productInfo.status).isEqualTo(ProductStatusType.ACTIVE) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(productCreateCriteria.quantity) },
             )
         }
@@ -78,12 +82,13 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         @Test
         fun createsProductWithZeroStock_whenStockQuantityIsNotProvided() {
             // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
             val productCreateCriteria = ProductCriteria.Create(
+                createdUser.username,
                 1L,
                 "상품A",
                 Price(100L),
                 "상품 설명",
-                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -95,7 +100,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
                 { Assertions.assertThat(productInfo.name).isEqualTo(productCreateCriteria.name) },
                 { Assertions.assertThat(productInfo.price).isEqualTo(productCreateCriteria.price.value) },
                 { Assertions.assertThat(productInfo.description).isEqualTo(productCreateCriteria.description) },
-                { Assertions.assertThat(productInfo.status).isEqualTo(productCreateCriteria.status) },
+                { Assertions.assertThat(productInfo.status).isEqualTo(ProductStatusType.ACTIVE) },
                 { Assertions.assertThat(productInfo.stockQuantity).isEqualTo(0) },
             )
         }
