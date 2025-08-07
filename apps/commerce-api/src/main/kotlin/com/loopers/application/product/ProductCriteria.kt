@@ -6,6 +6,7 @@ import com.loopers.support.enums.product.ProductStatusType
 
 class ProductCriteria {
     data class Create(
+        val username: String,
         val brandId: Long,
         val name: String,
         val price: Price,
