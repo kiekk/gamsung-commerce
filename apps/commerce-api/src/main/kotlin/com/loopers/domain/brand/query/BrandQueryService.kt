@@ -1,6 +1,5 @@
 package com.loopers.domain.brand.query
 
-import com.loopers.domain.brand.BrandEntity
 import com.loopers.domain.brand.QBrandEntity
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -13,14 +12,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class BrandQueryService(
     private val queryFactory: JPAQueryFactory,
 ) {
-    @Transactional(readOnly = true)
     fun searchBrands(
         condition: BrandSearchCondition,
         pageable: Pageable,
-    ): Page<BrandEntity> {
+    ): Page<BrandListViewModel> {
         val brand = QBrandEntity.brandEntity
 
         // 조건 where 절 구성
@@ -44,7 +43,14 @@ class BrandQueryService(
 
         // 목록 조회
         val brandEntities = queryFactory
-            .selectFrom(brand)
+            .select(
+                QBrandListViewModel(
+                    brand.id,
+                    brand.name,
+                    brand.status,
+                ),
+            )
+            .from(brand)
             .where(
                 condition.name?.let {
                     brand.name.lower().like("${it.lowercase()}%")
