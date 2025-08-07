@@ -91,6 +91,9 @@ class OrderFacade(
                     createdPayment.method,
                 ),
             )
+            // 쿠폰 사용 취소
+            issuedCouponService.unUseIssuedCoupon(criteria.issuedCouponId)
+
             // 주문 취소 상태 변경
             orderService.cancelOrder(createdOrder.id)
         }
