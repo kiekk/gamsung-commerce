@@ -13,20 +13,20 @@ class PointFacade(
     private val userService: UserService,
 ) {
     @Transactional(readOnly = true)
-    fun getPointBy(username: String): PointInfo? {
+    fun getPoint(username: String): PointInfo.PointDetail? {
         val user = userService.findUserBy(username) ?: return null
         return pointService.getPointBy(user.id)
-            ?.let { pointEntity -> PointInfo(pointEntity.userId, pointEntity.point.value) }
+            ?.let { pointEntity -> PointInfo.PointDetail(pointEntity.userId, pointEntity.point.value) }
     }
 
     @Transactional
-    fun chargePoint(criteria: PointCriteria.Charge): PointInfo? {
+    fun chargePoint(criteria: PointCriteria.Charge): PointInfo.PointResult {
         val user = userService.findUserBy(criteria.username) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자를 찾을 수 없습니다: ${criteria.username}",
         )
         return pointService.chargePoint(criteria.toCommand(user.id)).let {
-            PointInfo(it.userId, it.point.value)
+            PointInfo.PointResult(it.userId, it.point.value)
         }
     }
 }

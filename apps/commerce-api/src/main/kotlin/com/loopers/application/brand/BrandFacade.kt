@@ -17,21 +17,21 @@ class BrandFacade(
     private val userService: UserService,
 ) {
 
-    fun createBrand(criteria: BrandCriteria.Create): BrandInfo.BrandResponse {
+    fun createBrand(criteria: BrandCriteria.Create): BrandInfo.BrandResult {
         userService.findUserBy(criteria.username) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자를 찾을 수 없습니다. username: ${criteria.username}",
         )
         return brandService.createBrand(criteria.toCommand())
-            .let { BrandInfo.BrandResponse.from(it) }
+            .let { BrandInfo.BrandResult.from(it) }
     }
 
-    fun findBrandBy(brandId: Long): BrandInfo.BrandResponse {
+    fun getBrand(brandId: Long): BrandInfo.BrandResult {
         val brand = brandService.findBrandBy(brandId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "브랜드를 찾을 수 없습니다. id: $brandId",
         )
-        return brand.let { BrandInfo.BrandResponse.from(it) }
+        return brand.let { BrandInfo.BrandResult.from(it) }
     }
 
     fun searchBrands(criteria: BrandCriteria.Query, pageable: Pageable): Page<BrandListViewModel> {

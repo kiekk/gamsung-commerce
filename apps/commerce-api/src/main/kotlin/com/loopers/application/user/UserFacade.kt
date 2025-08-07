@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component
 class UserFacade(
     private val userService: UserService,
 ) {
-    fun getMyInfo(userId: String): UserInfo {
+    fun getMyInfo(userId: String): UserInfo.UserDetail {
         return userService.findUserBy(userId)
-            ?.let { UserInfo.from(it) }
+            ?.let { UserInfo.UserDetail.from(it) }
             ?: throw CoreException(
                 ErrorType.NOT_FOUND,
                 "사용자를 찾을 수 없습니다: $userId",
             )
     }
 
-    fun signUp(criteria: UserCriteria.SignUp): UserInfo {
+    fun signUp(criteria: UserCriteria.SignUp): UserInfo.UserResult {
         return userService.save(criteria.toCommand())
-            .let { UserInfo.from(it) }
+            .let { UserInfo.UserResult.from(it) }
     }
 }

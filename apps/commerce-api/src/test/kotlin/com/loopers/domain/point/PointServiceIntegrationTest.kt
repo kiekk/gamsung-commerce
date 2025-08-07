@@ -50,7 +50,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).build())
 
             // act
-            val userPoints = pointFacade.getPointBy(createdUser.username)
+            val userPoints = pointFacade.getPoint(createdUser.username)
 
             // assert
             assertThat(userPoints).isNotNull
@@ -65,7 +65,7 @@ class PointServiceIntegrationTest @Autowired constructor(
             val nonExistentUserId = "non-existent-user-id"
 
             // act
-            val userPoints = pointFacade.getPointBy(nonExistentUserId)
+            val userPoints = pointFacade.getPoint(nonExistentUserId)
 
             // assert
             assertThat(userPoints).isNull()

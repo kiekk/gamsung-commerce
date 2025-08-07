@@ -14,7 +14,7 @@ interface ProductV1ApiSpec {
         @Schema(name = "상품 생성 정보", description = "생성할 상품 정보")
         request: ProductV1Dto.CreateRequest,
         httpServletRequest: HttpServletRequest,
-    ): ApiResponse<ProductV1Dto.ProductResponse>
+    ): ApiResponse<ProductV1Dto.ProductResultResponse>
 
     @Operation(
         summary = "상품 조회",

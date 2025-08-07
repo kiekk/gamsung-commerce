@@ -22,11 +22,11 @@ class ProductV1Controller(
     override fun createProduct(
         @RequestBody request: ProductV1Dto.CreateRequest,
         httpServletRequest: HttpServletRequest,
-    ): ApiResponse<ProductV1Dto.ProductResponse> {
+    ): ApiResponse<ProductV1Dto.ProductResultResponse> {
         val username = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
         return productFacade.createProduct(request.toCriteria(username))
-            .let { ProductV1Dto.ProductResponse.from(it) }
+            .let { ProductV1Dto.ProductResultResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
 

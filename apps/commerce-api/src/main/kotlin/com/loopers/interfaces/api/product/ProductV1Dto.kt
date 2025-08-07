@@ -24,7 +24,7 @@ class ProductV1Dto {
         }
     }
 
-    data class ProductResponse(
+    data class ProductResultResponse(
         val id: Long,
         val brandId: Long,
         val name: String,
@@ -34,8 +34,8 @@ class ProductV1Dto {
         val stockQuantity: Int,
     ) {
         companion object {
-            fun from(product: ProductInfo.ProductResult): ProductResponse {
-                return ProductResponse(
+            fun from(product: ProductInfo.ProductResult): ProductResultResponse {
+                return ProductResultResponse(
                     product.id,
                     product.brandId,
                     product.name,

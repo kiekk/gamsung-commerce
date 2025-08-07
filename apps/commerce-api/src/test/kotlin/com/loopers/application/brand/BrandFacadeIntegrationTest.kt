@@ -76,7 +76,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
             val createdBrand = brandJpaRepository.save(aBrand().build())
 
             // act
-            val response = brandFacade.findBrandBy(createdBrand.id)
+            val response = brandFacade.getBrand(createdBrand.id)
 
             // assert
             assertAll(
@@ -94,7 +94,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
 
             // act
             val exception = assertThrows<CoreException> {
-                brandFacade.findBrandBy(nonExistentId)
+                brandFacade.getBrand(nonExistentId)
             }
 
             // assert

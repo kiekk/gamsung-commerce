@@ -36,7 +36,7 @@ class BrandV1Dto {
         val status: BrandStatusType,
     ) {
         companion object {
-            fun from(brand: BrandInfo.BrandResponse): BrandResponse {
+            fun from(brand: BrandInfo.BrandResult): BrandResponse {
                 return BrandResponse(
                     brand.id,
                     brand.name,

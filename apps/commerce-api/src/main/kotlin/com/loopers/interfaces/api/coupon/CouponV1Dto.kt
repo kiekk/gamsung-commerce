@@ -53,14 +53,14 @@ class CouponV1Dto {
         var status: CouponStatusType,
     ) {
         companion object {
-            fun from(couponDetail: CouponInfo.CouponDetail): CouponDetail {
+            fun from(couponResult: CouponInfo.CouponResult): CouponDetail {
                 return CouponDetail(
-                    couponDetail.id,
-                    couponDetail.name,
-                    couponDetail.type,
-                    couponDetail.discountAmount,
-                    couponDetail.discountRate,
-                    couponDetail.status,
+                    couponResult.id,
+                    couponResult.name,
+                    couponResult.type,
+                    couponResult.discountAmount,
+                    couponResult.discountRate,
+                    couponResult.status,
                 )
             }
         }
@@ -75,14 +75,14 @@ class CouponV1Dto {
         var usedAt: LocalDateTime?,
     ) {
         companion object {
-            fun from(issuedCouponDetail: CouponInfo.IssuedCouponDetail): IssuedCouponDetail {
+            fun from(issuedCouponResult: CouponInfo.IssuedCouponResult): IssuedCouponDetail {
                 return IssuedCouponDetail(
-                    issuedCouponDetail.id,
-                    issuedCouponDetail.couponId,
-                    issuedCouponDetail.userId,
-                    issuedCouponDetail.status,
-                    issuedCouponDetail.issuedAt,
-                    issuedCouponDetail.usedAt,
+                    issuedCouponResult.id,
+                    issuedCouponResult.couponId,
+                    issuedCouponResult.userId,
+                    issuedCouponResult.status,
+                    issuedCouponResult.issuedAt,
+                    issuedCouponResult.usedAt,
                 )
             }
         }

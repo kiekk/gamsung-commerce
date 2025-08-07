@@ -69,7 +69,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -93,7 +93,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -125,7 +125,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -149,7 +149,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val requestUrl = ENDPOINT_PRODUCT_GET(nonExistentProductId)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(requestUrl, HttpMethod.GET, HttpEntity<Any>(Unit), responseType)
 
             // assert
@@ -177,7 +177,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
                 { assertThat(response.body?.data?.brandName).isEqualTo(createdBrand.name) },
                 { assertThat(response.body?.data?.productStatus).isEqualTo(createdProduct.status) },
                 { assertThat(response.body?.data?.productPrice).isEqualTo(createdProduct.price.value) },
-                { assertThat(response.body?.data?.productLikeCount).isEqualTo(0) }, // 초기 좋아요 수는 0으로 가정
+                { assertThat(response.body?.data?.productLikeCount).isEqualTo(0) },
             )
         }
     }

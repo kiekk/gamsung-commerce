@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api.point
 
 import com.loopers.application.point.PointCriteria
+import com.loopers.application.point.PointInfo
 import com.loopers.domain.point.vo.Point
 import jakarta.validation.constraints.Min
 
@@ -18,14 +19,26 @@ class PointV1Dto {
         }
     }
 
-    data class PointResponse(
+    data class PointResultResponse(
         val userId: Long,
         val point: Long,
     ) {
         companion object {
-            fun from(userId: Long, point: Long): PointResponse = PointResponse(
-                userId,
-                point,
+            fun from(pointResult: PointInfo.PointResult): PointResultResponse = PointResultResponse(
+                pointResult.userId,
+                pointResult.point,
+            )
+        }
+    }
+
+    data class PointDetailResponse(
+        val userId: Long,
+        val point: Long,
+    ) {
+        companion object {
+            fun from(pointDetail: PointInfo.PointDetail): PointResultResponse = PointResultResponse(
+                pointDetail.userId,
+                pointDetail.point,
             )
         }
     }
