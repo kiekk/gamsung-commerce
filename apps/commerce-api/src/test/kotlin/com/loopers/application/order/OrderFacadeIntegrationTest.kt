@@ -18,7 +18,6 @@ import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository
-import com.loopers.infrastructure.payment.PaymentJpaRepository
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.stock.StockJpaRepository
@@ -26,7 +25,6 @@ import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
-import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
@@ -48,7 +46,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val userJpaRepository: UserJpaRepository,
     private val productJpaRepository: ProductJpaRepository,
     private val stockJpaRepository: StockJpaRepository,
-    private val paymentJpaRepository: PaymentJpaRepository,
     private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
     private val orderJpaRepository: OrderJpaRepository,
@@ -88,12 +85,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -124,12 +119,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         nonExistentProductId,
                         "존재하지 않는 상품",
                         Quantity(2),
-                        Price(20_000),
-                        Price(20_000),
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -160,12 +153,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         Quantity(2),
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -198,12 +189,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -237,12 +226,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -283,12 +270,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -325,12 +310,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -378,12 +361,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -400,15 +381,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
                     { assertThat(order.orderItems.size()).isEqualTo(2) },
                     { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                    { assertThat(order.orderItems.totalPrice()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
-                )
-            }
-            val findPayment = paymentJpaRepository.findWithItemsById(orderId)
-            findPayment?.let { payment ->
-                assertAll(
-                    { assertThat(payment.status).isEqualTo(PaymentStatusType.COMPLETED) },
-                    { assertThat(payment.paymentItems.isAllCompleted()).isTrue() },
-                    { assertThat(payment.totalAmount).isEqualTo(findOrder?.amount) },
                 )
             }
             val findPoint = pointJpaRepository.findByUserId(createdUser.id)
@@ -430,12 +402,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -470,12 +440,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -566,7 +534,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                         .order(order)
                         .productId(createdProduct.id)
                         .amount(createdProduct.price)
-                        .totalPrice(createdProduct.price)
                         .build(),
                 ),
             )
@@ -620,12 +587,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -675,12 +640,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 Mobile("010-1234-5678"),
                 Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                 listOf(
-                    OrderCriteria.Create.OrderItemCriteria(
+                    OrderCriteria.Create.OrderItem(
                         createdProduct.id,
                         createdProduct.name,
                         quantity,
-                        createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
                 PaymentMethodType.POINT,
@@ -740,12 +703,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                     Mobile("010-1234-5678"),
                     Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
                     listOf(
-                        OrderCriteria.Create.OrderItemCriteria(
+                        OrderCriteria.Create.OrderItem(
                             createdProduct.id,
                             createdProduct.name,
                             quantity,
-                            createdProduct.price,
-                            createdProduct.price,
                         ),
                     ),
                     PaymentMethodType.POINT,

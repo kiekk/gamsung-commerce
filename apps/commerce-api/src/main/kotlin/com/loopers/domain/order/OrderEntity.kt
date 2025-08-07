@@ -54,7 +54,7 @@ class OrderEntity(
 
     fun addItems(orderItems: List<OrderItemEntity>) {
         _orderItems.addAll(orderItems)
-        totalPrice = this.orderItems.totalPrice()
+        totalPrice = this.orderItems.amount()
         amount = Price(this.orderItems.amount().value - discountPrice.value)
     }
 }

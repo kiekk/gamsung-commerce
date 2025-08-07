@@ -17,7 +17,9 @@ class IssuedCouponService(
         return issuedCouponRepository.findByIdWithPessimisticLock(id)
     }
 
-    fun useIssuedCoupon(id: Long) {
-        issuedCouponRepository.getById(id).use()
+    fun useIssuedCoupon(id: Long?) {
+        id?.let {
+            issuedCouponRepository.getById(it).use()
+        }
     }
 }

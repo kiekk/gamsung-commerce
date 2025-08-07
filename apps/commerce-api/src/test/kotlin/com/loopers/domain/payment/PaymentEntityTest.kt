@@ -2,7 +2,6 @@ package com.loopers.domain.payment
 
 import com.loopers.domain.payment.fixture.PaymentEntityFixture.Companion.aPayment
 import com.loopers.domain.vo.Price
-import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -25,26 +24,21 @@ class PaymentEntityTest {
         @Test
         fun totalAmountMatchesPaymentItems() {
             // arrange
-            val payment = aPayment().build()
-            val paymentItem1 = PaymentItemEntity(payment, 1L, Price(1000L))
-            val paymentItem2 = PaymentItemEntity(payment, 2L, Price(2000L))
 
             // act
-            payment.addItems(listOf(paymentItem1, paymentItem2))
+            val payment = aPayment().totalPrice(Price(3000L)).build()
 
             // assert
-            assertThat(payment.totalAmount).isEqualTo(Price(3000L))
+            assertThat(payment.totalPrice).isEqualTo(Price(3000L))
         }
 
         @DisplayName("결제 정보를 생성하면 상태는 PENDING로 초기화된다.")
         @Test
         fun initialStatusIsPending() {
             // arrange
-            val payment = aPayment().build()
-            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
 
             // act
-            payment.addItems(listOf(paymentItem))
+            val payment = aPayment().build()
 
             // assert
             assertThat(payment.status).isEqualTo(PaymentStatusType.PENDING)
@@ -54,9 +48,7 @@ class PaymentEntityTest {
         @Test
         fun completePaymentChangesStatusToCompleted() {
             // arrange
-            val payment = PaymentEntity(1L, PaymentMethodType.POINT)
-            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
-            payment.addItems(listOf(paymentItem))
+            val payment = aPayment().build()
 
             // act
             payment.complete()
@@ -69,9 +61,7 @@ class PaymentEntityTest {
         @Test
         fun failPaymentChangesStatusToFailed() {
             // arrange
-            val payment = PaymentEntity(1L, PaymentMethodType.POINT)
-            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
-            payment.addItems(listOf(paymentItem))
+            val payment = aPayment().build()
 
             // act
             payment.fail()
@@ -84,9 +74,7 @@ class PaymentEntityTest {
         @Test
         fun cancelPaymentChangesStatusToCanceled() {
             // arrange
-            val payment = PaymentEntity(1L, PaymentMethodType.POINT)
-            val paymentItem = PaymentItemEntity(payment, 1L, Price(1000L))
-            payment.addItems(listOf(paymentItem))
+            val payment = aPayment().build()
 
             // act
             payment.cancel()

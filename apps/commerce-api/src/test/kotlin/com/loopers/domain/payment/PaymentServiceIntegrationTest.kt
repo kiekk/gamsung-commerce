@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -26,42 +25,30 @@ class PaymentServiceIntegrationTest @Autowired constructor(
 
     /*
      **🔗 통합 테스트**
-    - [ ] 결제가 생성되면 결제, 결제 항목의 상태가 PENDING이다.
-    - [ ] 결제가 완료되면 결제, 결제 항목의 상태가 COMPLETED로 변경된다.
-    - [ ] 결제가 실패하면 결제, 결제 항목의 상태가 FAILED로 변경된다.
-    - [ ] 결제가 취소되면 결제, 결제 항목의 상태가 CANCELED로 변경된다.
+    - [ ] 결제가 생성되면 결제 상태가 PENDING이다.
+    - [ ] 결제가 완료되면 결제 상태가 COMPLETED로 변경된다.
+    - [ ] 결제가 실패하면 결제 상태가 FAILED로 변경된다.
+    - [ ] 결제가 취소되면 결제 상태가 CANCELED로 변경된다.
     - [ ] 결제가 생성되면 결제 총 금액을 계산한다.
      */
     @DisplayName("결제를 생성할 때, ")
     @Nested
     inner class Create {
-        @DisplayName("결제가 생성되면 결제, 결제 항목의 상태가 PENDING이다.")
+        @DisplayName("결제가 생성되면 결제 상태가 PENDING이다.")
         @Test
         fun paymentStatusIsPending_whenPaymentCreated() {
             // arrange
             val command = PaymentCommand.Create(
                 1L,
                 PaymentMethodType.POINT,
-                listOf(
-                    PaymentCommand.Create.PaymentItemCommand(
-                        1L,
-                        Price(10_000),
-                    ),
-                    PaymentCommand.Create.PaymentItemCommand(
-                        2L,
-                        Price(20_000),
-                    ),
-                ),
+                Price(3000),
             )
 
             // act
             val paymentEntity = paymentService.createPayment(command)
 
             // assert
-            assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.PENDING) },
-                { assertThat(paymentEntity.paymentItems.isAllPending()).isTrue() },
-            )
+            assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.PENDING)
         }
 
         @DisplayName("결제가 완료되면 결제, 결제 항목의 상태가 COMPLETED로 변경된다.")
@@ -71,16 +58,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             val command = PaymentCommand.Create(
                 1L,
                 PaymentMethodType.POINT,
-                listOf(
-                    PaymentCommand.Create.PaymentItemCommand(
-                        1L,
-                        Price(10_000),
-                    ),
-                    PaymentCommand.Create.PaymentItemCommand(
-                        2L,
-                        Price(20_000),
-                    ),
-                ),
+                Price(3000),
             )
 
             // act
@@ -88,10 +66,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             paymentEntity.complete()
 
             // assert
-            assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.COMPLETED) },
-                { assertThat(paymentEntity.paymentItems.isAllCompleted()).isTrue() },
-            )
+            assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.COMPLETED)
         }
 
         @DisplayName("결제가 실패하면 결제, 결제 항목의 상태가 FAILED로 변경된다.")
@@ -101,16 +76,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             val command = PaymentCommand.Create(
                 1L,
                 PaymentMethodType.POINT,
-                listOf(
-                    PaymentCommand.Create.PaymentItemCommand(
-                        1L,
-                        Price(10_000),
-                    ),
-                    PaymentCommand.Create.PaymentItemCommand(
-                        2L,
-                        Price(20_000),
-                    ),
-                ),
+                Price(3000),
             )
 
             // act
@@ -118,10 +84,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             paymentEntity.fail()
 
             // assert
-            assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.FAILED) },
-                { assertThat(paymentEntity.paymentItems.isAllFailed()).isTrue() },
-            )
+            assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.FAILED)
         }
 
         @DisplayName("결제가 취소되면 결제, 결제 항목의 상태가 CANCELED로 변경된다.")
@@ -131,16 +94,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             val command = PaymentCommand.Create(
                 1L,
                 PaymentMethodType.POINT,
-                listOf(
-                    PaymentCommand.Create.PaymentItemCommand(
-                        1L,
-                        Price(10_000),
-                    ),
-                    PaymentCommand.Create.PaymentItemCommand(
-                        2L,
-                        Price(20_000),
-                    ),
-                ),
+                Price(3000),
             )
 
             // act
@@ -148,10 +102,7 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             paymentEntity.cancel()
 
             // assert
-            assertAll(
-                { assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.CANCELED) },
-                { assertThat(paymentEntity.paymentItems.isAllCanceled()).isTrue() },
-            )
+            assertThat(paymentEntity.status).isEqualTo(PaymentStatusType.CANCELED)
         }
 
         @DisplayName("결제가 생성되면 결제 총 금액을 계산한다.")
@@ -161,26 +112,14 @@ class PaymentServiceIntegrationTest @Autowired constructor(
             val command = PaymentCommand.Create(
                 1L,
                 PaymentMethodType.POINT,
-                listOf(
-                    PaymentCommand.Create.PaymentItemCommand(
-                        1L,
-                        Price(10_000),
-                    ),
-                    PaymentCommand.Create.PaymentItemCommand(
-                        2L,
-                        Price(20_000),
-                    ),
-                ),
+                Price(3000),
             )
 
             // act
             val paymentEntity = paymentService.createPayment(command)
 
             // assert
-            assertAll(
-                { assertThat(paymentEntity.totalAmount).isEqualTo(Price(30_000)) },
-                { assertThat(paymentEntity.paymentItems.totalAmount()).isEqualTo(Price(30_000)) },
-            )
+            assertThat(paymentEntity.totalPrice).isEqualTo(Price(3000))
         }
     }
 }

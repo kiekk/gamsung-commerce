@@ -1,23 +1,19 @@
 package com.loopers.application.order
 
-import com.loopers.domain.coupon.CouponEntity
-import com.loopers.domain.coupon.CouponService
+import com.loopers.domain.coupon.IssuedCouponDiscountAmountCalculator
 import com.loopers.domain.coupon.IssuedCouponService
-import com.loopers.domain.coupon.IssuedCouponValidationService
-import com.loopers.domain.coupon.policy.factory.CouponDiscountPolicyFactory
 import com.loopers.domain.order.OrderService
+import com.loopers.domain.order.OrderTotalPriceCalculator
 import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
-import com.loopers.domain.product.ProductValidationService
-import com.loopers.domain.stock.StockCommand
+import com.loopers.domain.product.ProductService
 import com.loopers.domain.stock.StockService
-import com.loopers.domain.stock.StockValidationService
 import com.loopers.domain.user.UserService
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
-import com.loopers.support.error.payment.PaymentException
+import com.loopers.support.error.payment.StockDeductionFailedException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -25,17 +21,17 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class OrderFacade(
     private val userService: UserService,
+    private val productService: ProductService,
     private val stockService: StockService,
     private val orderService: OrderService,
     private val paymentService: PaymentService,
     private val paymentProcessorFactory: PaymentProcessorFactory,
-    private val productValidationService: ProductValidationService,
-    private val stockValidationService: StockValidationService,
-    private val issuedCouponValidationService: IssuedCouponValidationService,
+    private val orderValidator: OrderValidator,
     private val issuedCouponService: IssuedCouponService,
-    private val couponService: CouponService,
-    private val couponDiscountPolicyFactory: CouponDiscountPolicyFactory,
+    private val issuedCouponDiscountAmountCalculator: IssuedCouponDiscountAmountCalculator,
 ) {
+    private val orderTotalPriceCalculator: OrderTotalPriceCalculator = OrderTotalPriceCalculator()
+
 
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
@@ -60,66 +56,40 @@ class OrderFacade(
             "사용자를 찾을 수 없습니다. userId: ${criteria.userId}",
         )
 
-        criteria.orderItems.forEach { orderItem ->
-            productValidationService.validate(orderItem.productId)
-            stockValidationService.validate(orderItem.productId, orderItem.quantity.value)
-            criteria.issuedCouponId?.let { issuedCouponValidationService.validate(it) }
-        }
+        orderValidator.validate(criteria)
 
-        var coupon: CouponEntity? = null
-        criteria.issuedCouponId?.let {
-            val issuedCoupon = issuedCouponService.findIssuedCouponById(it)
-            issuedCouponService.useIssuedCoupon(it)
-            issuedCoupon?.let {
-                coupon = couponService.findCouponById(it.couponId)
-            }
-        }
+        val products = productService.getProductsByIds(criteria.orderItems.map { it.productId })
+        issuedCouponService.useIssuedCoupon(criteria.issuedCouponId)
 
-        var discountAmount: Long = 0L
-        coupon?.let {
-            val totalAmount = criteria.orderItems.map { it.amount.value }.sumOf { it }
-            discountAmount = couponDiscountPolicyFactory.calculateDiscountAmount(coupon, totalAmount)
-        }
-        val createdOrder = orderService.createOrder(criteria.toCommand(discountAmount))
+        val discountAmount = issuedCouponDiscountAmountCalculator.calculateDiscountAmount(
+            criteria.issuedCouponId,
+            orderTotalPriceCalculator.calculateTotalPrice(criteria.orderItems, products),
+        )
+
+        val createdOrder = orderService.createOrder(criteria.toOrderCommand(products, discountAmount))
         val createdPayment = paymentService.createPayment(
-            PaymentCommand.Create(
-                createdOrder.id,
-                criteria.paymentMethodType,
-                createdOrder.orderItems.items.map {
-                    PaymentCommand.Create.PaymentItemCommand(
-                        it.id,
-                        it.amount,
-                    )
-                },
-            ),
+            PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
         )
 
         paymentProcessorFactory.pay(
             PaymentProcessorCommand.Pay(
                 user.id,
                 createdPayment.id,
-                criteria.paymentMethodType,
+                createdPayment.method,
             ),
         )
 
         try {
-            stockService.deductStockQuantities(
-                criteria.orderItems.map {
-                    StockCommand.Decrease(
-                        it.productId,
-                        it.quantity.value,
-                    )
-                },
-            )
+            stockService.deductStockQuantities(criteria.toStockDeductCommands())
             orderService.completeOrder(createdOrder.id)
-        } catch (e: PaymentException) {
+        } catch (e: StockDeductionFailedException) {
             log.error(e.message, e)
             // 재고 감소 오류에 따른 결제 취소, 포인트 복구
             paymentProcessorFactory.cancel(
                 PaymentProcessorCommand.Cancel(
                     user.id,
                     createdPayment.id,
-                    criteria.paymentMethodType,
+                    createdPayment.method,
                 ),
             )
             // 주문 취소 상태 변경

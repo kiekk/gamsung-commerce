@@ -54,7 +54,6 @@ class OrderServiceIntegrationTest @Autowired constructor(
                         createdProduct.name,
                         Quantity(2),
                         createdProduct.price,
-                        createdProduct.price,
                     ),
                 ),
             )
