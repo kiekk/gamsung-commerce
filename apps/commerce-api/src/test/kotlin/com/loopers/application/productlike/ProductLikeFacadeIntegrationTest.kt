@@ -15,7 +15,6 @@ import com.loopers.domain.vo.Price
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
-import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -65,11 +64,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(productCreateCommand)
-            val nonExistentUserId = 999L
-            val likeCommand = ProductLikeCriteria.Like(nonExistentUserId, createdProduct.id)
+            val nonExistentUsername = "nonexistentuser"
+            val likeCommand = ProductLikeCriteria.Like(nonExistentUsername, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -79,7 +77,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
@@ -96,7 +94,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
-            val likeCommand = ProductLikeCriteria.Like(createdUser.id, nonExistentProductId)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.username, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -121,7 +119,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
@@ -132,7 +129,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val createdProduct = productService.createProduct(productCreateCommand)
-            val likeCommand = ProductLikeCriteria.Like(createdUser.id, createdProduct.id)
+            val likeCommand = ProductLikeCriteria.Like(createdUser.username, createdProduct.id)
 
             // act
             productLikeFacade.like(likeCommand)
@@ -159,6 +156,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     @Nested
     inner class Unlike {
         @DisplayName("존재하지 않는 사용자가 상품 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.")
+        @Test
         fun failsToUnlikeProduct_whenUserNotFound() {
             // arrange
             val command = ProductCommand.Create(
@@ -166,11 +164,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val createdProduct = productService.createProduct(command)
-            val nonExistentUserId = 999L
-            val unlikeCommand = ProductLikeCriteria.Unlike(nonExistentUserId, createdProduct.id)
+            val nonExistentUsername = "nonexistentuser"
+            val unlikeCommand = ProductLikeCriteria.Unlike(nonExistentUsername, createdProduct.id)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -180,11 +177,12 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             // assert
             assertAll(
                 { assertThat(exception.errorType).isEqualTo(ErrorType.NOT_FOUND) },
-                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. userId: $nonExistentUserId") },
+                { assertThat(exception.message).contains("사용자를 찾을 수 없습니다. username: $nonExistentUsername") },
             )
         }
 
         @DisplayName("존재하지 않는 상품에 대해 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.")
+        @Test
         fun failsToUnlikeProduct_whenProductNotFound() {
             // arrange
             val userSignUpCommand = UserCommand.Create(
@@ -196,7 +194,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
             val createdUser = userService.save(userSignUpCommand)
             val nonExistentProductId = 999L
-            val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.id, nonExistentProductId)
+            val unlikeCommand = ProductLikeCriteria.Unlike(createdUser.username, nonExistentProductId)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -213,6 +211,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         }
 
         @DisplayName("상품 좋아요 취소에 성공하면 상품 좋아요 이력이 삭제된다.")
+        @Test
         fun unlikesProductSuccessfully() {
             // arrange
             val productCreateCommand = ProductCommand.Create(
@@ -220,7 +219,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val userSignUpCommand = UserCommand.Create(
                 "userId123",
@@ -239,7 +237,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.id, createdProduct.id))
+            productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.username, createdProduct.id))
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
@@ -252,7 +250,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 존재하지 않는 사용자의 경우 404 Not Found 에러가 발생한다.
     - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 존재하는 사용자의 경우 해당 사용자가 좋아요한 상품 목록이 반환된다.
     - [ ] 사용자가 좋아요한 상품 목록을 조회할 때, 해당 사용자가 좋아요한 상품이 없는 경우 빈 목록이 반환된다.

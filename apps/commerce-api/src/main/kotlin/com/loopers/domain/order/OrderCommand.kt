@@ -1,11 +1,11 @@
 package com.loopers.domain.order
 
 import com.loopers.domain.order.vo.OrderCustomer
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
 
 class OrderCommand {
     data class Create(
@@ -15,6 +15,7 @@ class OrderCommand {
         val ordererMobile: Mobile,
         val ordererAddress: Address,
         val orderItems: List<OrderItemCommand>,
+        val discountAmount: Long = 0L,
     ) {
 
         init {
@@ -26,7 +27,6 @@ class OrderCommand {
             val productId: Long,
             val productName: String,
             val quantity: Quantity,
-            val totalPrice: Price,
             val amount: Price,
         ) {
             init {
@@ -43,6 +43,7 @@ class OrderCommand {
                     ordererMobile,
                     ordererAddress,
                 ),
+                Price(discountAmount),
             )
         }
 
@@ -53,7 +54,6 @@ class OrderCommand {
                         order,
                         command.productId,
                         command.productName,
-                        command.totalPrice,
                         command.amount,
                     )
                 }

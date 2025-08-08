@@ -1,9 +1,6 @@
 package com.loopers.application.order
 
 import com.loopers.domain.order.OrderEntity
-import com.loopers.domain.vo.Address
-import com.loopers.domain.vo.Email
-import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 
 class OrderInfo {
@@ -11,9 +8,11 @@ class OrderInfo {
     data class OrderDetail(
         val orderId: Long,
         val ordererName: String,
-        val ordererEmail: Email,
-        val ordererMobile: Mobile,
-        val ordererAddress: Address,
+        val ordererEmail: String,
+        val ordererMobile: String,
+        val ordererZipCode: String,
+        val ordererAddress: String,
+        val ordererAddressDetail: String? = null,
         val orderItemCount: Int,
         val totalPrice: Price,
     ) {
@@ -22,9 +21,11 @@ class OrderInfo {
             fun from(orderEntity: OrderEntity): OrderDetail = OrderDetail(
                 orderEntity.id,
                 orderEntity.orderCustomer.name,
-                orderEntity.orderCustomer.email,
-                orderEntity.orderCustomer.mobile,
-                orderEntity.orderCustomer.address,
+                orderEntity.orderCustomer.email.value,
+                orderEntity.orderCustomer.mobile.value,
+                orderEntity.orderCustomer.address.zipCode,
+                orderEntity.orderCustomer.address.address,
+                orderEntity.orderCustomer.address.addressDetail,
                 orderEntity.orderItems.size(),
                 orderEntity.totalPrice,
             )

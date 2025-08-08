@@ -2,7 +2,6 @@ package com.loopers.domain.product.fixture
 
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.vo.Price
-import com.loopers.support.enums.product.ProductStatusType
 
 class ProductEntityFixture {
     private var productId: Long = 1L
@@ -10,7 +9,6 @@ class ProductEntityFixture {
     private var name: String = "productName"
     private var description: String = "productDescription"
     private var price: Price = Price(1000L)
-    private var status: ProductStatusType = ProductStatusType.ACTIVE
 
     companion object {
         fun aProduct(): ProductEntityFixture = ProductEntityFixture()
@@ -24,13 +22,10 @@ class ProductEntityFixture {
 
     fun price(price: Price): ProductEntityFixture = apply { this.price = price }
 
-    fun status(status: ProductStatusType): ProductEntityFixture = apply { this.status = status }
-
     fun build(): ProductEntity = ProductEntity(
         brandId,
         name,
         description,
         price,
-        status,
     )
 }

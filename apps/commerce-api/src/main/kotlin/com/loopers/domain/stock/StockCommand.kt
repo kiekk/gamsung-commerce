@@ -13,7 +13,7 @@ class StockCommand {
         }
     }
 
-    data class Decrease(
+    data class Deduct(
         val productId: Long,
         val quantity: Int,
     )

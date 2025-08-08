@@ -9,10 +9,6 @@ class OrderItems(
     val items: List<OrderItemEntity>,
 ) {
 
-    fun totalPrice(): Price {
-        return Price(items.sumOf { it.totalPrice.value })
-    }
-
     fun amount(): Price {
         return Price(items.sumOf { it.amount.value })
     }

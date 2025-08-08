@@ -3,7 +3,7 @@ package com.loopers.domain.productlike
 interface ProductLikeRepository {
     fun create(productLike: ProductLikeEntity): ProductLikeEntity
 
-    fun deleteByUserIdAndProductId(userId: Long, productId: Long)
+    fun deleteByUserIdAndProductId(userId: Long, productId: Long): Int
 
     fun existsByUserIdAndProductId(userId: Long, productId: Long): Boolean
 

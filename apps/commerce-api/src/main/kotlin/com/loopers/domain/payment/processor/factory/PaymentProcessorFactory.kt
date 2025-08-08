@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 class PaymentProcessorFactory(
     private val processors: List<PaymentProcessor>,
 ) {
-    fun process(command: PaymentProcessorCommand.Process) {
-        return processors.find { it.supports(command.paymentMethod) }?.process(command)
+    fun pay(command: PaymentProcessorCommand.Pay) {
+        return processors.find { it.supports(command.paymentMethod) }?.pay(command)
             ?: throw IllegalArgumentException("지원하지 않는 결제 방법입니다: ${command.paymentMethod}")
     }
 

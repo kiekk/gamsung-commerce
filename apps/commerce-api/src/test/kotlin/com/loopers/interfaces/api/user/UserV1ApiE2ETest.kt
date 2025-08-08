@@ -60,12 +60,12 @@ class UserV1ApiE2ETest @Autowired constructor(
             )
 
             // act
-            val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
+            val userResultResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResultResponse>>() {}
             val response = testRestTemplate.exchange(
                 ENDPOINT_POST,
                 HttpMethod.POST,
                 HttpEntity<Any>(signUpRequest),
-                userResponseType,
+                userResultResponseType,
             )
 
             // assert
@@ -93,9 +93,9 @@ class UserV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity(ObjectMapper().writeValueAsString(user), headers)
 
             // act
-            val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
+            val userResultResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResultResponse>>() {}
             val response =
-                testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(httpEntity), userResponseType)
+                testRestTemplate.exchange(ENDPOINT_POST, HttpMethod.POST, HttpEntity<Any>(httpEntity), userResultResponseType)
 
             // assert
             assertAll(
@@ -125,8 +125,8 @@ class UserV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
-            val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
-            val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, userResponseType)
+            val userResultResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResultResponse>>() {}
+            val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, userResultResponseType)
 
             // assert
             assertAll(
@@ -147,9 +147,9 @@ class UserV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
-            val userResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>>() {}
+            val userResultResponseType = object : ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResultResponse>>() {}
             val response =
-                testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, userResponseType)
+                testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, userResultResponseType)
 
             // assert
             assertAll(

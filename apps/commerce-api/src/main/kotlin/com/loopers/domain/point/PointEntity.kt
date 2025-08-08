@@ -7,6 +7,7 @@ import com.loopers.support.error.ErrorType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import jakarta.persistence.Version
 
 @Entity
 @Table(name = "point")
@@ -17,6 +18,9 @@ class PointEntity(
 ) : BaseEntity() {
     var point: Point = point
         private set
+
+    @Version
+    var version: Long? = null
 
     fun chargePoint(point: Point) {
         if (point.value <= 0) {

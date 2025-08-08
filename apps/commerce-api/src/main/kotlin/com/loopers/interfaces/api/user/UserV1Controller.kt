@@ -18,19 +18,19 @@ class UserV1Controller(
 ) : UserV1ApiSpec {
 
     @PostMapping
-    override fun signUp(@RequestBody request: UserV1Dto.SignUpRequest): ApiResponse<UserV1Dto.UserResponse> {
+    override fun signUp(@RequestBody request: UserV1Dto.SignUpRequest): ApiResponse<UserV1Dto.UserResultResponse> {
         return userFacade.signUp(request.toSignUp())
-            .let { UserV1Dto.UserResponse.from(it) }
+            .let { UserV1Dto.UserResultResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
 
     @GetMapping("/me")
-    override fun getMyInfo(httpServletRequest: HttpServletRequest): ApiResponse<UserV1Dto.UserResponse> {
+    override fun getMyInfo(httpServletRequest: HttpServletRequest): ApiResponse<UserV1Dto.UserDetailResponse> {
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
         return userFacade.getMyInfo(userId)
-            .let { UserV1Dto.UserResponse.from(it) }
+            .let { UserV1Dto.UserDetailResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
 }

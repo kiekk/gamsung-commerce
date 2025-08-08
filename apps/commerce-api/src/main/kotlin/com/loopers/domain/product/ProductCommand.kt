@@ -1,7 +1,6 @@
 package com.loopers.domain.product
 
 import com.loopers.domain.vo.Price
-import com.loopers.support.enums.product.ProductStatusType
 
 class ProductCommand {
     data class Create(
@@ -9,7 +8,6 @@ class ProductCommand {
         val name: String,
         val price: Price,
         val description: String?,
-        val status: ProductStatusType,
     ) {
 
         init {
@@ -27,7 +25,6 @@ class ProductCommand {
                 name,
                 description,
                 price,
-                status,
             )
         }
 

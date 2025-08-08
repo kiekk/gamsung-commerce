@@ -62,7 +62,7 @@ class ProductLikeCountEntityTest {
      **🧱 단위 테스트**
     - [ ] 상품 좋아요 수를 증가시킬 수 있다.
     - [ ] 상품 좋아요 수를 감소시킬 수 있다.
-    - [ ] 상품 좋아요 수가 0인 경우 상품 좋아요 수를 감소해도 0 이하로 내려가지 않는다.
+    - [ ] 상품 좋아요 수가 0인 경우 상품 좋아요 수를 감소하면 IllegalArgumentException을 발생시킨다.
      */
     @DisplayName("상품 좋아요 수를 변경할 때, ")
     @Nested
@@ -101,7 +101,7 @@ class ProductLikeCountEntityTest {
             assertThat(productLikeCountEntity.productLikeCount).isEqualTo(0)
         }
 
-        @DisplayName("상품 좋아요 수가 0인 경우 상품 좋아요 수를 감소해도 0 이하로 내려가지 않는다.")
+        @DisplayName("상품 좋아요 수가 0인 경우 상품 좋아요 수를 감소하면 IllegalArgumentException을 발생시킨다.")
         @Test
         fun doesNotDecreaseLikeCountBelowZero() {
             // arrange
@@ -112,10 +112,16 @@ class ProductLikeCountEntityTest {
             )
 
             // act
-            productLikeCountEntity.decreaseProductLikeCount()
+            val exception = assertThrows<IllegalArgumentException> {
+                productLikeCountEntity.decreaseProductLikeCount()
+            }
 
             // assert
-            assertThat(productLikeCountEntity.productLikeCount).isEqualTo(0)
+            assertAll(
+                { assertThat(exception).isInstanceOf(IllegalArgumentException::class.java) },
+                { assertThat(exception.message).isEqualTo("좋아요 수는 0보다 작을 수 없습니다.") },
+                { assertThat(productLikeCountEntity.productLikeCount).isEqualTo(initialProductLikeCount) },
+            )
         }
     }
 }

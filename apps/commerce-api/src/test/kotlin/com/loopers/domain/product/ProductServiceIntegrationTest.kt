@@ -53,7 +53,6 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 createdProduct.name,
                 createdProduct.price,
                 createdProduct.description,
-                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -79,14 +78,12 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
             val productCreateCommand2 = ProductCommand.Create(
                 createdBrand2.id,
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -111,7 +108,6 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 "상품A",
                 Price(1000),
                 "This is a test product.",
-                ProductStatusType.ACTIVE,
             )
 
             // act
@@ -122,7 +118,7 @@ class ProductServiceIntegrationTest @Autowired constructor(
                 { assertThat(createdProduct.name).isEqualTo(productCreateCommand.name) },
                 { assertThat(createdProduct.description).isEqualTo(productCreateCommand.description) },
                 { assertThat(createdProduct.price).isEqualTo(productCreateCommand.price) },
-                { assertThat(createdProduct.status).isEqualTo(productCreateCommand.status) },
+                { assertThat(createdProduct.status).isEqualTo(ProductStatusType.ACTIVE) },
             )
         }
     }

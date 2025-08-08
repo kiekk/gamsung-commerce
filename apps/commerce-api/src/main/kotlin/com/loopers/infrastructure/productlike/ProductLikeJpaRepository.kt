@@ -8,5 +8,5 @@ interface ProductLikeJpaRepository : JpaRepository<ProductLikeEntity, Long> {
 
     fun findByUserId(userId: Long): List<ProductLikeEntity>
 
-    fun deleteByUserIdAndProductId(userId: Long, productId: Long)
+    fun deleteByUserIdAndProductId(userId: Long, productId: Long): Int
 }

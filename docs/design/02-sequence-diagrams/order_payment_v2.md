@@ -14,6 +14,7 @@ sequenceDiagram
     participant OrderController
     participant UserService
     participant OrderService
+    participant CouponService
     activate User
     User ->> OrderController: 주문 요청 (배송지 정보, 주문 상품 목록 및 수량)
     activate OrderController
@@ -34,8 +35,22 @@ sequenceDiagram
     alt 주문 불가능한 상품이 하나 이상인 경우(비활성 상태, 재고 부족 등)
         OrderService -->> OrderController: 잘못된 요청 예외 (409 Conflict)
     end
+    alt 쿠폰 사용 요청이 있는 경우
+        OrderController ->> CouponService: 쿠폰 정보 조회 요청
+        activate CouponService
+        alt 쿠폰 정보가 없는 경우
+            CouponService -->> OrderController: 쿠폰 정보 없음 예외 (404 Not Found)
+        end
+        alt 쿠폰 사용 불가 상태인 경우
+            CouponService -->> OrderController: 쿠폰 사용 불가 예외 (409 Conflict)
+        end
+        alt 쿠폰 사용 가능 상태인 경우
+            CouponService -->> OrderController: 쿠폰 정보 응답
+        end
+        deactivate CouponService
+    end
     activate OrderController
-    OrderController ->> OrderService: 주문 생성 요청 (사용자 ID, 배송지 정보, 주문 상품 목록)
+    OrderController ->> OrderService: 주문 생성 요청 (사용자 ID, 쿠폰 정보, 배송지 정보, 주문 상품 목록)
     deactivate OrderController
     alt 주문 생성 실패
         OrderService -->> OrderController: 주문 처리 실패 예외 (500 Internal Server Error)
