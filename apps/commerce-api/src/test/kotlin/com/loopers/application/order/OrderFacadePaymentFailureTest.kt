@@ -3,7 +3,6 @@ package com.loopers.application.order
 import com.loopers.domain.coupon.fixture.CouponEntityFixture.Companion.aCoupon
 import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anIssuedCoupon
 import com.loopers.domain.order.OrderRepository
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
@@ -19,6 +18,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.support.StockServiceMockConfig

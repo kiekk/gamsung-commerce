@@ -5,7 +5,6 @@ import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anI
 import com.loopers.domain.order.fixture.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.vo.Point
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
@@ -15,6 +14,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository

@@ -1,5 +1,6 @@
 package com.loopers.domain.order.vo
 
+import com.loopers.domain.vo.Quantity
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

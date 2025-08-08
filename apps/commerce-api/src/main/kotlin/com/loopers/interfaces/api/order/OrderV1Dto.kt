@@ -2,11 +2,11 @@ package com.loopers.interfaces.api.order
 
 import com.loopers.application.order.OrderCriteria
 import com.loopers.application.order.OrderInfo
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderV1Dto {
