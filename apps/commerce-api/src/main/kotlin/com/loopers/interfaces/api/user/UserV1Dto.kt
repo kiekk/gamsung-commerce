@@ -32,7 +32,7 @@ class UserV1Dto {
         )
     }
 
-    data class UserResponse(
+    data class UserResultResponse(
         val username: String,
         val name: String,
         val email: String,
@@ -40,12 +40,30 @@ class UserV1Dto {
         val gender: GenderType,
     ) {
         companion object {
-            fun from(info: UserInfo): UserResponse = UserResponse(
-                info.username,
-                info.name,
-                info.email,
-                info.birthday,
-                info.gender,
+            fun from(userResult: UserInfo.UserResult): UserResultResponse = UserResultResponse(
+                userResult.username,
+                userResult.name,
+                userResult.email,
+                userResult.birthday,
+                userResult.gender,
+            )
+        }
+    }
+
+    data class UserDetailResponse(
+        val username: String,
+        val name: String,
+        val email: String,
+        val birthday: String,
+        val gender: GenderType,
+    ) {
+        companion object {
+            fun from(userDetail: UserInfo.UserDetail): UserDetailResponse = UserDetailResponse(
+                userDetail.username,
+                userDetail.name,
+                userDetail.email,
+                userDetail.birthday,
+                userDetail.gender,
             )
         }
     }

@@ -2,7 +2,6 @@ package com.loopers.application.product
 
 import com.loopers.domain.product.ProductCommand
 import com.loopers.domain.vo.Price
-import com.loopers.support.enums.product.ProductStatusType
 
 class ProductCriteria {
     data class Create(

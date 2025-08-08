@@ -48,7 +48,6 @@ class BrandFacadeIntegrationTest @Autowired constructor(
             val criteria = BrandCriteria.Create(
                 createdUser.username,
                 "TestBrand",
-                BrandStatusType.ACTIVE,
             )
 
             // act
@@ -77,7 +76,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
             val createdBrand = brandJpaRepository.save(aBrand().build())
 
             // act
-            val response = brandFacade.findBrandBy(createdBrand.id)
+            val response = brandFacade.getBrand(createdBrand.id)
 
             // assert
             assertAll(
@@ -95,7 +94,7 @@ class BrandFacadeIntegrationTest @Autowired constructor(
 
             // act
             val exception = assertThrows<CoreException> {
-                brandFacade.findBrandBy(nonExistentId)
+                brandFacade.getBrand(nonExistentId)
             }
 
             // assert
@@ -174,8 +173,8 @@ class BrandFacadeIntegrationTest @Autowired constructor(
         @Test
         fun findsBrands_whenFilteringByStatus() {
             // arrange
-            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").status(BrandStatusType.ACTIVE).build())
-            brandJpaRepository.save(aBrand().name("비활성브랜드").status(BrandStatusType.INACTIVE).build())
+            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").build())
+            brandJpaRepository.save(aBrand().name("비활성브랜드").build().apply { inactive() })
 
             // act
             val criteria = BrandCriteria.Query(status = BrandStatusType.ACTIVE)

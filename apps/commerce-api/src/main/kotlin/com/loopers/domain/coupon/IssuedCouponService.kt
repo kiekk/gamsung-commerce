@@ -22,4 +22,10 @@ class IssuedCouponService(
             issuedCouponRepository.getById(it).use()
         }
     }
+
+    fun unUseIssuedCoupon(id: Long?) {
+        id?.let {
+            issuedCouponRepository.getById(it).unUse()
+        }
+    }
 }

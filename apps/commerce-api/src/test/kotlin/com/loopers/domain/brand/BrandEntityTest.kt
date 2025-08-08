@@ -16,7 +16,7 @@ class BrandEntityTest {
     /*
      **🧱 단위 테스트**
     - [ ]  브랜드명이 `한글, 영문, 숫자 20자 이내` 형식에 맞지 않으면, BrandEntity 생성에 실패한다.
-    - [ ]  브랜드명, 브랜드상태가 올바른 경우 BrandEntity를 생성한다.
+    - [ ]  브랜드명이 올바른 경우 BrandEntity를 생성한다.
      */
     @DisplayName("브랜드를 생성할 때, ")
     @Nested
@@ -39,7 +39,6 @@ class BrandEntityTest {
             val result = assertThrows<IllegalArgumentException> {
                 BrandEntity(
                     invalidBrandName,
-                    BrandStatusType.ACTIVE,
                 )
             }
 
@@ -50,22 +49,19 @@ class BrandEntityTest {
             )
         }
 
-        @DisplayName("브랜드명, 브랜드상태가 올바른 경우 BrandEntity를 생성한다.")
+        @DisplayName("브랜드명이 올바른 경우 BrandEntity를 생성한다.")
         @Test
         fun createsBrand_whenNameAndStatusAreValid() {
             // arrange
             val validBrandName = "브랜드이름"
-            val validBrandStatus = BrandStatusType.ACTIVE
 
             // act
             val brandEntity = BrandEntity(
                 validBrandName,
-                validBrandStatus,
             )
 
             // assert
             assertThat(brandEntity.name).isEqualTo(validBrandName)
-            assertThat(brandEntity.status).isEqualTo(validBrandStatus)
         }
     }
 
@@ -81,7 +77,7 @@ class BrandEntityTest {
         @Test
         fun deactivatesBrand() {
             // arrange
-            val brandEntity = aBrand().name("브랜드이름").status(BrandStatusType.ACTIVE).build()
+            val brandEntity = aBrand().name("브랜드이름").build()
 
             // act
             brandEntity.inactive()
@@ -94,7 +90,7 @@ class BrandEntityTest {
         @Test
         fun withdrawsBrand() {
             // arrange
-            val brandEntity = aBrand().name("브랜드이름").status(BrandStatusType.ACTIVE).build()
+            val brandEntity = aBrand().name("브랜드이름").build()
 
             // act
             brandEntity.close()

@@ -8,7 +8,7 @@ import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import java.time.LocalDateTime
 
 class CouponInfo {
-    data class CouponDetail(
+    data class CouponResult(
         val id: Long,
         val name: String,
         val type: CouponType,
@@ -17,8 +17,8 @@ class CouponInfo {
         var status: CouponStatusType,
     ) {
         companion object {
-            fun from(couponEntity: CouponEntity): CouponDetail {
-                return CouponDetail(
+            fun from(couponEntity: CouponEntity): CouponResult {
+                return CouponResult(
                     couponEntity.id,
                     couponEntity.name,
                     couponEntity.type,
@@ -30,7 +30,7 @@ class CouponInfo {
         }
     }
 
-    data class IssuedCouponDetail(
+    data class IssuedCouponResult(
         val id: Long,
         val couponId: Long,
         val userId: Long,
@@ -39,8 +39,8 @@ class CouponInfo {
         var usedAt: LocalDateTime?,
     ) {
         companion object {
-            fun from(issuedCouponEntity: IssuedCouponEntity): IssuedCouponDetail {
-                return IssuedCouponDetail(
+            fun from(issuedCouponEntity: IssuedCouponEntity): IssuedCouponResult {
+                return IssuedCouponResult(
                     issuedCouponEntity.id,
                     issuedCouponEntity.couponId,
                     issuedCouponEntity.userId,

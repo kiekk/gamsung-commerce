@@ -44,7 +44,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 상품 생성이 성공할 경우, 생성된 상품 정보를 응답으로 반환한다.
     - [ ] 상품명이 중복될 경우, 상품 등록에 실패한다.
@@ -69,7 +69,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -93,7 +93,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -125,7 +125,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -134,7 +134,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
     }
 
     /*
-    **🌐 E2E 테스트**
+     **🌐 E2E 테스트**
     - [ ] 상품 ID로 상품 조회 시, 해당 상품이 존재하지 않으면 404 Not Found 예외가 발생한다.
     - [ ] 상품 ID로 상품 조회 시, 해당 상품이 존재하면 상품 정보를 응답으로 반환한다.
      */
@@ -149,7 +149,7 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val requestUrl = ENDPOINT_PRODUCT_GET(nonExistentProductId)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(requestUrl, HttpMethod.GET, HttpEntity<Any>(Unit), responseType)
 
             // assert
@@ -177,9 +177,8 @@ class ProductV1ApiE2ETest @Autowired constructor(
                 { assertThat(response.body?.data?.brandName).isEqualTo(createdBrand.name) },
                 { assertThat(response.body?.data?.productStatus).isEqualTo(createdProduct.status) },
                 { assertThat(response.body?.data?.productPrice).isEqualTo(createdProduct.price.value) },
-                { assertThat(response.body?.data?.productLikeCount).isEqualTo(0) }, // 초기 좋아요 수는 0으로 가정
+                { assertThat(response.body?.data?.productLikeCount).isEqualTo(0) },
             )
         }
     }
-
 }

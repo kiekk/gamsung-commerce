@@ -22,7 +22,7 @@ class BrandV1Controller(
 ) : BrandV1ApiSpec {
 
     @PostMapping("")
-    override fun createCoupon(
+    override fun createBrand(
         @RequestBody request: BrandV1Dto.CreateRequest,
         httpServletRequest: HttpServletRequest,
     ): ApiResponse<BrandV1Dto.BrandResponse> {
@@ -35,7 +35,7 @@ class BrandV1Controller(
 
     @GetMapping("{brandId}")
     override fun getBrand(@PathVariable("brandId") brandId: Long): ApiResponse<BrandV1Dto.BrandResponse> {
-        return brandFacade.findBrandBy(brandId)
+        return brandFacade.getBrand(brandId)
             .let { BrandV1Dto.BrandResponse.from(it) }
             .let { ApiResponse.success(it) }
     }

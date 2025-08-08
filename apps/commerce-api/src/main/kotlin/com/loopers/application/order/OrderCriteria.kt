@@ -1,12 +1,12 @@
 package com.loopers.application.order
 
 import com.loopers.domain.order.OrderCommand
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.product.ProductEntity
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
+import com.loopers.domain.vo.Quantity
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderCriteria {

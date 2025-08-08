@@ -1,11 +1,11 @@
 package com.loopers.domain.order
 
 import com.loopers.domain.order.vo.OrderCustomer
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
 
 class OrderCommand {
     data class Create(

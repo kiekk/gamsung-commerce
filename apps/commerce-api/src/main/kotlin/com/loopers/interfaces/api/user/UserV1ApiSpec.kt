@@ -16,7 +16,7 @@ interface UserV1ApiSpec {
     fun signUp(
         @Schema(name = "회원 가입 정보", description = "회원 가입할 사용자의 요청 정보")
         request: UserV1Dto.SignUpRequest,
-    ): ApiResponse<UserV1Dto.UserResponse>
+    ): ApiResponse<UserV1Dto.UserResultResponse>
 
     @Operation(
         summary = "내 정보 조회",
@@ -24,5 +24,5 @@ interface UserV1ApiSpec {
     )
     fun getMyInfo(
         httpServletRequest: HttpServletRequest,
-    ): ApiResponse<UserV1Dto.UserResponse>
+    ): ApiResponse<UserV1Dto.UserDetailResponse>
 }

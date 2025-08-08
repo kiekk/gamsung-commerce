@@ -1,10 +1,10 @@
 package com.loopers.domain.order
 
-import com.loopers.domain.order.vo.Quantity
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
+import com.loopers.domain.vo.Quantity
 import com.loopers.infrastructure.order.OrderJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.utils.DatabaseCleanUp

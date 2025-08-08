@@ -14,18 +14,18 @@ class CouponFacade(
     private val userService: UserService,
 ) {
 
-    fun createCoupon(criteria: CouponCriteria.Create): CouponInfo.CouponDetail {
+    fun createCoupon(criteria: CouponCriteria.Create): CouponInfo.CouponResult {
         userService.findUserBy(criteria.username)
             ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다. username: ${criteria.username}")
         if (couponService.existsCouponByName(criteria.name)) {
             throw CoreException(ErrorType.CONFLICT, "이미 존재하는 쿠폰명입니다. 쿠폰명: ${criteria.name}")
         }
         return couponService.createCoupon(criteria.toCommand()).let {
-            CouponInfo.CouponDetail.from(it)
+            CouponInfo.CouponResult.from(it)
         }
     }
 
-    fun issueCoupon(criteria: CouponCriteria.Issue): CouponInfo.IssuedCouponDetail {
+    fun issueCoupon(criteria: CouponCriteria.Issue): CouponInfo.IssuedCouponResult {
         userService.findUserBy(criteria.username)
             ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다. username: ${criteria.username}")
 
@@ -40,7 +40,7 @@ class CouponFacade(
             ?: throw CoreException(ErrorType.NOT_FOUND, "쿠폰을 발급할 사용자를 찾을 수 없습니다. userId: ${criteria.issuedUserId}")
 
         return issuedCouponService.issueCoupon(criteria.toCommand()).let {
-            CouponInfo.IssuedCouponDetail.from(it)
+            CouponInfo.IssuedCouponResult.from(it)
         }
     }
 }

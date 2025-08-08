@@ -1,8 +1,8 @@
 package com.loopers.application.order
 
+import com.loopers.domain.coupon.fixture.CouponEntityFixture.Companion.aCoupon
+import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anIssuedCoupon
 import com.loopers.domain.order.OrderRepository
-import com.loopers.domain.order.vo.Quantity
-import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
@@ -18,6 +18,9 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
+import com.loopers.domain.vo.Quantity
+import com.loopers.infrastructure.coupon.CouponJpaRepository
+import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.support.StockServiceMockConfig
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentMethodType
@@ -43,7 +46,8 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
     private val productRepository: ProductRepository,
     private val stockRepository: StockRepository,
     private val orderRepository: OrderRepository,
-    private val paymentRepository: PaymentRepository,
+    private val couponJpaRepository: CouponJpaRepository,
+    private val issuedCouponJpaRepository: IssuedCouponJpaRepository,
     private val pointRepository: PointRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
@@ -61,12 +65,12 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
 
     /*
      **🔗 통합 테스트
-    - [ ] 결제 성공 후 재고 감소에 실패하면 포인트는 원복하고 결제/주문은 실패한다.
+    - [ ] 결제 성공 후 재고 감소에 실패하면 포인트, 쿠폰은 원복하고 결제/주문은 실패한다.
      */
     @DisplayName("결제 성공 후 재고 감소에 실패할 때, 포인트는")
     @Nested
     inner class StockReductionFailure {
-        @DisplayName("결제 성공 후 재고 감소에 실패하면 포인트는 원복하고 결제/주문은 실패한다.")
+        @DisplayName("결제 성공 후 재고 감소에 실패하면 포인트, 쿠폰은 원복하고 결제/주문은 실패한다.")
         @Test
         fun failsToPayWithPoints_whenStockReductionFails() {
             // arrange
@@ -74,6 +78,8 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             val createdPoint = pointRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
             val createdProduct = productRepository.save(aProduct().price(Price(1000)).build())
             val createdStock = stockRepository.save(aStock().productId(createdProduct.id).build())
+            val createdCoupon = couponJpaRepository.save(aCoupon().build())
+            val createdIssuedCoupon = issuedCouponJpaRepository.save(anIssuedCoupon().userId(createdUser.id).couponId(createdCoupon.id).build())
             val quantity = Quantity(2)
             val criteria = OrderCriteria.Create(
                 createdUser.username,
@@ -88,6 +94,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                     ),
                 ),
                 PaymentMethodType.POINT,
+                createdIssuedCoupon.id,
             )
 
             whenever(stockService.getStocksByProductIds(listOf(createdProduct.id))).thenReturn(
@@ -104,6 +111,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
                 { assertThat(orderRepository.findWithItemsById(orderId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
                 { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
                 { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
+                { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().isUsed()).isFalse() },
             )
         }
     }
