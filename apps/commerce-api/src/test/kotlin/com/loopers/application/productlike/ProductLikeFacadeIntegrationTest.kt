@@ -156,6 +156,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     @Nested
     inner class Unlike {
         @DisplayName("존재하지 않는 사용자가 상품 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.")
+        @Test
         fun failsToUnlikeProduct_whenUserNotFound() {
             // arrange
             val command = ProductCommand.Create(
@@ -181,6 +182,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         }
 
         @DisplayName("존재하지 않는 상품에 대해 좋아요 취소 요청을 하면 404 Not Found 에러가 발생한다.")
+        @Test
         fun failsToUnlikeProduct_whenProductNotFound() {
             // arrange
             val userSignUpCommand = UserCommand.Create(
@@ -209,6 +211,7 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
         }
 
         @DisplayName("상품 좋아요 취소에 성공하면 상품 좋아요 이력이 삭제된다.")
+        @Test
         fun unlikesProductSuccessfully() {
             // arrange
             val productCreateCommand = ProductCommand.Create(
