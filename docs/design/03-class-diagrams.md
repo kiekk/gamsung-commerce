@@ -21,9 +21,9 @@ classDiagram
         -Long id
         -String name
         -BrandStatus status
-        +active()
-        +inactive()
-        +close()
+        +active() boolean
+        +inactive() boolean
+        +close() boolean
     }
     class Product {
         -Long id
@@ -31,7 +31,7 @@ classDiagram
         -Brand brand
         -ProductStatus status
         -String description
-        +isNotActive()
+        +isNotActive() boolean
     }
     class ProductLike {
         -Long id
@@ -74,18 +74,20 @@ classDiagram
         -Stock stock
         -Price price
         -String description
+        +isNotActive() boolean
     }
 %% 재고
     class Stock {
         -Long productId
         -int quantity
-        +isQuantityLessThan(quantity)
-        +deductQuantity(quantity)
+        -version: Long
+        +isQuantityLessThan(quantity: Int) boolean
+        +deductQuantity(quantity: Int) void
     }
 %% 사용자
     class User {
         -Long id
-        -String userId
+        -String username
         -String name
         -Email email
         -Birthday birthday
@@ -109,70 +111,98 @@ classDiagram
 %% 주문 상품 목록
     class OrderItems {
         -List~OrderItem~ items
-        +getTotalPrice()
-        +getAmount()
-        +size()
+        +getTotalPrice() Price
+        +getAmount() Price
+        +size() Int
     }
 %% 주문 상품
     class OrderItem {
-        -Product product
+        -Long productId
+        -Order order
         -String productName
         -Price totalPrice
         -Price amount
-        +getTotalPrice()
-        +getAmount()
     }
 %% 결제
     class Payment {
         -Long id
-        -Order order
+        -Long orderId
         -PaymentMethodType method
         -PaymentStatusType status
         -PaymentItems paymentItems
-        -List~PaymentGatewayHistory~ histories
         -Price totalAmount
-        +complete()
-        +fail()
-        +cancel()
-        +addItems()
-        +getTotalAmount()
+        +complete() void
+        +fail() void
+        +cancel() void
+        +addItems(paymentItem: List~PaymentItem~) void
     }
 %% 결제 항목 목록
     class PaymentItems {
         -List~PaymentItem~ items
-        +getTotalAmount()
-        +totalAmount()
-        +complete()
-        +fail()
-        +isAllPending()
-        +isAllCompleted()
-        +isAllFailed()
-        +isAllCanceled()
-        +cancel()
+        +totalAmount() Price
+        +complete() void
+        +fail() void
+        +isAllPending() boolean
+        +isAllCompleted() boolean
+        +isAllFailed() boolean
+        +isAllCanceled() boolean
+        +cancel() void
     }
 %% 결제 항목
     class PaymentItem {
         -Long id
         -Payment payment
-        -OrderItem orderItem
-        -PaymentStatusType status
+        -Long orderItemId
+        -PaymentItemStatusType status
         -Price amount
-        +complete()
-        +fail()
-        +cancel()
-        +isPending()
-        +isCompleted()
-        +isFailed()
-        +isCanceled()
+        +complete() void
+        +fail() void
+        +cancel() void
+        +isPending() boolean
+        +isCompleted() boolean
+        +isFailed() boolean
+        +isCanceled() boolean
     }
-%% 결제 히스토리
-    class PaymentGatewayHistory {
+%% 쿠폰
+    class Coupon {
         -Long id
-        -Payment payment
-        -PaymentGatewayType type
-        -String transactionId
-        -String gatewayResponse
+        -String name
+        -CouponType type
+        -Price discountAmount
+        -PercentRate discountRate
+        -CouponStatus status
+        +issue(userId: Long) IssuedCoupon
+        +issuable() boolean
+        +calculateDiscountAmount(orderTotalPrice: Price) Price
     }
+%% 사용자 쿠폰
+    class IssuedCoupon {
+        -Long id
+        -User user
+        -Coupon coupon
+        -IssuedCouponStatus status
+        -LocalDateTime issuedAt
+        -LocalDateTime usedAt
+        +isUsable() boolean
+        +use() void
+    }
+
+    Product --> Stock
+    Order --> OrderItems
+    OrderItems --> OrderItem
+    OrderItem --> Product
+    Order --> User
+    Order --> Payment
+    Payment --> PaymentItems
+    PaymentItems --> PaymentItem
+    PaymentItem --> OrderItem
+    Coupon --> IssuedCoupon
+    IssuedCoupon --> User
+    Order --> IssuedCoupon
+```
+
+```mermaid
+classDiagram
 %% 주문 상태 enum 정의
     class OrderStatusType {
         <<enumeration>>
@@ -243,16 +273,29 @@ classDiagram
         <<valueobject>>
         -int value
     }
-
-    Product --> Stock
-    Order --> OrderItems
-    OrderItems --> OrderItem
-    OrderItem --> Product
-    Order --> User
-    Order --> Payment
-    Payment --> PaymentItem
-    PaymentItem --> OrderItem
-    Payment --> PaymentGatewayHistory
+%% 쿠폰 상태
+    class CouponStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+    }
+%% 쿠폰 타입
+    class CouponType {
+        <<enumeration>>
+        AMOUNT
+        PERCENTAGE
+    }
+%% 쿠폰 발급 상태
+    class IssuedCouponStatus {
+        <<enumeration>>
+        ACTIVE
+        USED
+    }
+%% 퍼센트
+    class PercentRate {
+        <<valueobject>>
+        -Double value
+    }
 ```
 
 ## 상품-주문-결제 클래스 다이어그램 V2
@@ -375,13 +418,27 @@ classDiagram
         -PaymentStatus status
         -Price amount
     }
-%% 결제 히스토리
-    class PaymentGatewayHistory {
+%% 쿠폰
+    class Coupon {
         -Long id
-        -Payment payment
-        -PaymentGatewayType type
-        -String transactionId
-        -String gatewayResponse
+        -String name
+        -CouponType type
+        -Price discountAmount
+        -PercentRate discountPercentage
+        -CouponStatus status
+        +issue(userId: Long) IssuedCoupon
+        +issuable() boolean
+        +calculateDiscountAmount(orderTotalPrice: Price) Price
+    }
+%% 사용자 쿠폰
+    class IssuedCoupon {
+        -Long id
+        -User user
+        -Coupon coupon
+        -IssuedCouponStatus status
+        -LocalDateTime issuedAt
+        +isUsable() boolean
+        +use() void
     }
 
     Product --> ProductAttribute
@@ -398,5 +455,7 @@ classDiagram
     Order --> Payment
     Payment --> PaymentItem
     PaymentItem --> OrderItem
-    Payment --> PaymentGatewayHistory
+    Coupon --> IssuedCoupon
+    IssuedCoupon --> User
+    Order --> IssuedCoupon
 ```

@@ -36,7 +36,7 @@ class UserTest {
 
             // act
             val result = assertThrows<IllegalArgumentException> {
-                aUser().userId(invalidUserId).build()
+                aUser().username(invalidUserId).build()
             }
 
             // assert

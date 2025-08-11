@@ -18,12 +18,12 @@ class PointV1Controller(
 ) : PointV1ApiSpec {
 
     @GetMapping("")
-    override fun getPoint(httpServletRequest: HttpServletRequest): ApiResponse<PointV1Dto.PointResponse> {
+    override fun getPoint(httpServletRequest: HttpServletRequest): ApiResponse<PointV1Dto.PointResultResponse> {
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
-        return pointFacade.getPointBy(userId)
-            ?.let { PointV1Dto.PointResponse.from(it.userId, it.point.value) }
+        return pointFacade.getPoint(userId)
+            ?.let { PointV1Dto.PointDetailResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
 
@@ -31,17 +31,12 @@ class PointV1Controller(
     override fun chargePoint(
         httpServletRequest: HttpServletRequest,
         @RequestBody request: PointV1Dto.ChargeRequest,
-    ): ApiResponse<PointV1Dto.PointResponse> {
+    ): ApiResponse<PointV1Dto.PointResultResponse> {
         val userId = httpServletRequest.getHeader("X-USER-ID")
             ?: throw CoreException(ErrorType.BAD_REQUEST, "X-USER-ID가 존재하지 않습니다.")
 
         return pointFacade.chargePoint(request.toCriteria(userId))
-            ?.let {
-                PointV1Dto.PointResponse.from(
-                    it.userId,
-                    it.point.value,
-                )
-            }
+            .let { PointV1Dto.PointResultResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
 }

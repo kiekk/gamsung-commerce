@@ -18,34 +18,38 @@ class PointPaymentProcessor(
 ) : PaymentProcessor {
 
     @Transactional
-    override fun process(command: PaymentProcessorCommand.Process) {
-        val point =
-            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
-        val payment =
-            paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(
-                ErrorType.NOT_FOUND,
-                "결제 정보를 찾을 수 없습니다.",
-            )
+    override fun pay(command: PaymentProcessorCommand.Pay) {
+        val point = pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "사용자 포인트를 찾을 수 없습니다.",
+        )
+        val payment = paymentRepository.findWithItemsById(command.paymentId) ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "결제 정보를 찾을 수 없습니다.",
+        )
 
-        if (point.cannotUsePoint(Point(payment.totalAmount.value))) {
+        if (point.cannotUsePoint(Point(payment.totalPrice.value))) {
             throw CoreException(ErrorType.BAD_REQUEST, "포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${point.point}")
         }
 
-        point.usePoint(Point(payment.totalAmount.value))
+        point.usePoint(Point(payment.totalPrice.value))
         payment.complete()
     }
 
     @Transactional
     override fun cancel(command: PaymentProcessorCommand.Cancel) {
         val point =
-            pointRepository.findByUserId(command.userId) ?: throw CoreException(ErrorType.NOT_FOUND, "사용자 포인트를 찾을 수 없습니다.")
+            pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(
+                ErrorType.NOT_FOUND,
+                "사용자 포인트를 찾을 수 없습니다.",
+            )
         val payment =
-            paymentRepository.findWithItemsByOrderId(command.paymentId) ?: throw CoreException(
+            paymentRepository.findWithItemsById(command.paymentId) ?: throw CoreException(
                 ErrorType.NOT_FOUND,
                 "결제 정보를 찾을 수 없습니다.",
             )
 
-        point.refundPoint(Point(payment.totalAmount.value))
+        point.refundPoint(Point(payment.totalPrice.value))
         payment.cancel()
     }
 

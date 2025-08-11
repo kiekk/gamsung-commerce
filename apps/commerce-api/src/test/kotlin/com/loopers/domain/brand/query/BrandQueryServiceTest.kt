@@ -98,8 +98,8 @@ class BrandQueryServiceTest @Autowired constructor(
         @Test
         fun findsBrands_whenFilteringByStatus() {
             // arrange
-            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").status(BrandStatusType.ACTIVE).build())
-            brandJpaRepository.save(aBrand().name("비활성브랜드").status(BrandStatusType.INACTIVE).build())
+            val activeBrand = brandJpaRepository.save(aBrand().name("활성브랜드").build())
+            brandJpaRepository.save(aBrand().name("비활성브랜드").build().apply { inactive() })
 
             // act
             val condition = BrandSearchCondition(status = BrandStatusType.ACTIVE)

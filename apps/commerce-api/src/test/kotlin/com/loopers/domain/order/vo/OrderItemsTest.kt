@@ -1,7 +1,7 @@
 package com.loopers.domain.order.vo
 
 import com.loopers.domain.order.OrderItemEntity
-import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
+import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.vo.Price
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
@@ -26,13 +26,11 @@ class OrderItemsTest {
                 anOrderItem()
                     .productId(1L)
                     .productName("Product 1")
-                    .totalPrice(Price(2000L))
                     .amount(Price(1000L))
                     .build(),
                 anOrderItem()
                     .productId(2L)
                     .productName("Product 2")
-                    .totalPrice(Price(1500L))
                     .amount(Price(1500L))
                     .build(),
             )
@@ -43,7 +41,6 @@ class OrderItemsTest {
             // assert
             assertAll(
                 { assertThat(orderItems.size()).isEqualTo(2) },
-                { assertThat(orderItems.totalPrice()).isEqualTo(Price(3500L)) },
                 { assertThat(orderItems.amount()).isEqualTo(Price(2500L)) },
             )
         }
@@ -59,7 +56,6 @@ class OrderItemsTest {
 
             assertAll(
                 { assertThat(orderItems.size()).isZero() },
-                { assertThat(orderItems.totalPrice()).isEqualTo(Price.ZERO) },
                 { assertThat(orderItems.amount()).isEqualTo(Price.ZERO) },
             )
         }

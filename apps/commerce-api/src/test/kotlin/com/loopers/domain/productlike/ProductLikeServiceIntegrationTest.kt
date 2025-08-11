@@ -2,7 +2,10 @@ package com.loopers.domain.productlike
 
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
+import com.loopers.domain.vo.Email
 import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
+import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -13,12 +16,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.dao.OptimisticLockingFailureException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 
 @SpringBootTest
 class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeService: ProductLikeService,
     private val databaseCleanUp: DatabaseCleanUp,
     private val productJpaRepository: ProductJpaRepository,
+    private val productLikeJpaRepository: ProductLikeJpaRepository,
+    private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
     private val userJpaRepository: UserJpaRepository,
 ) {
 
@@ -155,6 +163,308 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 { assertThat(productLikes).isEmpty() },
                 { assertThat(productLikeCount?.productLikeCount).isZero() },
             )
+        }
+    }
+
+    /*
+     **🔗 통합 테스트
+    - [ ] 동일한 상품에 대해 여러명이 좋아요 등록을 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.
+    - [ ] 동일한 상품에 대해 여러명이 좋아요 취소를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.
+    - [ ] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도, 상품의 좋아요는 1번만 등록되어야 한다.
+    - [ ] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도, 상품의 좋아요는 1번만 취소되어야 한다.
+     */
+    @DisplayName("좋아요 등록/취소 동시성 테스트, ")
+    @Nested
+    inner class Concurrency {
+
+        @DisplayName("[비관적 락] 동일한 상품에 대해 여러명이 좋아요 등록을 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
+        @Test
+        fun multipleUsersLikeSameProduct() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            val userIds = mutableListOf<Long>()
+            repeat(numberOfThreads) {
+                val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
+                userIds.add(createdUser.id)
+            }
+
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 0))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.like(ProductLikeCommand.Like(userIds[it], createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount).isNotNull
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(10L)
+        }
+
+        @DisplayName("[비관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
+        @Test
+        fun multipleUsersUnikeSameProduct() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            val userIds = mutableListOf<Long>()
+            repeat(numberOfThreads) {
+                val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
+                productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
+                userIds.add(createdUser.id)
+            }
+
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, userIds.size))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.unlike(ProductLikeCommand.Unlike(userIds[it], createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount).isNotNull
+            assertThat(productLikeCount?.productLikeCount).isZero()
+        }
+
+        @DisplayName("[비관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도, 상품의 좋아요는 1번만 등록되어야 한다.")
+        @Test
+        fun singleUserLikesSameProductMultipleTimes() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.like(ProductLikeCommand.Like(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(1)
+        }
+
+        @DisplayName("[비관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도, 상품의 좋아요는 1번만 취소되어야 한다.")
+        @Test
+        fun singleUserUnlikesSameProductMultipleTimes() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 1))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.unlike(ProductLikeCommand.Unlike(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isZero()
+        }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 등록을 동시에 요청할 때, 충돌이 발생해도 최종 좋아요 수는 정확해야 한다.")
+        @Test
+        fun multipleUsersLikeSameProductWithOptimisticLock() {
+            // given
+            val numberOfThreads = 20
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            val userIds = mutableListOf<Long>()
+            var failureCount = 0
+            var successCount = 0
+
+            repeat(numberOfThreads) {
+                val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
+                userIds.add(createdUser.id)
+            }
+
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 0))
+
+            // when
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.likeOptimistic(ProductLikeCommand.Like(userIds[it], createdProduct.id))
+                        successCount++
+                    } catch (e: OptimisticLockingFailureException) {
+                        println("실패: ${e.message}")
+                        failureCount++
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // then
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
+            println("성공적으로 등록된 좋아요 수: $successCount")
+            println("최종 좋아요 수: ${productLikeCount?.productLikeCount}")
+            assertThat(productLikeCount).isNotNull
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(numberOfThreads - failureCount)
+        }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
+        @Test
+        fun multipleUsersUnikeSameProductWithOptimisticLock() {
+            // arrange
+            val numberOfThreads = 20
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            val userIds = mutableListOf<Long>()
+            var failureCount = 0
+            var successCount = 0
+
+            repeat(numberOfThreads) {
+                val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
+                productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
+                userIds.add(createdUser.id)
+            }
+
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, userIds.size))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.unlikeOptimistic(ProductLikeCommand.Unlike(userIds[it], createdProduct.id))
+                        successCount++
+                    } catch (e: OptimisticLockingFailureException) {
+                        println("실패: ${e.message}")
+                        failureCount++
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
+            println("성공적으로 취소된 좋아요 수: $successCount")
+            println("최종 좋아요 수: ${productLikeCount?.productLikeCount}")
+            assertThat(productLikeCount).isNotNull
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(numberOfThreads - successCount)
+        }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도, 상품의 좋아요는 1번만 등록되어야 한다.")
+        @Test
+        fun singleUserLikesSameProductMultipleTimesWithOptimisticLock() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.likeOptimistic(ProductLikeCommand.Like(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isEqualTo(1)
+        }
+
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도, 상품의 좋아요는 1번만 취소되어야 한다.")
+        @Test
+        fun singleUserUnlikesSameProductMultipleTimesWithOptimisticLock() {
+            // arrange
+            val numberOfThreads = 10
+            val latch = CountDownLatch(numberOfThreads)
+            val executor = Executors.newFixedThreadPool(numberOfThreads)
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
+            productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 1))
+
+            // act
+            repeat(numberOfThreads) {
+                executor.submit {
+                    try {
+                        productLikeService.unlikeOptimistic(ProductLikeCommand.Unlike(createdUser.id, createdProduct.id))
+                    } catch (e: Exception) {
+                        println("실패: ${e.message}")
+                    } finally {
+                        latch.countDown()
+                    }
+                }
+            }
+
+            latch.await()
+
+            // assert
+            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            assertThat(productLikeCount?.productLikeCount).isZero()
         }
     }
 }

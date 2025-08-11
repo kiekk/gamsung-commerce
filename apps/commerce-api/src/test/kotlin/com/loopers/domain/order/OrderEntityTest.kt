@@ -1,7 +1,7 @@
 package com.loopers.domain.order
 
-import com.loopers.domain.order.OrderEntityFixture.Companion.anOrder
-import com.loopers.domain.order.OrderItemEntityFixture.Companion.anOrderItem
+import com.loopers.domain.order.fixture.OrderEntityFixture.Companion.anOrder
+import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
 import com.loopers.domain.vo.Price
 import com.loopers.support.enums.order.OrderStatusType
@@ -34,11 +34,9 @@ class OrderEntityTest {
             order.addItems(
                 listOf(
                     anOrderItem()
-                        .totalPrice(Price(2000))
                         .amount(Price(2000))
                         .build(),
                     anOrderItem()
-                        .totalPrice(Price(3000))
                         .amount(Price(3000))
                         .build(),
                 ),
@@ -64,11 +62,9 @@ class OrderEntityTest {
             order.addItems(
                 listOf(
                     anOrderItem()
-                        .totalPrice(Price(2000))
                         .amount(Price(2000))
                         .build(),
                     anOrderItem()
-                        .totalPrice(Price(3000))
                         .amount(Price(3000))
                         .build(),
                 ),
@@ -89,11 +85,9 @@ class OrderEntityTest {
             order.addItems(
                 listOf(
                     anOrderItem()
-                        .totalPrice(Price(2000))
                         .amount(Price(2000))
                         .build(),
                     anOrderItem()
-                        .totalPrice(Price(3000))
                         .amount(Price(3000))
                         .build(),
                 ),
@@ -116,11 +110,9 @@ class OrderEntityTest {
             order.addItems(
                 listOf(
                     anOrderItem()
-                        .totalPrice(Price(2000))
                         .amount(Price(2000))
                         .build(),
                     anOrderItem()
-                        .totalPrice(Price(3000))
                         .amount(Price(3000))
                         .build(),
                 ),
