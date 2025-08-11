@@ -1,4 +1,4 @@
-package com.loopers.domain.order.vo
+package com.loopers.domain.vo
 
 @JvmInline
 value class Quantity(

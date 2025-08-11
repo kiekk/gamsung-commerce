@@ -13,24 +13,25 @@ import jakarta.persistence.Table
 class BrandEntity(
     @Column(unique = true)
     val name: String,
-    @Enumerated(EnumType.STRING)
-    var status: BrandStatusType,
 ) : BaseEntity() {
+    @Enumerated(EnumType.STRING)
+    var status: BrandStatusType
 
     init {
         !name.matches(BRAND_NAME_REGEX) && throw IllegalArgumentException("브랜드명은 한글, 영문, 숫자 20자 이내로 입력해야 합니다.")
+        status = BrandStatusType.ACTIVE
     }
 
     fun active() {
-        this.status = BrandStatusType.ACTIVE
+        status = BrandStatusType.ACTIVE
     }
 
     fun inactive() {
-        this.status = BrandStatusType.INACTIVE
+        status = BrandStatusType.INACTIVE
     }
 
     fun close() {
-        this.status = BrandStatusType.CLOSED
+        status = BrandStatusType.CLOSED
     }
 
     companion object {

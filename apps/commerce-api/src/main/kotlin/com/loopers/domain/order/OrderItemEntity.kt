@@ -17,9 +17,6 @@ class OrderItemEntity(
     val productId: Long,
     productName: String,
     @Embedded
-    @AttributeOverride(name = "value", column = Column("total_price"))
-    val totalPrice: Price,
-    @Embedded
     @AttributeOverride(name = "value", column = Column("amount"))
     val amount: Price,
 ) : BaseEntity() {

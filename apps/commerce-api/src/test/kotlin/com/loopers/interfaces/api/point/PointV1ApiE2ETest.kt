@@ -67,7 +67,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, httpEntity, responseType)
 
             // assert
@@ -115,7 +115,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity(requestBody, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_CHARGE, HttpMethod.POST, httpEntity, responseType)
 
             // assert
@@ -139,7 +139,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             val httpEntity = HttpEntity(requestBody, httpHeaders)
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_CHARGE, HttpMethod.POST, httpEntity, responseType)
 
             // assert

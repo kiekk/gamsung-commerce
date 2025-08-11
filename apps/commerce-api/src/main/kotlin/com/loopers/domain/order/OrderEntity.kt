@@ -22,9 +22,12 @@ class OrderEntity(
     val userId: Long,
     @Embedded
     val orderCustomer: OrderCustomer,
+    @Embedded
+    var discountPrice: Price = Price.ZERO,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private val _orderItems: MutableList<OrderItemEntity> = mutableListOf(),
 ) : BaseEntity() {
+    val issuedCouponId: Long? = null
     val orderItems: OrderItems
         get() = OrderItems(_orderItems)
 
@@ -33,12 +36,12 @@ class OrderEntity(
 
     @Embedded
     @AttributeOverride(name = "value", column = Column("total_price"))
-    var totalPrice: Price = orderItems.totalPrice()
+    var totalPrice: Price = Price.ZERO
         private set
 
     @Embedded
     @AttributeOverride(name = "value", column = Column("amount"))
-    var amount: Price = orderItems.amount()
+    var amount: Price = Price.ZERO
         private set
 
     fun complete() {
@@ -51,7 +54,7 @@ class OrderEntity(
 
     fun addItems(orderItems: List<OrderItemEntity>) {
         _orderItems.addAll(orderItems)
-        totalPrice = this.orderItems.totalPrice()
-        amount = this.orderItems.amount()
+        totalPrice = this.orderItems.amount()
+        amount = Price(this.orderItems.amount().value - discountPrice.value)
     }
 }

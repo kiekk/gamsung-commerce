@@ -42,7 +42,6 @@ class BrandServiceIntegrationTest @Autowired constructor(
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
-                BrandStatusType.ACTIVE,
             )
             brandService.createBrand(brandCreateCommand)
 
@@ -64,7 +63,6 @@ class BrandServiceIntegrationTest @Autowired constructor(
             // arrange
             val brandCreateCommand = BrandCommand.Create(
                 "브랜드A",
-                BrandStatusType.ACTIVE,
             )
 
             // act
@@ -74,7 +72,7 @@ class BrandServiceIntegrationTest @Autowired constructor(
             assertAll(
                 { assertThat(createdBrand.id).isNotNull() },
                 { assertThat(createdBrand.name).isEqualTo(brandCreateCommand.name) },
-                { assertThat(createdBrand.status).isEqualTo(brandCreateCommand.status) },
+                { assertThat(createdBrand.status).isEqualTo(BrandStatusType.ACTIVE) },
             )
         }
     }

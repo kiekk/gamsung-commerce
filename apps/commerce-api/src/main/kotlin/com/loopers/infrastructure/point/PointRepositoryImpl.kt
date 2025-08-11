@@ -15,4 +15,8 @@ class PointRepositoryImpl(
     override fun findByUserId(userId: Long): PointEntity? {
         return pointJpaRepository.findByUserId(userId)
     }
+
+    override fun findByUserIdWithLock(userId: Long): PointEntity? {
+        return pointJpaRepository.findByUserIdWithLock(userId)
+    }
 }

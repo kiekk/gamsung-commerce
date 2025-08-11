@@ -40,7 +40,6 @@ class ProductEntityTest {
                     invalidProductName,
                     "Valid description.",
                     Price(1000L),
-                    ProductStatusType.ACTIVE,
                 )
             }
 
@@ -64,7 +63,6 @@ class ProductEntityTest {
                     "상품A",
                     longDescription,
                     Price(1000L),
-                    ProductStatusType.ACTIVE,
                 )
             }
 
@@ -90,7 +88,6 @@ class ProductEntityTest {
                 productName,
                 description,
                 Price(1000L),
-                ProductStatusType.ACTIVE,
             )
 
             // assert
