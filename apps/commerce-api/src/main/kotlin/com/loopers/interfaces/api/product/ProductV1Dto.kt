@@ -13,12 +13,14 @@ class ProductV1Dto {
         var name: String? = null,
         var minPrice: BigDecimal? = null,
         var maxPrice: BigDecimal? = null,
+        var brandId: Long? = null,
     ) {
         fun toCriteria(): ProductSearchCondition {
             return ProductSearchCondition(
                 name,
                 minPrice,
                 maxPrice,
+                brandId,
             )
         }
     }
