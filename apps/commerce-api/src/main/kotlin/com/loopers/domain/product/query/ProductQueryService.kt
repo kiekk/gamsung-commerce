@@ -25,6 +25,9 @@ class ProductQueryService(
 
         // 조건 where 절 구성
         val predicate = BooleanBuilder().apply {
+            condition.brandId?.let {
+                and(product.brandId.eq(it))
+            }
             condition.name?.let {
                 and(product.name.lower().like("${it.lowercase()}%"))
             }
