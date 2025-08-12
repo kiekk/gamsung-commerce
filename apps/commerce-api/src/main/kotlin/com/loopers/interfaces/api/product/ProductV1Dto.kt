@@ -2,10 +2,27 @@ package com.loopers.interfaces.api.product
 
 import com.loopers.application.product.ProductCriteria
 import com.loopers.application.product.ProductInfo
+import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.vo.Price
 import com.loopers.support.enums.product.ProductStatusType
+import java.math.BigDecimal
 
 class ProductV1Dto {
+
+    data class SearchRequest(
+        var name: String? = null,
+        var minPrice: BigDecimal? = null,
+        var maxPrice: BigDecimal? = null,
+    ) {
+        fun toCriteria(): ProductSearchCondition {
+            return ProductSearchCondition(
+                name,
+                minPrice,
+                maxPrice,
+            )
+        }
+    }
+
     data class CreateRequest(
         val brandId: Long,
         val name: String,
@@ -65,6 +82,28 @@ class ProductV1Dto {
                     productDetail.productStatus,
                     productDetail.productPrice,
                     productDetail.productLikeCount,
+                )
+            }
+        }
+    }
+
+    data class ProductListResponse(
+        val id: Long,
+        val productName: String,
+        val productPrice: Long,
+        val productStatus: ProductStatusType,
+        val brandName: String,
+        val productLikeCount: Int,
+    ) {
+        companion object {
+            fun from(product: ProductInfo.ProductList): ProductListResponse {
+                return ProductListResponse(
+                    product.id,
+                    product.productName,
+                    product.productPrice,
+                    product.productStatus,
+                    product.brandName,
+                    product.productLikeCount,
                 )
             }
         }

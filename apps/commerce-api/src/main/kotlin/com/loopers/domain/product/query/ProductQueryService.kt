@@ -3,6 +3,7 @@ package com.loopers.domain.product.query
 import com.loopers.domain.brand.QBrandEntity
 import com.loopers.domain.product.QProductEntity
 import com.loopers.domain.productlike.QProductLikeCountEntity
+import com.loopers.domain.productlike.QProductLikeEntity
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.querydsl.core.BooleanBuilder
@@ -79,6 +80,42 @@ class ProductQueryService(
             .join(brand).on(product.brandId.eq(brand.id))
             .leftJoin(likeCount).on(product.id.eq(likeCount.productId))
             .where(predicate)
+            .fetchOne() ?: 0L
+
+        return PageImpl(productListViewModels, pageable, totalCount)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchProductsByCountQuery(pageable: Pageable): Page<ProductListViewModel> {
+        val product = QProductEntity.productEntity
+        val brand = QBrandEntity.brandEntity
+        val productLike = QProductLikeEntity.productLikeEntity
+
+        // 목록 조회
+        val productListViewModels = queryFactory
+            .select(
+                QProductListViewModel(
+                    product.id,
+                    product.name,
+                    product.price.value,
+                    product.status,
+                    brand.name,
+                    productLike.id.count().intValue(), // COUNT(pl.id)
+                    product.createdAt,
+                ),
+            )
+            .from(product)
+            .join(brand).on(brand.id.eq(product.brandId))
+            .leftJoin(productLike).on(productLike.productId.eq(product.id))
+            .groupBy(product.id)
+            .fetch()
+
+        // 전체 개수 조회
+        val totalCount = queryFactory
+            .select(product.count())
+            .from(product)
+            .join(brand).on(product.brandId.eq(brand.id))
+            .leftJoin(productLike).on(productLike.productId.eq(product.id))
             .fetchOne() ?: 0L
 
         return PageImpl(productListViewModels, pageable, totalCount)
