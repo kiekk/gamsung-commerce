@@ -5,6 +5,8 @@ import com.loopers.interfaces.api.ApiResponse
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -36,4 +38,25 @@ class ProductV1Controller(
             .let { ProductV1Dto.ProductDetailResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
+
+    @GetMapping("")
+    override fun getProducts(
+        request: ProductV1Dto.SearchRequest,
+        pageable: Pageable,
+    ): ApiResponse<Page<ProductV1Dto.ProductListResponse>> {
+        return productFacade.searchProducts(request.toCriteria(), pageable)
+            .map { ProductV1Dto.ProductListResponse.from(it) }
+            .let { ApiResponse.success(it) }
+    }
+
+    @GetMapping("count-query")
+    override fun getProductsByCountQuery(
+        request: ProductV1Dto.SearchRequest,
+        pageable: Pageable,
+    ): ApiResponse<Page<ProductV1Dto.ProductListResponse>> {
+        return productFacade.searchProductsByCountQuery(pageable)
+            .map { ProductV1Dto.ProductListResponse.from(it) }
+            .let { ApiResponse.success(it) }
+    }
+
 }

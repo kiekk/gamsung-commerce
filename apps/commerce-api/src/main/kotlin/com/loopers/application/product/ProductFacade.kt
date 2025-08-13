@@ -56,4 +56,13 @@ class ProductFacade(
         }
         return PageImpl(productList, pageable, searchProductsPage.totalElements)
     }
+
+    @Transactional(readOnly = true)
+    fun searchProductsByCountQuery(pageable: Pageable): Page<ProductInfo.ProductList> {
+        val searchProductsPage = productQueryService.searchProductsByCountQuery(pageable)
+        val productList = searchProductsPage.content.map { productListViewModel ->
+            ProductInfo.ProductList.from(productListViewModel)
+        }
+        return PageImpl(productList, pageable, searchProductsPage.totalElements)
+    }
 }

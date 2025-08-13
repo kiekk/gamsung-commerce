@@ -6,6 +6,7 @@ class ProductSearchCondition(
     var name: String? = null,
     var minPrice: BigDecimal? = null,
     var maxPrice: BigDecimal? = null,
+    var brandId: Long? = null,
 ) {
 
     init {
