@@ -30,7 +30,7 @@ class ProductQueryService(
                 and(product.brandId.eq(it))
             }
             condition.name?.let {
-                and(product.name.lower().like("${it.lowercase()}%"))
+                and(product.name.like("${it}%"))
             }
             condition.minPrice?.let {
                 and(product.price.value.goe(it))
