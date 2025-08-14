@@ -1,7 +1,9 @@
 package com.loopers.domain.brand
 
+import com.loopers.support.config.cache.CacheConfig.CacheNames.BRAND_DETAIL
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,6 +24,7 @@ class BrandService(
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = [BRAND_DETAIL], key = "#brandId", unless = "#result == null")
     fun findBrandBy(brandId: Long): BrandEntity? {
         return brandRepository.findById(brandId)
     }

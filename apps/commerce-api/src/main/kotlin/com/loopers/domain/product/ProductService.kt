@@ -1,7 +1,9 @@
 package com.loopers.domain.product
 
+import com.loopers.support.config.cache.CacheConfig.CacheNames.PRODUCT_DETAIL
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,6 +20,7 @@ class ProductService(
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = [PRODUCT_DETAIL], key = "#id", unless = "#result == null")
     fun findProductBy(id: Long): ProductEntity? {
         return productRepository.findById(id)
     }

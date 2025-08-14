@@ -38,6 +38,7 @@ class ProductFacade(
     }
 
     @Transactional(readOnly = true)
+//    @Cacheable(value = [PRODUCT_FACADE_DETAIL], key = "#id", unless = "#result == null")
     fun getProduct(id: Long): ProductInfo.ProductDetail {
         val product = productService.findProductBy(id) ?: throw CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. $id")
         val brand = brandService.findBrandBy(product.brandId) ?: throw CoreException(
