@@ -19,6 +19,7 @@ import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -39,11 +40,13 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val databaseCleanUp: DatabaseCleanUp,
     private val productLikeJpaRepository: ProductLikeJpaRepository,
     private val productJpaRepository: ProductJpaRepository,
+    private val redisCleanUp: RedisCleanUp,
 ) {
 
     @AfterEach
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
+        redisCleanUp.truncateAll()
     }
 
     /*

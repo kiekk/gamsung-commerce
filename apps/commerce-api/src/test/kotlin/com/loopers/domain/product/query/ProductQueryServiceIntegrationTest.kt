@@ -42,6 +42,7 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
     - [ ] 상품 목록은 페이지 번호와 페이지 크기를 기준으로 조회할 수 있다.
     - [ ] 상품 목록은 상품명으로 부분 일치 (Like) 검색할 수 있으며 대소문자를 구분하지 않는다.
     - [ ] 상품 목록은 가격 범위로 검색할 수 있다.
+    - [ ] 상품 목록은 브랜드 ID로 검색할 수 있다.
     - [ ] 상품명과 일치하는 상품 목록이 없을 경우 빈 목록을 반환한다.
     - [ ] 상품 목록은 가격 오름차순으로 정렬할 수 있다.
     - [ ] 상품 목록은 가격 내림차순으로 정렬할 수 있다.
@@ -113,6 +114,28 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
                 { assertThat(productsPage.content[0].name).isEqualTo(createdProduct1.name) },
                 { assertThat(productsPage.content[0].price).isEqualTo(createdProduct1.price.value) },
                 { assertThat(productsPage.content[0].productStatus).isEqualTo(createdProduct1.status) },
+            )
+        }
+
+        @DisplayName("상품 목록은 브랜드 ID로 검색할 수 있다.")
+        @Test
+        fun returnsProductsByBrandId() {
+            // arrange
+            val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
+            val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
+            val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand1.id).name("상품A").build())
+            productJpaRepository.save(aProduct().brandId(createdBrand2.id).name("상품B").build())
+
+            // act
+            val pageRequest = PageRequest.of(0, 10)
+            val productsPage = productQueryService.searchProducts(ProductSearchCondition(brandId = createdBrand1.id), pageRequest)
+
+            // assert
+            assertAll(
+                { assertThat(productsPage).hasSize(1) },
+                { assertThat(productsPage.totalElements).isEqualTo(1) },
+                { assertThat(productsPage.content[0].brandName).isEqualTo(createdBrand1.name) },
+                { assertThat(productsPage.content[0].name).isEqualTo(createdProduct1.name) },
             )
         }
 

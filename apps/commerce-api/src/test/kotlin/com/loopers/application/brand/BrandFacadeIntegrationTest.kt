@@ -8,6 +8,7 @@ import com.loopers.support.enums.brand.BrandStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -26,11 +27,13 @@ class BrandFacadeIntegrationTest @Autowired constructor(
     private val brandJpaRepository: BrandJpaRepository,
     private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
+    private val redisCreate: RedisCleanUp,
 ) {
 
     @AfterEach
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
+        redisCreate.truncateAll()
     }
 
     /*

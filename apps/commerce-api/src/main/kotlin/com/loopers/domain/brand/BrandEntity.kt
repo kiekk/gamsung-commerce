@@ -34,6 +34,10 @@ class BrandEntity(
         status = BrandStatusType.CLOSED
     }
 
+    override fun toString(): String {
+        return "BrandEntity(id=$id, name=$name, status=$status, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+
     companion object {
         private val BRAND_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
     }
