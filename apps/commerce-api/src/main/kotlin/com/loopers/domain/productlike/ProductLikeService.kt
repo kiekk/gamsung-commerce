@@ -1,7 +1,5 @@
 package com.loopers.domain.productlike
 
-import com.loopers.support.config.cache.CacheConfig.CacheNames.PRODUCT_LIKE_COUNT
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -72,7 +70,6 @@ class ProductLikeService(
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = [PRODUCT_LIKE_COUNT], key = "#productId", unless = "#result == null")
     fun getProductLikeCount(productId: Long): ProductLikeCountEntity? {
         return productLikeCountRepository.findByProductId(productId)
     }
