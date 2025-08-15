@@ -1,4 +1,4 @@
-SET SESSION cte_max_recursion_depth = 100;
+SET SESSION cte_max_recursion_depth = 200;
 
 -- brand 테이블에 더미 데이터 삽입
 INSERT INTO brand (created_at, deleted_at, updated_at, name, status)
@@ -7,7 +7,7 @@ WITH RECURSIVE cte (n) AS
                     UNION ALL
                     SELECT n + 1
                     FROM cte
-                    WHERE n < 100 -- 생성하고 싶은 더미 데이터의 개수
+                    WHERE n < 200 -- 생성하고 싶은 더미 데이터의 개수
                    )
 SELECT TIMESTAMP(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 3650 + 1) DAY) +
                  INTERVAL FLOOR(RAND() * 86400) SECOND) AS created_at, -- 최근 10년 내의 임의의 날짜와 시간 생성
