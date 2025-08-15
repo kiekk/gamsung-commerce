@@ -1,4 +1,4 @@
-SET SESSION cte_max_recursion_depth = 100000;
+SET SESSION cte_max_recursion_depth = 1000000;
 
 -- product 테이블에 더미 데이터 삽입
 INSERT INTO product (brand_id, created_at, deleted_at, price, updated_at, description, name, status)
@@ -7,9 +7,9 @@ WITH RECURSIVE cte (n) AS
                     UNION ALL
                     SELECT n + 1
                     FROM cte
-                    WHERE n < 100000 -- 생성하고 싶은 더미 데이터의 개수
+                    WHERE n < 1000000 -- 생성하고 싶은 더미 데이터의 개수
                    )
-SELECT FLOOR((n - 1) / 5000) + 1                      AS brand_id,    -- 5천건당 brandId가 1씩 증가
+SELECT FLOOR((n - 1) / 50000) + 1                      AS brand_id,    -- 5만건당 brandId가 1씩 증가
        TIMESTAMP(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 3650 + 1) DAY) +
                  INTERVAL FLOOR(RAND() * 86400) SECOND) AS created_at,  -- 최근 10년 내의 임의의 날짜와 시간 생성
        NULL                                             AS deleted_at,  -- deleted_at은 NULL로 설정
