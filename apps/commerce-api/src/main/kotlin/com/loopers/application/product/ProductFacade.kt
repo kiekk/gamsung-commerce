@@ -59,7 +59,7 @@ class ProductFacade(
     @Transactional(readOnly = true)
     fun searchProducts(condition: ProductSearchCondition, pageable: Pageable): Page<ProductInfo.ProductList> {
         // 페이지네이션과 정렬이 캐시 가능한지 확인
-        val cacheable = ProductListCachePolicy.isCacheable(pageable)
+        val cacheable = ProductListCachePolicy.isCacheable(condition, pageable)
         val cacheKey = if (cacheable) {
             ProductListCachePolicy.buildCacheKey(pageable, Duration.ofMinutes(3))
         } else null

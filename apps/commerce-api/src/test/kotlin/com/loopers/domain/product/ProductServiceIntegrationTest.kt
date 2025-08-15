@@ -1,6 +1,5 @@
 package com.loopers.domain.product
 
-import com.loopers.domain.brand.BrandService
 import com.loopers.domain.brand.fixture.BrandEntityFixture.Companion.aBrand
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.vo.Price
@@ -10,6 +9,7 @@ import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -23,15 +23,16 @@ import kotlin.test.Test
 @SpringBootTest
 class ProductServiceIntegrationTest @Autowired constructor(
     private val productService: ProductService,
-    private val brandService: BrandService,
     private val productJpaRepository: ProductJpaRepository,
     private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
+    private val redisCleanUp: RedisCleanUp,
 ) {
 
     @AfterEach
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
+        redisCleanUp.truncateAll()
     }
 
     /*

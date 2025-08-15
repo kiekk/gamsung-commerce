@@ -1,5 +1,6 @@
 package com.loopers.support.cache.policy
 
+import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.support.cache.CacheKey
 import com.loopers.support.cache.CacheNames
 import org.springframework.data.domain.Pageable
@@ -11,8 +12,9 @@ import java.time.Duration
 object ProductListCachePolicy {
     private val ALLOWED_SORT_PROPERTIES = setOf("name", "price", "createdAt", "likeCount")
 
-    // page 0,1만 캐시 & 정렬 허용 체크
-    fun isCacheable(pageable: Pageable): Boolean {
+    // page 0,1만 캐시 & 정렬 허용 체크, 검색 조건이 없을 때만 캐시 가능
+    fun isCacheable(condition: ProductSearchCondition, pageable: Pageable): Boolean {
+        if (!condition.isEmpty()) return false
         if (pageable.pageNumber !in 0..1) return false
         val sortAllowed = pageable.sort == Sort.unsorted() ||
                 pageable.sort.map { it.property }.all { it in ALLOWED_SORT_PROPERTIES }

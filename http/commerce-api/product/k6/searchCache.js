@@ -3,7 +3,7 @@ import { check, sleep } from 'k6';
 
 export let options = {
     stages: [
-        { duration: '2s', target: 1 },   // 워밍업: 1 VU로 10초
+        { duration: '2s', target: 1 },   // 워밍업: 1 VU로 2초
         { duration: '30s', target: 100 }, // 본 테스트: 100 VU로 30초
     ]
 };

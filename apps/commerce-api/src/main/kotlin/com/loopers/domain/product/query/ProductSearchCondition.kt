@@ -21,6 +21,10 @@ class ProductSearchCondition(
         }
     }
 
+    fun isEmpty(): Boolean {
+        return name.isNullOrBlank() && minPrice == null && maxPrice == null && brandId == null
+    }
+
     companion object {
         private val PRODUCT_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
     }
