@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import org.slf4j.LoggerFactory
 
 object DataSerializer {
@@ -13,6 +14,7 @@ object DataSerializer {
     private fun initialize(): ObjectMapper {
         return ObjectMapper()
             .registerModule(JavaTimeModule())
+            .registerModule(kotlinModule())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
