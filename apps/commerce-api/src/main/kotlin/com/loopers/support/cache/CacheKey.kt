@@ -11,7 +11,7 @@ object CacheNames {
 class CacheKey(
     val prefix: String,
     val key: String,
-    val ttl: Duration = Duration.ofSeconds(10), // TTL 10초는 실제 운영에 적용하기에는 매우 짧지만 테스용으로 설정
+    val ttl: Duration = Duration.ofMinutes(10), // Jitter 확인을 위해 10s -> 10m로 변경
 ) {
 
     fun fullKey(): String {
