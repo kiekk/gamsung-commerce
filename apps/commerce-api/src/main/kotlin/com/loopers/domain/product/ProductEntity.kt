@@ -37,6 +37,10 @@ class ProductEntity(
         status = ProductStatusType.INACTIVE
     }
 
+    override fun toString(): String {
+        return "ProductEntity(id=$id, brandId=$brandId, name='$name', description=$description, price=$price, status=$status, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+
     companion object {
         private val PRODUCT_NAME_REGEX = "^[가-힣a-zA-Z0-9]{1,20}$".toRegex()
         private val PRODUCT_DESCRIPTION_REGEX = "^.{0,100}$".toRegex()

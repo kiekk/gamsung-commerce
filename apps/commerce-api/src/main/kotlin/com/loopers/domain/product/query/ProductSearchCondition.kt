@@ -6,6 +6,7 @@ class ProductSearchCondition(
     var name: String? = null,
     var minPrice: BigDecimal? = null,
     var maxPrice: BigDecimal? = null,
+    var brandId: Long? = null,
 ) {
 
     init {
@@ -18,6 +19,10 @@ class ProductSearchCondition(
         maxPrice?.let {
             require(it >= BigDecimal.ZERO) { "최대 가격은 0 이상이어야 합니다." }
         }
+    }
+
+    fun isEmpty(): Boolean {
+        return name.isNullOrBlank() && minPrice == null && maxPrice == null && brandId == null
     }
 
     companion object {
