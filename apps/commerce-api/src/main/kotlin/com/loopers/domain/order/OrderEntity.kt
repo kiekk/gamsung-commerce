@@ -57,4 +57,8 @@ class OrderEntity(
         totalPrice = this.orderItems.amount()
         amount = Price(this.orderItems.amount().value - discountPrice.value)
     }
+
+    fun equalAmount(totalPrice: Price): Boolean {
+        return amount != totalPrice
+    }
 }

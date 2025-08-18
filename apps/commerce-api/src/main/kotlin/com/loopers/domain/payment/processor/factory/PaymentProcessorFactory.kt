@@ -1,5 +1,6 @@
 package com.loopers.domain.payment.processor.factory
 
+import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.processor.PaymentProcessor
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import org.springframework.stereotype.Component
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component
 class PaymentProcessorFactory(
     private val processors: List<PaymentProcessor>,
 ) {
-    fun pay(command: PaymentProcessorCommand.Pay) {
+    fun pay(command: PaymentProcessorCommand.Pay): PaymentEntity {
         return processors.find { it.supports(command.paymentMethod) }?.pay(command)
             ?: throw IllegalArgumentException("지원하지 않는 결제 방법입니다: ${command.paymentMethod}")
     }

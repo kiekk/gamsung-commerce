@@ -16,6 +16,7 @@ class PaymentCommand {
         fun toPaymentEntity(): PaymentEntity {
             return PaymentEntity(
                 orderId,
+                1L,
                 method,
                 totalPrice,
             )

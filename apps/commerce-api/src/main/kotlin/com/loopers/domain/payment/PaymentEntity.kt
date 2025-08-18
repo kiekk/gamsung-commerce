@@ -14,6 +14,7 @@ import jakarta.persistence.Table
 @Table(name = "payment")
 class PaymentEntity(
     val orderId: Long,
+    val userId: Long,
     @Enumerated(EnumType.STRING)
     val method: PaymentMethodType,
     @Embedded

@@ -4,7 +4,6 @@ import com.loopers.domain.coupon.IssuedCouponDiscountAmountCalculator
 import com.loopers.domain.coupon.IssuedCouponService
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.order.OrderTotalPriceCalculator
-import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentService
 import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
@@ -66,15 +65,13 @@ class OrderFacade(
         )
 
         val createdOrder = orderService.createOrder(criteria.toOrderCommand(user.id, products, discountAmount))
-        val createdPayment = paymentService.createPayment(
-            PaymentCommand.Create(createdOrder.id, criteria.paymentMethodType, createdOrder.amount),
-        )
 
-        paymentProcessorFactory.pay(
+        val createdPayment = paymentProcessorFactory.pay(
             PaymentProcessorCommand.Pay(
+                createdOrder.id,
                 user.id,
-                createdPayment.id,
-                createdPayment.method,
+                criteria.paymentMethodType,
+                createdOrder.amount,
             ),
         )
 
