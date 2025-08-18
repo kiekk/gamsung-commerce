@@ -14,6 +14,7 @@ import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -38,12 +39,13 @@ class OrderV1ApiE2ETest @Autowired constructor(
     private val stockJpaRepository: StockJpaRepository,
     private val pointJpaRepository: PointJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
-    jpaRepository: StockJpaRepository,
+    private val redisCleanUp: RedisCleanUp,
 ) {
 
     @AfterEach
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
+        redisCleanUp.truncateAll()
     }
 
     companion object {
