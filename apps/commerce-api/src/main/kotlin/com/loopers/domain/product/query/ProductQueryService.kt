@@ -30,7 +30,7 @@ class ProductQueryService(
                 and(product.brandId.eq(it))
             }
             condition.name?.let {
-                and(product.name.like("${it}%"))
+                and(product.name.like("$it%"))
             }
             condition.minPrice?.let {
                 and(product.price.value.goe(it))
@@ -100,7 +100,7 @@ class ProductQueryService(
                     product.price.value,
                     product.status,
                     brand.name,
-                    productLike.id.count().intValue(), // COUNT(pl.id)
+                    productLike.id.count().intValue(),
                     product.createdAt,
                 ),
             )

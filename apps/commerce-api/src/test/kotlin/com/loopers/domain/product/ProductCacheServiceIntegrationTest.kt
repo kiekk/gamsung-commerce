@@ -55,7 +55,6 @@ class ProductCacheServiceIntegrationTest @Autowired constructor(
 
         @DisplayName("상품 상세 조회 시 캐시가 만료되면 다시 DB를 조회한다.")
         @Test
-        // 메서드명은 영어로
         fun getProductById_CacheMiss() {
             // arrange
             val createdProduct = productJpaRepository.save(aProduct().build())

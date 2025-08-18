@@ -20,7 +20,12 @@ private class CacheRedisRepository(
     override fun <T> set(cacheKey: CacheKey, value: T) {
         runCatching {
             val jitteredTtl = jitteredTtl(cacheKey.ttl)
-            log.info("[jitteredTtl] key: ${cacheKey.fullKey()}, baseTTL: ${cacheKey.ttl.toMillis()}, jitteredTTL: ${jitteredTtl.toMillis()}")
+            log.info(
+                "[jitteredTtl] key: {}, baseTTL: {}, jitteredTTL: {}",
+                cacheKey.fullKey(),
+                cacheKey.ttl.toMillis(),
+                jitteredTtl.toMillis(),
+            )
             DataSerializer.serialize(value)?.let {
                 redisTemplate.opsForValue().set(cacheKey.fullKey(), it, jitteredTtl)
             }
@@ -53,5 +58,4 @@ private class CacheRedisRepository(
         private val JITTER_PERCENTAGE = 0.15 // ±15%의 지터를 추가하여 TTL을 설정합니다.
         private val MINIMUM_TTL_MINUTES = Duration.ofMinutes(5) // 최소 TTL은 5분으로 설정합니다.
     }
-
 }
