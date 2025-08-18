@@ -58,5 +58,4 @@ class ProductV1Controller(
             .map { ProductV1Dto.ProductListResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
-
 }
