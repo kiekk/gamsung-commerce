@@ -16,6 +16,7 @@ class OrderCommand {
         val ordererAddress: Address,
         val orderItems: List<OrderItemCommand>,
         val discountAmount: Long = 0L,
+        val issuedCouponId: Long? = null,
     ) {
 
         init {
@@ -44,6 +45,7 @@ class OrderCommand {
                     ordererAddress,
                 ),
                 Price(discountAmount),
+                issuedCouponId = issuedCouponId,
             )
         }
 

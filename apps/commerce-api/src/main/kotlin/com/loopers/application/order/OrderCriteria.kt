@@ -44,6 +44,7 @@ class OrderCriteria {
                 ordererAddress,
                 orderItems.map { it.toOrderItemCommand(products) },
                 discountAmount,
+                issuedCouponId,
             )
         }
 
