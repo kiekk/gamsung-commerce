@@ -52,13 +52,21 @@ class OrderEntity(
         orderStatus = OrderStatusType.CANCELED
     }
 
+    fun fail() {
+        orderStatus = OrderStatusType.FAILED
+    }
+
     fun addItems(orderItems: List<OrderItemEntity>) {
         _orderItems.addAll(orderItems)
         totalPrice = this.orderItems.amount()
         amount = Price(this.orderItems.amount().value - discountPrice.value)
     }
 
-    fun equalAmount(totalPrice: Price): Boolean {
+    fun isNotEqualAmount(totalPrice: Price): Boolean {
         return amount != totalPrice
+    }
+
+    fun isCompleted(): Boolean {
+        return orderStatus == OrderStatusType.COMPLETED
     }
 }

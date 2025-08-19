@@ -32,7 +32,7 @@ class PointPaymentProcessor(
             "주문 정보를 찾을 수 없습니다.",
         )
 
-        if (order.equalAmount(command.totalPrice)) {
+        if (order.isNotEqualAmount(command.totalPrice)) {
             throw CoreException(
                 ErrorType.BAD_REQUEST,
                 "주문 총액과 결제 금액이 일치하지 않습니다. 주문 총액: ${order.amount.value}, 결제 금액: ${command.totalPrice.value}",
