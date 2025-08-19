@@ -4,7 +4,6 @@ import com.loopers.domain.BaseEntityWithoutId
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import jakarta.persistence.Version
 
 @Entity
 @Table(name = "stock")
@@ -13,9 +12,6 @@ class StockEntity(
     val productId: Long = 0L,
     var quantity: Int,
 ) : BaseEntityWithoutId() {
-
-    @Version
-    var version: Long? = null
 
     init {
         require(productId > 0) { "상품 ID는 1 이상이어야 합니다." }
