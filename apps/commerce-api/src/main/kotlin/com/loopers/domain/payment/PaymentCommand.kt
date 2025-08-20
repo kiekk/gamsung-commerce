@@ -4,9 +4,10 @@ import com.loopers.domain.vo.Price
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class PaymentCommand {
-    data class Create(
+    data class Pay(
         val orderId: Long,
-        val method: PaymentMethodType,
+        val userId: Long,
+        val paymentMethod: PaymentMethodType,
         val totalPrice: Price,
     ) {
         init {
@@ -16,10 +17,16 @@ class PaymentCommand {
         fun toPaymentEntity(): PaymentEntity {
             return PaymentEntity(
                 orderId,
-                1L,
-                method,
+                userId,
+                paymentMethod,
                 totalPrice,
             )
         }
     }
+
+    data class Cancel(
+        val userId: Long,
+        val paymentId: Long,
+        val paymentMethod: PaymentMethodType,
+    )
 }

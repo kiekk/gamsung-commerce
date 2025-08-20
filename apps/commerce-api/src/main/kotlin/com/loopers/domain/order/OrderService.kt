@@ -1,5 +1,8 @@
 package com.loopers.domain.order
 
+import com.loopers.application.order.OrderValidator
+import com.loopers.domain.coupon.IssuedCouponDiscountAmountCalculator
+import com.loopers.domain.product.ProductRepository
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.springframework.stereotype.Service
@@ -7,12 +10,25 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderService(
+    private val orderValidator: OrderValidator,
     private val orderRepository: OrderRepository,
+    private val productRepository: ProductRepository,
+    private val issuedCouponDiscountAmountCalculator: IssuedCouponDiscountAmountCalculator,
 ) {
+    private val orderTotalPriceCalculator: OrderTotalPriceCalculator = OrderTotalPriceCalculator()
+
     @Transactional
     fun createOrder(command: OrderCommand.Create): OrderEntity {
-        val order = command.toOrderEntity()
-        order.addItems(command.toOrderItemEntities(order))
+        orderValidator.validate(command)
+
+        val products = productRepository.findByIds(command.orderItems.map { it.productId })
+        val discountAmount = issuedCouponDiscountAmountCalculator.calculateDiscountAmount(
+            command.issuedCouponId,
+            orderTotalPriceCalculator.calculateTotalPrice(command.orderItems, products),
+        )
+
+        val order = command.toOrderEntity(discountAmount)
+        order.addItems(command.toOrderItemEntities(order, products))
         return orderRepository.save(order)
     }
 

@@ -1,10 +1,10 @@
 package com.loopers.infrastructure.payment.processor
 
 import com.loopers.domain.order.OrderRepository
+import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
 import com.loopers.domain.payment.processor.PaymentProcessor
-import com.loopers.domain.payment.processor.PaymentProcessorCommand
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
 import com.loopers.support.enums.payment.PaymentMethodType
@@ -21,7 +21,7 @@ class PointPaymentProcessor(
 ) : PaymentProcessor {
 
     @Transactional
-    override fun pay(command: PaymentProcessorCommand.Pay): PaymentEntity {
+    override fun pay(command: PaymentCommand.Pay): PaymentEntity {
         val point = pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(
             ErrorType.NOT_FOUND,
             "사용자 포인트를 찾을 수 없습니다.",
@@ -48,7 +48,7 @@ class PointPaymentProcessor(
     }
 
     @Transactional
-    override fun cancel(command: PaymentProcessorCommand.Cancel) {
+    override fun cancel(command: PaymentCommand.Cancel) {
         val point =
             pointRepository.findByUserIdWithLock(command.userId) ?: throw CoreException(
                 ErrorType.NOT_FOUND,

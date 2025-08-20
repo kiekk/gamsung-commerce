@@ -35,4 +35,8 @@ class PaymentEntity(
     fun cancel() {
         status = PaymentStatusType.CANCELED
     }
+
+    fun isCompleted(): Boolean {
+        return status == PaymentStatusType.COMPLETED
+    }
 }

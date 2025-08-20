@@ -51,9 +51,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
                 listOf(
                     OrderCommand.Create.OrderItemCommand(
                         createdProduct.id,
-                        createdProduct.name,
                         Quantity(2),
-                        createdProduct.price,
                     ),
                 ),
             )
