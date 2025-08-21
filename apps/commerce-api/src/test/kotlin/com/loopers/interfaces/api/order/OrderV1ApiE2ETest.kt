@@ -128,7 +128,7 @@ class OrderV1ApiE2ETest @Autowired constructor(
     /*
      **🌐 E2E 테스트**
     - [ ] 로그인 사용자가 존재하지 않으면 404 Not Found 예외가 발생한다.
-    - [ ] 주문이 성공적으로 생성되면, 주문 ID를 응답으로 반환한다.
+    - [ ] 결제 타입[포인트] 주문이 성공하면, 주문 ID를 응답으로 반환한다.
      */
     @DisplayName("POST /api/v1/orders")
     @Nested
@@ -165,7 +165,7 @@ class OrderV1ApiE2ETest @Autowired constructor(
             assertThat(response.statusCode).isEqualTo(HttpStatus.NOT_FOUND)
         }
 
-        @DisplayName("주문이 성공적으로 생성되면, 주문 ID를 응답으로 반환한다.")
+        @DisplayName("결제 타입[포인트] 주문이 성공적으로 생성되면, 주문 ID를 응답으로 반환한다.")
         @Test
         fun returnsOrderId_whenCreateOrderIsSuccessful() {
             // arrange

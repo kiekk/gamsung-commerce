@@ -27,6 +27,7 @@ class OrderEntity(
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private val _orderItems: MutableList<OrderItemEntity> = mutableListOf(),
     val issuedCouponId: Long? = null,
+    val orderKey: String? = null,
 ) : BaseEntity() {
     val orderItems: OrderItems
         get() = OrderItems(_orderItems)

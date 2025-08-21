@@ -7,6 +7,7 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.domain.vo.Quantity
+import java.util.UUID
 
 class OrderCommand {
     data class Create(
@@ -44,6 +45,7 @@ class OrderCommand {
                 ),
                 Price(discountAmount),
                 issuedCouponId = issuedCouponId,
+                orderKey = UUID.randomUUID().toString(),
             )
         }
 

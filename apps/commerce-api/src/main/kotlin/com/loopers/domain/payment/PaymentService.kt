@@ -8,8 +8,8 @@ class PaymentService(
     private val paymentRepository: PaymentRepository,
     private val paymentProcessorFactory: PaymentProcessorFactory,
 ) {
-    fun findById(paymentId: Long): PaymentEntity? {
-        return paymentRepository.findWithItemsById(paymentId)
+    fun findByTransactionKey(transactionKey: String): PaymentEntity? {
+        return paymentRepository.findWithItemsByTransactionKey(transactionKey)
     }
 
     fun pay(command: PaymentCommand.Pay): PaymentEntity {

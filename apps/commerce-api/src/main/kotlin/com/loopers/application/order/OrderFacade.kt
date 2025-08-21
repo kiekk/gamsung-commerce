@@ -53,6 +53,9 @@ class OrderFacade(
                 user.id,
                 criteria.paymentMethodType,
                 createdOrder.amount,
+                criteria.cardType,
+                criteria.cardNo,
+                createdOrder.orderKey,
             ),
         )
 
@@ -60,31 +63,34 @@ class OrderFacade(
         // CARD(비동기) 결제인 경우 결제 상태는 PENDING이므로 주문 완료 처리 로직 추가 X
         // CARD(동기) 결제인 경우 결제 상태는 COMPLETED이므로 주문 완료 처리 로직 추가
         if (payment.isCompleted()) {
-            handlePaymentCompleted(createdOrder.id, payment.id)
+            handlePaymentCompleted(createdOrder.orderKey, payment.transactionKey)
         }
 
         return createdOrder.id
     }
 
     @Transactional
-    fun handlePaymentCompleted(orderId: Long, paymentId: Long) {
-        val order = orderService.findWithItemsById(orderId) ?: throw CoreException(
-            ErrorType.NOT_FOUND,
-            "주문을 찾을 수 없습니다. orderId: $orderId",
-        )
-
-        if (order.isCompleted()) {
-            log.warn("이미 완료된 주문입니다. orderId: $orderId")
+    fun handlePaymentCompleted(orderKey: String?, transactionKey: String?) {
+        if (orderKey.isNullOrBlank() || transactionKey.isNullOrBlank()) {
+            log.warn("주문 키 또는 결제 키가 비어 있습니다. orderKey: $orderKey, transactionKey: $transactionKey")
             return
         }
 
-        val payment = paymentService.findById(paymentId) ?: throw CoreException(
+        val order = orderService.findWithItemsByOrderKey(orderKey) ?: throw CoreException(
             ErrorType.NOT_FOUND,
-            "결제 정보를 찾을 수 없습니다. paymentId: $paymentId",
+            "주문을 찾을 수 없습니다. orderKey: $orderKey",
         )
 
+        if (order.isCompleted()) {
+            log.warn("이미 완료된 주문입니다. orderId: ${order.id}")
+            return
+        }
+
+        val payment = (paymentService.findByTransactionKey(transactionKey)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey"))
+
         if (!payment.isCompleted()) {
-            log.warn("완료되지 않은 결제 입니다. paymentId: $paymentId, status: ${payment.status}")
+            log.warn("완료되지 않은 결제 입니다. paymentId: ${payment.id}, status: ${payment.status}")
             return
         }
 
@@ -94,8 +100,8 @@ class OrderFacade(
                     order.orderItems.toProductQuantityMap(),
                 ),
             )
-            orderService.completeOrder(orderId)
-            log.info("주문이 완료되었습니다. orderId: $orderId")
+            orderService.completeOrder(order.id)
+            log.info("주문이 완료되었습니다. orderId: ${order.id}")
         } catch (e: Exception) {
             log.error(e.message, e)
 
@@ -103,7 +109,7 @@ class OrderFacade(
             paymentService.cancel(
                 PaymentCommand.Cancel(
                     order.userId,
-                    paymentId,
+                    payment.id,
                     payment.method,
                 ),
             )
@@ -111,7 +117,34 @@ class OrderFacade(
             issuedCouponService.unUseIssuedCoupon(order.issuedCouponId)
 
             // 주문 실패 상태 변경
-            orderService.cancelOrder(order.id)
+            orderService.failOrder(order.id)
         }
+    }
+
+    @Transactional
+    fun handlePaymentFailed(orderKey: String?, transactionKey: String?) {
+        if (orderKey.isNullOrBlank() || transactionKey.isNullOrBlank()) {
+            log.warn("주문 키 또는 결제 키가 비어 있습니다. orderKey: $orderKey, transactionKey: $transactionKey")
+            return
+        }
+
+        val order = orderService.findWithItemsByOrderKey(orderKey) ?: throw CoreException(
+            ErrorType.NOT_FOUND,
+            "주문을 찾을 수 없습니다. orderKey: $orderKey",
+        )
+
+        if (order.isCompleted()) {
+            log.warn("이미 완료된 주문입니다. orderId: ${order.id}")
+            return
+        }
+
+        val payment = (paymentService.findByTransactionKey(transactionKey)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey"))
+
+        // 결제 실패 상태 변경
+        payment.fail()
+
+        // 주문 실패 상태 변경
+        order.fail()
     }
 }

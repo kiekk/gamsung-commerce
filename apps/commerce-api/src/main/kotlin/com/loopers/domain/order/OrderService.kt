@@ -37,12 +37,17 @@ class OrderService(
         return orderRepository.findWithItemsById(id)
     }
 
+    @Transactional(readOnly = true)
+    fun findWithItemsByOrderKey(orderKey: String): OrderEntity? {
+        return orderRepository.findWithItemsByOrderKey(orderKey)
+    }
+
     @Transactional
-    fun cancelOrder(id: Long) {
+    fun failOrder(id: Long) {
         val order = orderRepository.findWithItemsById(id)
             ?: throw CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다. id: $id")
 
-        order.cancel()
+        order.fail()
     }
 
     @Transactional

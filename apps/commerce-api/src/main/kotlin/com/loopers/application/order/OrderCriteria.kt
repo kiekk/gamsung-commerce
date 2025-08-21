@@ -5,6 +5,7 @@ import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Quantity
+import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderCriteria {
@@ -26,6 +27,8 @@ class OrderCriteria {
         val orderItems: List<OrderItem>,
         val paymentMethodType: PaymentMethodType,
         val issuedCouponId: Long? = null,
+        val cardType: PaymentCardType? = null,
+        val cardNo: String? = null,
     ) {
 
         init {

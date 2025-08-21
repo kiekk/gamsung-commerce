@@ -4,6 +4,7 @@ import com.loopers.domain.order.OrderRepository
 import com.loopers.domain.payment.PaymentCommand
 import com.loopers.domain.payment.PaymentEntity
 import com.loopers.domain.payment.PaymentRepository
+import com.loopers.domain.payment.TransactionKeyGenerator
 import com.loopers.domain.payment.processor.PaymentProcessor
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
@@ -44,7 +45,8 @@ class PointPaymentProcessor(
         }
 
         point.usePoint(Point(command.totalPrice.value))
-        return paymentRepository.save(command.toPaymentEntity().apply { complete() })
+        val transactionKey = TransactionKeyGenerator().generate()
+        return paymentRepository.save(command.toPaymentEntity(transactionKey).apply { complete() })
     }
 
     @Transactional

@@ -1,12 +1,14 @@
 package com.loopers.domain.order
 
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
+import com.loopers.domain.stock.fixture.StockEntityFixture.Companion.aStock
 import com.loopers.domain.vo.Address
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Quantity
 import com.loopers.infrastructure.order.OrderJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.infrastructure.stock.StockJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -21,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest
 class OrderServiceIntegrationTest @Autowired constructor(
     private val orderService: OrderService,
     private val productJpaRepository: ProductJpaRepository,
+    private val stockJpaRepository: StockJpaRepository,
     private val orderJpaRepository: OrderJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
@@ -42,6 +45,7 @@ class OrderServiceIntegrationTest @Autowired constructor(
         fun calculatesTotalAmount_whenOrderIsCreated() {
             // arrange
             val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().productId(createdProduct.id).build())
             val orderCommand = OrderCommand.Create(
                 1L,
                 "홍길동",

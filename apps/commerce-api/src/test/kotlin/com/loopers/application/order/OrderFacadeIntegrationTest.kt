@@ -5,6 +5,8 @@ import com.loopers.domain.coupon.fixture.IssuedCouponEntityFixture.Companion.anI
 import com.loopers.domain.order.fixture.OrderEntityFixture.Companion.anOrder
 import com.loopers.domain.order.fixture.OrderItemEntityFixture.Companion.anOrderItem
 import com.loopers.domain.order.vo.OrderCustomerFixture.Companion.anOrderCustomer
+import com.loopers.domain.payment.gateway.PaymentGateway
+import com.loopers.domain.payment.gateway.PaymentGatewayResult
 import com.loopers.domain.point.PointEntityFixture.Companion.aPoint
 import com.loopers.domain.point.vo.Point
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
@@ -18,13 +20,16 @@ import com.loopers.domain.vo.Quantity
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository
+import com.loopers.infrastructure.payment.PaymentJpaRepository
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.stock.StockJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
+import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
+import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
@@ -34,14 +39,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
 @SpringBootTest
 class OrderFacadeIntegrationTest @Autowired constructor(
-    private val orderFacade: OrderFacade,
     private val userJpaRepository: UserJpaRepository,
     private val productJpaRepository: ProductJpaRepository,
     private val stockJpaRepository: StockJpaRepository,
@@ -50,7 +59,14 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val orderJpaRepository: OrderJpaRepository,
     private val couponJpaRepository: CouponJpaRepository,
     private val issuedCouponJpaRepository: IssuedCouponJpaRepository,
+    private val paymentJpaRepository: PaymentJpaRepository,
 ) {
+
+    @MockitoBean
+    lateinit var paymentGateway: PaymentGateway
+
+    @Autowired
+    lateinit var orderFacade: OrderFacade
 
     @AfterEach
     fun tearDown() {
@@ -67,9 +83,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     - [ ] 쿠폰 적용 시, 쿠폰이 이미 사용한 상태라면 409 Conflict 예외가 발생한다.
     - [ ] 쿠폰 적용 시, 쿠폰이 유효하면 쿠폰 할인 금액만큼 주문 금액이 할인된다.
      */
-    @DisplayName("주문을 생성할 때, ")
+    @DisplayName("결제 타입[포인트]으로 주문을 생성할 때, ")
     @Nested
-    inner class Create {
+    inner class CreateByPointType {
 
         @DisplayName("존재하지 않는 사용자가 주문을 요청할 경우 예외가 발생한다.")
         @Test
@@ -551,7 +567,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     - [ ] 동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.
     - [ ] 동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.
      */
-    @DisplayName("주문 결제 통시성 테스트, ")
+    @DisplayName("결제 타입[포인트]으로 주문 결제 통시성 테스트, ")
     @Nested
     inner class Concurrency {
         @DisplayName("동일한 쿠폰으로 여러 기기에서 동시에 주문해도, 쿠폰은 단 한번만 사용되어야 한다.")
@@ -717,6 +733,119 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             println("성공한 주문 수: $successCount")
             println("남은 재고: $remainingStock")
             assertThat(remainingStock).isEqualTo(createdStock.quantity - successCount)
+        }
+    }
+
+    /*
+     **🔗 통합 테스트
+    - [ ] 결제 타입[카드]으로 주문을 생성할 때, 결제 요청이 성공하면 결제 상태는 PENDING 상태로 저장된다.
+    - [ ] 결제 타입[카드]으로 주문을 생성할 때, 결제 요청이 실패하면 결제 상태는 FAILED 상태로 저장된다.
+     */
+    @DisplayName("결제 타입[카드]으로 주문을 생성할 때, ")
+    @Nested
+    inner class CreateByCardType {
+        @DisplayName("결제 요청이 성공하면 결제 상태는 PENDING 상태로 저장된다.")
+        @Test
+        fun succeedsToCreateOrder_whenPaymentIsSuccessful() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().build())
+            val quantity = Quantity(2)
+            val orderCriteria = OrderCriteria.Create(
+                createdUser.username,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItem(
+                        createdProduct.id,
+                        quantity,
+                    ),
+                ),
+                PaymentMethodType.CARD,
+                cardType = PaymentCardType.SAMSUNG,
+                cardNo = "1234-5678-9012-3456",
+            )
+
+            whenever(paymentGateway.requestPayment(any(), any()))
+                .thenReturn(PaymentGatewayResult.Requested(transactionKey = "pg_tx_123", status = PaymentStatusType.PENDING))
+
+            // act
+            val orderId = orderFacade.placeOrder(orderCriteria)
+
+            // assert
+            val findOrder = orderJpaRepository.findWithItemsById(orderId)
+            val findPayment = paymentJpaRepository.findByOrderId(orderId)
+            findOrder?.let { order ->
+                assertAll(
+                    { assertThat(order.userId).isEqualTo(createdUser.id) },
+                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.PENDING) },
+                    { assertThat(order.orderItems.size()).isEqualTo(2) },
+                    { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                )
+            }
+            verify(paymentGateway, times(1)).requestPayment(any(), any())
+            findPayment?.let { payment ->
+                assertAll(
+                    { assertThat(payment.orderId).isEqualTo(orderId) },
+                    { assertThat(payment.status).isEqualTo(PaymentStatusType.PENDING) },
+                    { assertThat(payment.transactionKey).isEqualTo("pg_tx_123") },
+                )
+            }
+        }
+
+        @DisplayName("결제 요청이 실패하면 결제 상태는 FAILED 상태로 저장된다.")
+        @Test
+        fun failsToCreateOrder_whenPaymentFails() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().build())
+            stockJpaRepository.save(aStock().build())
+            val quantity = Quantity(2)
+            val orderCriteria = OrderCriteria.Create(
+                createdUser.username,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItem(
+                        createdProduct.id,
+                        quantity,
+                    ),
+                ),
+                PaymentMethodType.CARD,
+                cardType = PaymentCardType.SAMSUNG,
+                cardNo = "1234-5678-9012-3456",
+            )
+
+            whenever(paymentGateway.requestPayment(any(), any()))
+                .thenReturn(PaymentGatewayResult.Requested(status = PaymentStatusType.FAILED))
+
+            // act
+            val orderId = orderFacade.placeOrder(orderCriteria)
+
+            // assert
+            val findOrder = orderJpaRepository.findWithItemsById(orderId)
+            val findPayment = paymentJpaRepository.findByOrderId(orderId)
+            findOrder?.let { order ->
+                assertAll(
+                    { assertThat(order.userId).isEqualTo(createdUser.id) },
+                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.PENDING) },
+                    { assertThat(order.orderItems.size()).isEqualTo(2) },
+                    { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                )
+            }
+            verify(paymentGateway, times(1)).requestPayment(any(), any())
+            findPayment?.let { payment ->
+                assertAll(
+                    { assertThat(payment.orderId).isEqualTo(orderId) },
+                    { assertThat(payment.status).isEqualTo(PaymentStatusType.FAILED) },
+                    { assertThat(payment.transactionKey).isNull() },
+                )
+            }
         }
     }
 }

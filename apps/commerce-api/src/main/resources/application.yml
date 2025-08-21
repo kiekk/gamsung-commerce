@@ -10,6 +10,10 @@ server:
     keep-alive-timeout: 60s # 60s
   max-http-request-header-size: 8KB
 
+pg-simulator:
+  url: http://localhost:8082
+  callback: http://localhost:8080/api/v1/payments/callback
+
 spring:
   main:
     web-application-type: servlet
