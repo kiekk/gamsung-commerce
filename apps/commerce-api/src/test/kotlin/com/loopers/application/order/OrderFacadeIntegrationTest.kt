@@ -32,6 +32,7 @@ import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -60,6 +61,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val couponJpaRepository: CouponJpaRepository,
     private val issuedCouponJpaRepository: IssuedCouponJpaRepository,
     private val paymentJpaRepository: PaymentJpaRepository,
+    private val redisCleanUp: RedisCleanUp,
 ) {
 
     @MockitoBean
@@ -71,6 +73,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     @AfterEach
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
+        redisCleanUp.truncateAll()
     }
 
     /*
