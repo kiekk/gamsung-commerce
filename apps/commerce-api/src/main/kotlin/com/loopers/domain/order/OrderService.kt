@@ -57,4 +57,8 @@ class OrderService(
 
         order.complete()
     }
+
+    fun findPendingOrders(): List<OrderEntity> {
+        return orderRepository.findPendingOrders()
+    }
 }

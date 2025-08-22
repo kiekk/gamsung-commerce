@@ -34,5 +34,5 @@ interface PgSimulatorFeignClient {
     fun getPaymentsByOrderId(
         @RequestHeader("X-USER-ID") userId: Long,
         @RequestParam orderId: String,
-    ): List<PaymentGatewayResult.ListResult>
+    ): ApiResponse<PaymentGatewayResult.ListResult>
 }

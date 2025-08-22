@@ -43,4 +43,12 @@ class PaymentEntity(
     fun isCompleted(): Boolean {
         return status == PaymentStatusType.COMPLETED
     }
+
+    fun updateStatus(status: PaymentStatusType) {
+        this.status = status
+    }
+
+    fun updateTransactionKey(transactionKey: String) {
+        this.transactionKey = transactionKey
+    }
 }

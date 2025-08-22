@@ -23,6 +23,11 @@ class OrderFacade(
 ) {
     private val log = LoggerFactory.getLogger(OrderFacade::class.java)
 
+    fun findPendingOrders(): List<OrderInfo.OrderDetail> {
+        return orderService.findPendingOrders()
+            .map { OrderInfo.OrderDetail.from(it) }
+    }
+
     @Transactional(readOnly = true)
     fun getOrder(criteria: OrderCriteria.Get): OrderInfo.OrderDetail {
         userService.findUserBy(criteria.username) ?: throw CoreException(
@@ -88,11 +93,6 @@ class OrderFacade(
 
         val payment = (paymentService.findByTransactionKey(transactionKey)
             ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey"))
-
-        if (!payment.isCompleted()) {
-            log.warn("완료되지 않은 결제 입니다. paymentId: ${payment.id}, status: ${payment.status}")
-            return
-        }
 
         try {
             stockService.deductStockQuantities(

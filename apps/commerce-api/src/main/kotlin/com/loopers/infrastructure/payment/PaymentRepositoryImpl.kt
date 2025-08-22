@@ -20,4 +20,8 @@ class PaymentRepositoryImpl(
     override fun findWithItemsByTransactionKey(transactionKey: String): PaymentEntity? {
         return paymentJpaRepository.findByTransactionKey(transactionKey)
     }
+
+    override fun findByOrderId(orderId: Long): PaymentEntity? {
+        return paymentJpaRepository.findByOrderId(orderId)
+    }
 }

@@ -6,4 +6,6 @@ interface PaymentRepository {
     fun findWithItemsById(id: Long): PaymentEntity?
 
     fun findWithItemsByTransactionKey(transactionKey: String): PaymentEntity?
+
+    fun findByOrderId(orderId: Long): PaymentEntity?
 }

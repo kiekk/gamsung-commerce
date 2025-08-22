@@ -26,6 +26,13 @@ class PgSimulatorGateway(
         return pgSimulatorFeignClient.getPayment(userId, transactionKey).data!!
     }
 
+    override fun getPaymentByOrderId(
+        userId: Long,
+        orderId: String,
+    ): PaymentGatewayResult.ListResult {
+        return pgSimulatorFeignClient.getPaymentsByOrderId(userId, orderId).data!!
+    }
+
     private fun requestPaymentFallback(
         userId: Long, command: PaymentGatewayCommand.Request, ex: Throwable,
     ): PaymentGatewayResult.Requested {

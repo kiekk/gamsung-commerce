@@ -19,4 +19,16 @@ class PaymentService(
     fun cancel(command: PaymentCommand.Cancel) {
         return paymentProcessorFactory.cancel(command)
     }
+
+    fun findPaymentByOrderId(orderId: Long): PaymentEntity? {
+        return paymentRepository.findByOrderId(orderId)
+    }
+
+    fun updatePayment(command: PaymentCommand.Update) {
+        val payment = paymentRepository.findWithItemsById(command.id)
+            ?: throw IllegalArgumentException("결제 정보가 존재하지 않습니다. id: ${command.id}")
+
+        payment.updateStatus(command.status)
+        payment.updateTransactionKey(command.transactionKey)
+    }
 }

@@ -6,4 +6,6 @@ interface OrderRepository {
     fun findWithItemsById(id: Long): OrderEntity?
 
     fun findWithItemsByOrderKey(orderKey: String): OrderEntity?
+
+    fun findPendingOrders(): List<OrderEntity>
 }

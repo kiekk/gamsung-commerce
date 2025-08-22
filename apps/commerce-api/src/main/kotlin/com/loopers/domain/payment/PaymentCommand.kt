@@ -6,6 +6,16 @@ import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 
 class PaymentCommand {
+    data class Update(
+        val id: Long,
+        val status: PaymentStatusType,
+        val transactionKey: String,
+    ) {
+        init {
+            require(id > 0) { "결제 아이디는 0보다 커야 합니다." }
+        }
+    }
+
     data class Pay(
         val orderId: Long,
         val userId: Long,

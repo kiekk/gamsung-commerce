@@ -9,4 +9,7 @@ interface OrderJpaRepository : JpaRepository<OrderEntity, Long> {
     fun findWithItemsById(id: Long): OrderEntity?
 
     fun findWithItemsByOrderKey(orderKey: String): OrderEntity?
+
+    @Query("""SELECT o FROM OrderEntity o LEFT JOIN FETCH o._orderItems WHERE o.orderStatus = 'PENDING'""")
+    fun findPendingOrders(): List<OrderEntity>
 }

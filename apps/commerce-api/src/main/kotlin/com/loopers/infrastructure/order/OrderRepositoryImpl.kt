@@ -20,4 +20,8 @@ class OrderRepositoryImpl(
     override fun findWithItemsByOrderKey(orderKey: String): OrderEntity? {
         return orderJpaRepository.findWithItemsByOrderKey(orderKey)
     }
+
+    override fun findPendingOrders(): List<OrderEntity> {
+        return orderJpaRepository.findPendingOrders()
+    }
 }
