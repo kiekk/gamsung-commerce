@@ -2,6 +2,7 @@ package com.loopers.domain.payment
 
 import com.loopers.domain.BaseEntity
 import com.loopers.domain.vo.Price
+import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.enums.payment.PaymentStatusType
 import jakarta.persistence.Embedded
@@ -14,15 +15,19 @@ import jakarta.persistence.Table
 @Table(name = "payment")
 class PaymentEntity(
     val orderId: Long,
+    val userId: Long,
     @Enumerated(EnumType.STRING)
     val method: PaymentMethodType,
     @Embedded
     val totalPrice: Price,
-) : BaseEntity() {
+    var transactionKey: String? = null,
+    var cardType: PaymentCardType? = null,
+    var cardNo: String? = null,
+    var reason: String? = null,
     @Enumerated(EnumType.STRING)
-    var status: PaymentStatusType = PaymentStatusType.PENDING
-        private set
-
+    var status: PaymentStatusType = PaymentStatusType.PENDING,
+    val orderKey: String? = null,
+) : BaseEntity() {
     fun complete() {
         status = PaymentStatusType.COMPLETED
     }
@@ -33,5 +38,17 @@ class PaymentEntity(
 
     fun cancel() {
         status = PaymentStatusType.CANCELED
+    }
+
+    fun isCompleted(): Boolean {
+        return status == PaymentStatusType.COMPLETED
+    }
+
+    fun updateStatus(status: PaymentStatusType) {
+        this.status = status
+    }
+
+    fun updateTransactionKey(transactionKey: String) {
+        this.transactionKey = transactionKey
     }
 }

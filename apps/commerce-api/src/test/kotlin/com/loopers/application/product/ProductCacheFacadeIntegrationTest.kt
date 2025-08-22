@@ -73,7 +73,6 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
 
         @DisplayName("상품 상세 조회 시 품, 브랜드 정보 모두 캐시가 만료되면 다시 DB를 조회한다.")
         @Test
-        // 메서드명은 영어로
         fun getProductById_CacheMiss() {
             // arrange
             val createdBrand = brandJpaRepository.save(aBrand().build())
@@ -181,7 +180,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -201,9 +200,8 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
-
         }
 
         @DisplayName("상품 목록 조회 시 좋아요 수 내림차순으로 정렬하면 캐시에 저장되어 이후 요청 시 캐시를 사용한다.")
@@ -222,7 +220,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -242,7 +240,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -262,7 +260,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -282,7 +280,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -302,7 +300,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
 
@@ -322,7 +320,7 @@ class ProductCacheFacadeIntegrationTest @Autowired constructor(
             // assert
             verify(productQueryService, times(1)).searchProducts(
                 condition,
-                pageRequest
+                pageRequest,
             )
         }
     }

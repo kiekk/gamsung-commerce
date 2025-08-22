@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.time.Duration
 
 @Component
 class ProductFacade(
@@ -62,7 +61,9 @@ class ProductFacade(
         val cacheable = ProductListCachePolicy.isCacheable(condition, pageable)
         val cacheKey = if (cacheable) {
             ProductListCachePolicy.buildCacheKey(pageable)
-        } else null
+        } else {
+            null
+        }
 
         // 캐시 조회
         cacheKey?.let {

@@ -7,6 +7,7 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.domain.vo.Quantity
+import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
 
 class OrderV1Dto {
@@ -20,6 +21,8 @@ class OrderV1Dto {
         val orderItems: List<OrderItemRequest>,
         val paymentMethodType: PaymentMethodType,
         val issuedCouponId: Long? = null,
+        val cardType: PaymentCardType? = null,
+        val cardNo: String? = null,
     ) {
 
         data class OrderItemRequest(
@@ -41,6 +44,8 @@ class OrderV1Dto {
                 orderItems.map { OrderCriteria.Create.OrderItem(it.productId, Quantity(it.quantity)) },
                 paymentMethodType,
                 issuedCouponId,
+                cardType,
+                cardNo,
             )
         }
     }

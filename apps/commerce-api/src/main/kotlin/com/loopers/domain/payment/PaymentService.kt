@@ -1,15 +1,34 @@
 package com.loopers.domain.payment
 
+import com.loopers.domain.payment.processor.factory.PaymentProcessorFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PaymentService(
     private val paymentRepository: PaymentRepository,
+    private val paymentProcessorFactory: PaymentProcessorFactory,
 ) {
-    @Transactional
-    fun createPayment(command: PaymentCommand.Create): PaymentEntity {
-        val payment = command.toPaymentEntity()
-        return paymentRepository.save(payment)
+    fun findByTransactionKey(transactionKey: String): PaymentEntity? {
+        return paymentRepository.findWithItemsByTransactionKey(transactionKey)
+    }
+
+    fun pay(command: PaymentCommand.Pay): PaymentEntity {
+        return paymentProcessorFactory.pay(command)
+    }
+
+    fun cancel(command: PaymentCommand.Cancel) {
+        return paymentProcessorFactory.cancel(command)
+    }
+
+    fun findPaymentByOrderId(orderId: Long): PaymentEntity? {
+        return paymentRepository.findByOrderId(orderId)
+    }
+
+    fun updatePayment(command: PaymentCommand.Update) {
+        val payment = paymentRepository.findWithItemsById(command.id)
+            ?: throw IllegalArgumentException("결제 정보가 존재하지 않습니다. id: ${command.id}")
+
+        payment.updateStatus(command.status)
+        payment.updateTransactionKey(command.transactionKey)
     }
 }

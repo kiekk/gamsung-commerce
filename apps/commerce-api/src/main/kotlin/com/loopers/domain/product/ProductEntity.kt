@@ -38,7 +38,8 @@ class ProductEntity(
     }
 
     override fun toString(): String {
-        return "ProductEntity(id=$id, brandId=$brandId, name='$name', description=$description, price=$price, status=$status, createdAt=$createdAt, updatedAt=$updatedAt)"
+        return "ProductEntity(id=$id, brandId=$brandId, name='$name', description=$description, price=$price, status=$status," +
+                " createdAt=$createdAt, updatedAt=$updatedAt)"
     }
 
     companion object {

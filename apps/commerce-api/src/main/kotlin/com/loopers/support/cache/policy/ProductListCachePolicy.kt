@@ -22,8 +22,11 @@ object ProductListCachePolicy {
     }
 
     fun normalizeSort(sort: Sort): String =
-        if (sort.isUnsorted) "unsorted"
-        else sort.joinToString(",") { "${it.property}:${if (it.isAscending) "asc" else "desc"}" }
+        if (sort.isUnsorted) {
+            "unsorted"
+        } else {
+            sort.joinToString(",") { "${it.property}:${if (it.isAscending) "asc" else "desc"}" }
+        }
 
     // SHA-256으로 compact key 구성
     private fun sha256(s: String): String {

@@ -7,6 +7,7 @@ class OrderInfo {
 
     data class OrderDetail(
         val orderId: Long,
+        val userId: Long,
         val ordererName: String,
         val ordererEmail: String,
         val ordererMobile: String,
@@ -15,11 +16,13 @@ class OrderInfo {
         val ordererAddressDetail: String? = null,
         val orderItemCount: Int,
         val totalPrice: Price,
+        val orderKey: String? = null,
     ) {
 
         companion object {
             fun from(orderEntity: OrderEntity): OrderDetail = OrderDetail(
                 orderEntity.id,
+                orderEntity.userId,
                 orderEntity.orderCustomer.name,
                 orderEntity.orderCustomer.email.value,
                 orderEntity.orderCustomer.mobile.value,
@@ -28,6 +31,7 @@ class OrderInfo {
                 orderEntity.orderCustomer.address.addressDetail,
                 orderEntity.orderItems.size(),
                 orderEntity.totalPrice,
+                orderEntity.orderKey,
             )
         }
     }

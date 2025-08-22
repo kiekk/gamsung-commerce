@@ -65,9 +65,9 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
 
     /*
      **🔗 통합 테스트
-    - [ ] 결제 성공 후 재고 감소에 실패하면 포인트, 쿠폰은 원복하고 결제/주문은 실패한다.
+    - [ ] 결제 타입[포인트]으로 결제 성공 후 재고 감소에 실패하면 포인트, 쿠폰은 원복하고 결제/주문은 실패한다.
      */
-    @DisplayName("결제 성공 후 재고 감소에 실패할 때, 포인트는")
+    @DisplayName("결제 타입[포인트]으로 결제 성공 후 재고 감소에 실패할 때,")
     @Nested
     inner class StockReductionFailure {
         @DisplayName("결제 성공 후 재고 감소에 실패하면 포인트, 쿠폰은 원복하고 결제/주문은 실패한다.")
@@ -108,7 +108,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
 
             // assert
             assertAll(
-                { assertThat(orderRepository.findWithItemsById(orderId)?.orderStatus).isEqualTo(OrderStatusType.CANCELED) },
+                { assertThat(orderRepository.findWithItemsById(orderId)?.orderStatus).isEqualTo(OrderStatusType.FAILED) },
                 { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
                 { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
                 { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().isUsed()).isFalse() },
