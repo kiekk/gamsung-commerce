@@ -5,7 +5,6 @@ import com.loopers.domain.payment.gateway.PaymentGatewayResult
 import com.loopers.interfaces.api.ApiResponse
 import com.loopers.support.config.feign.FeignConfig
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam
     configuration = [FeignConfig::class],
 )
 interface PgSimulatorFeignClient {
-    @PostMapping("/api/v1/payments", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping("/api/v1/payments")
     fun createPayment(
         @RequestHeader("X-USER-ID") userId: Long,
         @RequestBody request: PaymentGatewayCommand.Request,

@@ -1,8 +1,8 @@
 package com.loopers.support.config.feign
 
 import feign.Feign
+import feign.Logger
 import feign.Request
-import feign.Retryer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -22,6 +22,8 @@ class FeignConfig {
                     true,
                 ),
             )
-            .retryer(Retryer.Default())
     }
+
+    @Bean
+    fun feignLoggerLevel(): Logger.Level = Logger.Level.BASIC
 }
