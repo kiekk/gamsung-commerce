@@ -34,7 +34,9 @@ class PgSimulatorGateway(
     }
 
     private fun requestPaymentFallback(
-        userId: Long, command: PaymentGatewayCommand.Request, ex: Throwable,
+        userId: Long,
+        command: PaymentGatewayCommand.Request,
+        ex: Throwable,
     ): PaymentGatewayResult.Requested {
         log.error("PG createPayment failed for userId: $userId, command: $command", ex)
         return PaymentGatewayResult.Requested(

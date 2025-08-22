@@ -40,7 +40,7 @@ class PgSimulatorGatewayTest @Autowired constructor(
     }
 
     /*
-    **🔗 서킷 브레이커 테스트
+     **🔗 서킷 브레이커 테스트
     - [ ] 정상 응답 시 서킷 브레이커는 닫힌 상태(CLOSED)를 유지한다.
     - [ ] 임계치 이상 실패 시 서킷 브레이커는 열림 상태(OPEN)가 된다. [failure-rate-threshold: 50]
     - [ ] 임계치 이상 실패해도 최소 호출 횟수 미만이면 서킷 브레이커는 열린 상태(OPEN)가 되지 않는다. [minimum-number-of-calls: 3]

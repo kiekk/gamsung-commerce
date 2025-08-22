@@ -91,8 +91,10 @@ class OrderFacade(
             return
         }
 
-        val payment = (paymentService.findByTransactionKey(transactionKey)
-            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey"))
+        val payment = (
+            paymentService.findByTransactionKey(transactionKey)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey")
+        )
 
         try {
             stockService.deductStockQuantities(
@@ -138,8 +140,10 @@ class OrderFacade(
             return
         }
 
-        val payment = (paymentService.findByTransactionKey(transactionKey)
-            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey"))
+        val payment = (
+            paymentService.findByTransactionKey(transactionKey)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey")
+        )
 
         // 결제 실패 상태 변경
         payment.fail()

@@ -15,9 +15,9 @@ class FeignConfig {
         return Feign.builder()
             .options(
                 Request.Options(
-                    1000, // 1초
+                    1000,
                     MILLISECONDS,
-                    3000, // 3초
+                    3000,
                     MILLISECONDS,
                     true,
                 ),
