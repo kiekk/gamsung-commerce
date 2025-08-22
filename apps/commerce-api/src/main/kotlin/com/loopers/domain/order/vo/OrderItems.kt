@@ -16,4 +16,7 @@ class OrderItems(
     fun size(): Int {
         return items.size
     }
+
+    fun toProductQuantityMap(): Map<Long, Int> =
+        items.groupingBy { it.productId }.eachCount()
 }

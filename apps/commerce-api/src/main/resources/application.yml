@@ -10,6 +10,77 @@ server:
     keep-alive-timeout: 60s # 60s
   max-http-request-header-size: 8KB
 
+pg-simulator:
+  url: http://localhost:8082
+  callback: http://localhost:8080/api/v1/payments/callback
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        # ----- 서킷 브레이커 기본 설정 -----
+        failure-rate-threshold: 50                # 실패율(%) 임계치. 최근 윈도우 내 요청 중 50% 이상 실패 시 Open 전환
+        slow-call-rate-threshold: 50             # 느린 호출 비율(%) 임계치. 느린 호출 비율이 50% 이상이면 Open 전환
+        slow-call-duration-threshold: 500ms      # 느린 호출 기준 시간. 이 시간(500ms) 초과하면 '느린 호출'로 집계
+        permitted-number-of-calls-in-half-open-state: 1 # Half-Open 상태에서 허용되는 탐색 호출 수. 1건만 허용 후 결과에 따라 Closed/Open 전환
+        max-wait-duration-in-half-open-state: 1s # Half-Open 상태에서 탐색 호출들의 완료를 기다리는 최대 시간. 초과 시 미완료 호출은 실패로 간주
+        sliding-window-type: COUNT_BASED         # 슬라이딩 윈도우 유형 (COUNT_BASED=호출 개수 기준, TIME_BASED=시간 기준)
+        sliding-window-size: 10                  # 실패율/느린호출율 집계 대상 호출 수. 최근 10개 요청 기준으로 평가
+        minimum-number-of-calls: 3               # 실패율/느린호출율 계산을 시작하기 위한 최소 호출 수. 3건 미만이면 서킷 안 열림
+        wait-duration-in-open-state: 2s          # Open 상태 유지 시간. 이후 다음 호출에서 Half-Open으로 전환 시도
+    instances:
+      pg-request:
+        base-config: default
+  retry:
+    configs:
+      default:
+        # ----- 재시도(Retry) 기본 설정 -----
+        max-attempts: 3                          # 최대 재시도 횟수 (최초 호출 포함 3번)
+        wait-duration: 100ms                     # 재시도 사이 기본 대기 시간
+        enable-exponential-backoff: true         # 지수 백오프 활성화 여부
+        exponential-backoff-multiplier: 2        # 지수 백오프 배수 (100ms → 200ms → 400ms)
+        retry-exceptions:                        # 재시도 대상 예외 목록
+          - feign.RetryableException             # Feign에서 재시도 가능 예외
+          - java.net.ConnectException            # 커넥션 연결 실패
+          - feign.FeignException.InternalServerError # 서버 500 오류
+          - java.net.SocketTimeoutException      # 소켓 타임아웃
+          - java.io.IOException                  # IO 예외
+        ignore-exceptions:                       # 재시도 무시 예외 목록
+          - feign.FeignException.BadRequest      # Feign 400 예외는 재시도하지 않음
+        fail-after-max-attempts: true            # 최대 재시도 횟수 이후 실패 예외 발생 여부
+    instances:
+      pg-request:
+        base-config: default
+        wait-duration: 1000ms
+      pg-get:
+        max-attempts: 3
+        wait-duration: 100ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - feign.RetryableException
+          - java.net.SocketTimeoutException
+          - java.io.IOException
+          - java.net.ConnectException
+  bulkhead:
+    instances:
+      pg-request:
+        # ----- Bulkhead(동시 실행 제한) -----
+        max-concurrent-calls: 10                 # 동시에 실행 가능한 최대 요청 수 (초과 시 대기 또는 거절)
+        max-wait-duration: 200ms                 # 동시 요청 초과 시, 대기 가능한 최대 시간 (초과하면 BulkheadFullException 발생)
+      pg-get:
+        max-concurrent-calls: 100
+        max-wait-duration: 100ms
+  timelimiter:
+    instances:
+      pg-request:
+        # ----- TimeLimiter(요청 시간 제한) -----
+        timeout-duration: 3s                     # 요청 최대 수행 시간 (3초 초과 시 TimeoutException 발생)
+        cancel-running-future: false             # 타임아웃 발생 시 실행 중인 Future를 강제 취소할지 여부
+      pg-get:
+        timeout-duration: 2s
+        cancel-running-future: false
+
 spring:
   main:
     web-application-type: servlet

@@ -26,8 +26,9 @@ class OrderEntity(
     var discountPrice: Price = Price.ZERO,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private val _orderItems: MutableList<OrderItemEntity> = mutableListOf(),
+    val issuedCouponId: Long? = null,
+    val orderKey: String? = null,
 ) : BaseEntity() {
-    val issuedCouponId: Long? = null
     val orderItems: OrderItems
         get() = OrderItems(_orderItems)
 
@@ -52,9 +53,21 @@ class OrderEntity(
         orderStatus = OrderStatusType.CANCELED
     }
 
+    fun fail() {
+        orderStatus = OrderStatusType.FAILED
+    }
+
     fun addItems(orderItems: List<OrderItemEntity>) {
         _orderItems.addAll(orderItems)
         totalPrice = this.orderItems.amount()
         amount = Price(this.orderItems.amount().value - discountPrice.value)
+    }
+
+    fun isNotEqualAmount(totalPrice: Price): Boolean {
+        return amount != totalPrice
+    }
+
+    fun isCompleted(): Boolean {
+        return orderStatus == OrderStatusType.COMPLETED
     }
 }
