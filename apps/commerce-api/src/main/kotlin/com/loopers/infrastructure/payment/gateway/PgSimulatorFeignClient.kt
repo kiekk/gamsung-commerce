@@ -1,9 +1,9 @@
 package com.loopers.infrastructure.payment.gateway
 
+import com.loopers.config.FeignConfig
 import com.loopers.domain.payment.gateway.PaymentGatewayCommand
 import com.loopers.domain.payment.gateway.PaymentGatewayResult
 import com.loopers.interfaces.api.ApiResponse
-import com.loopers.support.config.feign.FeignConfig
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

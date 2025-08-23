@@ -6,12 +6,12 @@ dependencies {
     // add-ons
     implementation(project(":modules:jpa"))
     implementation(project(":modules:redis"))
+    implementation(project(":modules:data-serializer"))
+    implementation(project(":modules:feign"))
+    implementation(project(":modules:retry"))
     implementation(project(":supports:jackson"))
     implementation(project(":supports:logging"))
     implementation(project(":supports:monitoring"))
-
-    implementation("org.springframework.retry:spring-retry")
-    implementation("org.springframework:spring-aspects")
 
     // feign
     api("org.springframework.cloud:spring-cloud-starter-openfeign")
