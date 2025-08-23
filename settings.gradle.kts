@@ -7,6 +7,7 @@ include(
     ":modules:redis",
     ":modules:data-serializer",
     ":modules:feign",
+    ":modules:retry",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",
