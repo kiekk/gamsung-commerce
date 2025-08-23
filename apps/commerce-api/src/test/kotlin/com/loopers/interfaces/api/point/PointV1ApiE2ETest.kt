@@ -5,7 +5,6 @@ import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
-import com.loopers.interfaces.api.example.ExampleV1Dto
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -85,7 +84,7 @@ class PointV1ApiE2ETest @Autowired constructor(
             // arrange
 
             // act
-            val responseType = object : ParameterizedTypeReference<ApiResponse<ExampleV1Dto.ExampleResponse>>() {}
+            val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, HttpEntity<Any>(Unit), responseType)
 
             // assert
