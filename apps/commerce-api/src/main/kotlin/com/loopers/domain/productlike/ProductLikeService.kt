@@ -1,8 +1,8 @@
 package com.loopers.domain.productlike
 
-import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
+import com.loopers.event.payload.productlike.ProductLikeEvent
+import com.loopers.event.payload.productlike.ProductUnlikeEvent
+import com.loopers.event.publisher.EventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 class ProductLikeService(
     private val productLikeRepository: ProductLikeRepository,
     private val productLikeCountRepository: ProductLikeCountRepository,
+    private val eventPublisher: EventPublisher,
 ) {
     @Transactional
     fun like(command: ProductLikeCommand.Like) {
@@ -35,29 +36,15 @@ class ProductLikeService(
         productLikeCountRepository.findByProductIdWithPessimisticLock(command.productId)?.decreaseProductLikeCount()
     }
 
-    @Retryable(
-        value = [OptimisticLockingFailureException::class],
-        maxAttempts = 3,
-        backoff = Backoff(delay = 10, multiplier = 1.0),
-    )
     @Transactional
     fun likeOptimistic(command: ProductLikeCommand.Like) {
         if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
         productLikeRepository.create(command.toEntity()).let { created ->
-            productLikeCountRepository.findByProductIdWithOptimisticLock(created.productId)?.apply {
-                increaseProductLikeCount()
-            } ?: productLikeCountRepository.save(
-                ProductLikeCountEntity(created.productId, 1),
-            )
+            eventPublisher.publish(ProductLikeEvent(created.productId))
         }
     }
 
-    @Retryable(
-        value = [OptimisticLockingFailureException::class],
-        maxAttempts = 3,
-        backoff = Backoff(delay = 10, multiplier = 1.0),
-    )
     @Transactional
     fun unlikeOptimistic(command: ProductLikeCommand.Unlike) {
         if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId).not()) return
@@ -66,7 +53,7 @@ class ProductLikeService(
             productLikeRepository.deleteByUserIdAndProductId(command.userId, command.productId)
         if (deleteCount == 0) return
 
-        productLikeCountRepository.findByProductIdWithOptimisticLock(command.productId)?.decreaseProductLikeCount()
+        eventPublisher.publish(ProductUnlikeEvent(command.productId))
     }
 
     @Transactional(readOnly = true)

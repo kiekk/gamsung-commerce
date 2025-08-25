@@ -12,6 +12,8 @@ import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Birthday
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Price
+import com.loopers.event.payload.productlike.ProductLikeEvent
+import com.loopers.event.payload.productlike.ProductUnlikeEvent
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
@@ -29,7 +31,10 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
 
+@RecordApplicationEvents
 @SpringBootTest
 class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val productLikeFacade: ProductLikeFacade,
@@ -42,6 +47,9 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val productJpaRepository: ProductJpaRepository,
     private val redisCleanUp: RedisCleanUp,
 ) {
+
+    @Autowired
+    lateinit var applicationEvents: ApplicationEvents
 
     @AfterEach
     fun tearDown() {
@@ -139,12 +147,13 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            val callProductLikeEventCount = applicationEvents.stream(ProductLikeEvent::class.java)
+                .filter { event -> event.productId == createdProduct.id }.count()
             assertAll(
                 { assertThat(productLikes).hasSize(1) },
                 { assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
                 { assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
-                { assertThat(productLikeCount?.productLikeCount).isEqualTo(1) },
+                { assertThat(callProductLikeEventCount).isEqualTo(1) },
             )
         }
     }
@@ -244,10 +253,11 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
+            val callProductUnlikeEventCount = applicationEvents.stream(ProductUnlikeEvent::class.java)
+                .filter { event -> event.productId == createdProduct.id }.count()
             assertAll(
                 { assertThat(productLikes).isEmpty() },
-                { assertThat(productLikeCount?.productLikeCount).isEqualTo(0) },
+                { assertThat(callProductUnlikeEventCount).isEqualTo(1) },
             )
         }
     }
