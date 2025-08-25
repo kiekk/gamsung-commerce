@@ -15,14 +15,13 @@ class ProductLikeFacade(
     private val productService: ProductService,
     private val productLikeService: ProductLikeService,
 ) {
-    @Transactional
     fun like(like: ProductLikeCriteria.Like) {
         val user = userService.findUserBy(like.username)
             ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다. username: ${like.username}")
         val product = productService.findProductBy(like.productId)
             ?: throw CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. productId: ${like.productId}")
 
-        productLikeService.like(
+        productLikeService.likeOptimistic(
             ProductLikeCommand.Like(
                 user.id,
                 product.id,
@@ -30,14 +29,13 @@ class ProductLikeFacade(
         )
     }
 
-    @Transactional
     fun unlike(like: ProductLikeCriteria.Unlike) {
         val user = userService.findUserBy(like.username)
             ?: throw CoreException(ErrorType.NOT_FOUND, "사용자를 찾을 수 없습니다. username: ${like.username}")
         val product = productService.findProductBy(like.productId)
             ?: throw CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다. productId: ${like.productId}")
 
-        productLikeService.unlike(
+        productLikeService.unlikeOptimistic(
             ProductLikeCommand.Unlike(
                 user.id,
                 product.id,

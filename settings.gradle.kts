@@ -8,6 +8,7 @@ include(
     ":modules:data-serializer",
     ":modules:feign",
     ":modules:retry",
+    ":modules:event",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",
