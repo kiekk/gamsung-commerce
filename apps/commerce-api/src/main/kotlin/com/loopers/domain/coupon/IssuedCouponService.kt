@@ -13,19 +13,15 @@ class IssuedCouponService(
         return issuedCouponRepository.save(command.toEntity())
     }
 
-    fun findIssuedCouponById(id: Long): IssuedCouponEntity? {
-        return issuedCouponRepository.findByIdWithPessimisticLock(id)
-    }
-
     fun useIssuedCoupon(id: Long?) {
         id?.let {
-            issuedCouponRepository.getById(it).use()
+            issuedCouponRepository.findByIdWithPessimisticLock(it)?.use()
         }
     }
 
     fun unUseIssuedCoupon(id: Long?) {
         id?.let {
-            issuedCouponRepository.getById(it).unUse()
+            issuedCouponRepository.findByIdWithPessimisticLock(it)?.unUse()
         }
     }
 }

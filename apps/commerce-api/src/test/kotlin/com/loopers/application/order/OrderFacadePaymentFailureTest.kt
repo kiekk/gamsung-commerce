@@ -19,6 +19,8 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.domain.vo.Quantity
+import com.loopers.event.payload.order.OrderCreatedEvent
+import com.loopers.event.payload.payment.PaymentCompletedEvent
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.support.StockServiceMockConfig
@@ -28,6 +30,7 @@ import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.StockDeductionFailedException
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -38,7 +41,11 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
+import java.time.Duration
 
+@RecordApplicationEvents
 @SpringBootTest
 @Import(StockServiceMockConfig::class)
 class OrderFacadePaymentFailureTest @Autowired constructor(
@@ -51,6 +58,8 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
     private val pointRepository: PointRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+    @Autowired
+    lateinit var applicationEvents: ApplicationEvents
 
     @Autowired
     private lateinit var orderFacade: OrderFacade
@@ -107,12 +116,23 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            assertAll(
-                { assertThat(orderRepository.findWithItemsById(orderId)?.orderStatus).isEqualTo(OrderStatusType.FAILED) },
-                { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
-                { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
-                { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().isUsed()).isFalse() },
-            )
+            await().during(Duration.ofSeconds(2)).untilAsserted {
+                val findOrder = orderRepository.findWithItemsById(orderId)
+                val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java)
+                    .filter { event -> event.orderId == orderId }
+                    .count()
+                val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java)
+                    .filter { event -> event.orderKey == findOrder?.orderKey }
+                    .count()
+                assertAll(
+                    { assertThat(callOrderCreatedEventCount).isEqualTo(1) },
+                    { assertThat(callPaymentCompletedEventCount).isEqualTo(1) },
+                    { assertThat(findOrder?.orderStatus).isEqualTo(OrderStatusType.FAILED) },
+                    { assertThat(pointRepository.findByUserId(createdUser.id)?.point).isEqualTo(createdPoint.point) },
+                    { assertThat(stockRepository.findByProductId(createdProduct.id)?.quantity).isEqualTo(createdStock.quantity) },
+                    { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().isUsed()).isFalse() },
+                )
+            }
         }
     }
 }
