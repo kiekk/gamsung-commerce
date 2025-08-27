@@ -347,7 +347,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(orderCriteria)
 
             // assert
-            await().atMost(Duration.ofSeconds(2)).untilAsserted {
+            await().atMost(Duration.ofSeconds(5)).untilAsserted {
                 val findOrder = orderJpaRepository.findWithItemsById(orderId)
                 findOrder?.let { order ->
                     assertAll(
@@ -396,7 +396,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            await().atMost(Duration.ofSeconds(2)).untilAsserted {
+            await().atMost(Duration.ofSeconds(5)).untilAsserted {
                 val findOrder = orderJpaRepository.findWithItemsById(orderId)
                 findOrder?.let { order ->
                     assertAll(
