@@ -16,7 +16,7 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-class PaymentEventHandler(
+class PaymentEventListener(
     private val orderFacade: OrderFacade,
     private val paymentService: PaymentService,
 ) {

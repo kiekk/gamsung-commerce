@@ -9,7 +9,7 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-class DataFlatformEventHandler(
+class DataFlatformEventListener(
     private val dataFlatformRepository: DataFlatformRepository,
 ) {
     @EventListener
