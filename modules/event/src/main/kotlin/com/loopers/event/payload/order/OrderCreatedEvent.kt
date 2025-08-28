@@ -2,7 +2,7 @@ package com.loopers.event.payload.order
 
 import com.loopers.event.payload.EventPayload
 
-class OrderCreatedEvent(
+data class OrderCreatedEvent(
     val orderId: Long,
     val userId: Long,
     val totalPrice: Long,
