@@ -14,21 +14,37 @@ class DataFlatformEventListener(
 ) {
     @EventListener
     fun handle(event: OrderCreatedEvent) {
-        dataFlatformRepository.send(event)
+        try {
+            dataFlatformRepository.send(event)
+        } catch (e: Exception) {
+            println("데이터플랫폼 전송 실패 event: $event, error: ${e.message}")
+        }
     }
 
     @EventListener
     fun handle(event: PaymentCompletedEvent) {
-        dataFlatformRepository.send(event)
+        try {
+            dataFlatformRepository.send(event)
+        } catch (e: Exception) {
+            println("데이터플랫폼 전송 실패 event: $event, error: ${e.message}")
+        }
     }
 
     @EventListener
     fun handle(event: PaymentFailedEvent) {
-        dataFlatformRepository.send(event)
+        try {
+            dataFlatformRepository.send(event)
+        } catch (e: Exception) {
+            println("데이터플랫폼 전송 실패 event: $event, error: ${e.message}")
+        }
     }
 
     @EventListener
     fun handle(event: OrderCompletedEvent) {
-        dataFlatformRepository.send(event)
+        try {
+            dataFlatformRepository.send(event)
+        } catch (e: Exception) {
+            println("데이터플랫폼 전송 실패 event: $event, error: ${e.message}")
+        }
     }
 }
