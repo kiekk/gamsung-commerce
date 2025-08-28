@@ -150,7 +150,7 @@ class PgSimulatorGatewayTest @Autowired constructor(
             // assert
             assertThat(circuitBreaker.state).isEqualTo(CircuitBreaker.State.HALF_OPEN)
             val waitDurationInOpenState = 2L
-            TimeUnit.SECONDS.sleep(waitDurationInOpenState + 1)
+            TimeUnit.SECONDS.sleep(waitDurationInOpenState + 2)
 
             // 요청 성공 mock
             whenever(pgSimulatorFeignClient.createPayment(any(), any()))

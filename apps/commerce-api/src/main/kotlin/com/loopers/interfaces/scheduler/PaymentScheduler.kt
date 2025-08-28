@@ -3,6 +3,9 @@ package com.loopers.interfaces.scheduler
 import com.loopers.application.order.OrderFacade
 import com.loopers.application.payment.PaymentCriteria
 import com.loopers.application.payment.PaymentFacade
+import com.loopers.event.payload.payment.PaymentCompletedEvent
+import com.loopers.event.payload.payment.PaymentFailedEvent
+import com.loopers.event.publisher.EventPublisher
 import com.loopers.support.enums.payment.PaymentStatusType
 import com.loopers.support.enums.payment.TransactionStatus
 import org.slf4j.LoggerFactory
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Component
 class PaymentScheduler(
     private val orderFacade: OrderFacade,
     private val paymentFacade: PaymentFacade,
+    private val eventPublisher: EventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(PaymentScheduler::class.java)
@@ -46,8 +50,20 @@ class PaymentScheduler(
                 )
 
                 when (pgResultTransaction.status) {
-                    TransactionStatus.SUCCESS -> orderFacade.handlePaymentCompleted(order.orderKey, payment.transactionKey)
-                    TransactionStatus.FAILED -> orderFacade.handlePaymentFailed(order.orderKey, payment.transactionKey)
+                    TransactionStatus.SUCCESS -> eventPublisher.publish(
+                        PaymentCompletedEvent(
+                            order.orderKey,
+                            pgResultTransaction.transactionKey,
+                        ),
+                    )
+
+                    TransactionStatus.FAILED -> eventPublisher.publish(
+                        PaymentFailedEvent(
+                            order.orderKey,
+                            pgResultTransaction.transactionKey,
+                        ),
+                    )
+
                     else -> {}
                 }
             }

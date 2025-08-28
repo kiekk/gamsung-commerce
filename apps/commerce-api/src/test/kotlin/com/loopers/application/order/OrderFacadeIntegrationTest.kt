@@ -17,6 +17,8 @@ import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Mobile
 import com.loopers.domain.vo.Price
 import com.loopers.domain.vo.Quantity
+import com.loopers.event.payload.order.OrderCreatedEvent
+import com.loopers.event.payload.payment.PaymentCompletedEvent
 import com.loopers.infrastructure.coupon.CouponJpaRepository
 import com.loopers.infrastructure.coupon.IssuedCouponJpaRepository
 import com.loopers.infrastructure.order.OrderJpaRepository
@@ -34,6 +36,7 @@ import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
 import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -47,9 +50,14 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
+@RecordApplicationEvents
 @SpringBootTest
 class OrderFacadeIntegrationTest @Autowired constructor(
     private val userJpaRepository: UserJpaRepository,
@@ -64,6 +72,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val redisCleanUp: RedisCleanUp,
 ) {
 
+    @Autowired
+    lateinit var applicationEvents: ApplicationEvents
+
     @MockitoBean
     lateinit var paymentGateway: PaymentGateway
 
@@ -74,6 +85,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     fun tearDown() {
         databaseCleanUp.truncateAllTables()
         redisCleanUp.truncateAll()
+        applicationEvents.clear()
     }
 
     /*
@@ -335,13 +347,14 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(orderCriteria)
 
             // assert
-            val findOrder = orderJpaRepository.findWithItemsById(orderId)
-
-            findOrder?.let { order ->
-                assertAll(
-                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
-                    { assertThat(order.amount).isEqualTo(Price(order.totalPrice.value - order.discountPrice.value)) },
-                )
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val findOrder = orderJpaRepository.findWithItemsById(orderId)
+                findOrder?.let { order ->
+                    assertAll(
+                        { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
+                        { assertThat(order.amount).isEqualTo(Price(order.totalPrice.value - order.discountPrice.value)) },
+                    )
+                }
             }
         }
     }
@@ -383,24 +396,71 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            val findOrder = orderJpaRepository.findWithItemsById(orderId)
-            findOrder?.let { order ->
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val findOrder = orderJpaRepository.findWithItemsById(orderId)
+                findOrder?.let { order ->
+                    assertAll(
+                        { assertThat(order.userId).isEqualTo(createdUser.id) },
+                        { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
+                        { assertThat(order.orderItems.size()).isEqualTo(2) },
+                        { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                    )
+                }
+                val findPoint = pointJpaRepository.findByUserId(createdUser.id)
+                assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
+            }
+        }
+
+        @DisplayName("포인트 정보가 없을 경우 예외가 발생하고 주문 상태는 PENDING이다.")
+        @Test
+        fun failsToPayWithPoints_whenPointDoesNotExist() {
+            // arrange
+            val createdUser = userJpaRepository.save(aUser().build())
+            val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
+            stockJpaRepository.save(aStock().build())
+            val quantity = Quantity(2)
+            val criteria = OrderCriteria.Create(
+                createdUser.username,
+                "홍길동",
+                Email("shyoon991@gmail.com"),
+                Mobile("010-1234-5678"),
+                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
+                listOf(
+                    OrderCriteria.Create.OrderItem(
+                        createdProduct.id,
+                        quantity,
+                    ),
+                ),
+                PaymentMethodType.POINT,
+            )
+
+            // act
+            val orderId = orderFacade.placeOrder(criteria)
+
+            // assert
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val findOrder = orderJpaRepository.findWithItemsById(orderId)
+                val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java)
+                    .filter { event -> event.orderId == orderId }
+                    .count()
+                val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java)
+                    .filter { event -> event.orderKey == findOrder?.orderKey }
+                    .count()
+
                 assertAll(
-                    { assertThat(order.userId).isEqualTo(createdUser.id) },
-                    { assertThat(order.orderStatus).isEqualTo(OrderStatusType.COMPLETED) },
-                    { assertThat(order.orderItems.size()).isEqualTo(2) },
-                    { assertThat(order.orderItems.amount()).isEqualTo(Price(createdProduct.price.value * quantity.value)) },
+                    { assertThat(callOrderCreatedEventCount).isEqualTo(1) },
+                    { assertThat(callPaymentCompletedEventCount).isZero },
+                    { assertThat(findOrder?.orderStatus).isEqualTo(OrderStatusType.PENDING) },
                 )
             }
-            val findPoint = pointJpaRepository.findByUserId(createdUser.id)
-            assertThat(findPoint?.point).isEqualTo(Point(createdPoint.point.value - (createdProduct.price.value * quantity.value)))
         }
 
-        @DisplayName("포인트 정보가 없을 경우 예외가 발생하고 주문 정보는 생성되지 않는다.")
+        @DisplayName("포인트 부족 시 예외가 발생하고 주문은 PENDING 상태가 된다.")
         @Test
-        fun failsToPayWithPoints_whenPointInfoIsMissing() {
+        fun failsToPayWithPoints_whenPointIsInsufficient() {
             // arrange
             val createdUser = userJpaRepository.save(aUser().build())
+            pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
             val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
             stockJpaRepository.save(aStock().build())
             val quantity = Quantity(2)
@@ -420,52 +480,20 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
 
             // act
-            val exception = assertThrows<CoreException> {
-                orderFacade.placeOrder(criteria)
-            }
+            val orderId = orderFacade.placeOrder(criteria)
 
             // assert
+            val findOrder = orderJpaRepository.findWithItemsById(orderId)
+            val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java)
+                .filter { event -> event.orderId == orderId }
+                .count()
+            val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java)
+                .filter { event -> event.orderKey == findOrder?.orderKey }
+                .count()
             assertAll(
-                { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("사용자 포인트를 찾을 수 없습니다.") },
-                { assertThat(orderJpaRepository.findAll()).isEmpty() },
-            )
-        }
-
-        @DisplayName("포인트 부족 시 예외가 발생하고 주문 정보는 생성되지 않는다.")
-        @Test
-        fun failsToPayWithPoints_whenPaymentFails() {
-            // arrange
-            val createdUser = userJpaRepository.save(aUser().build())
-            val createdPoint = pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(1000)).build())
-            val createdProduct = productJpaRepository.save(aProduct().price(Price(1000)).build())
-            stockJpaRepository.save(aStock().build())
-            val quantity = Quantity(2)
-            val criteria = OrderCriteria.Create(
-                createdUser.username,
-                "홍길동",
-                Email("shyoon991@gmail.com"),
-                Mobile("010-1234-5678"),
-                Address("12345", "서울시 강남구 역삼동", "역삼로 123"),
-                listOf(
-                    OrderCriteria.Create.OrderItem(
-                        createdProduct.id,
-                        quantity,
-                    ),
-                ),
-                PaymentMethodType.POINT,
-            )
-
-            // act
-            val exception = assertThrows<CoreException> {
-                orderFacade.placeOrder(criteria)
-            }
-
-            // assert
-            assertAll(
-                { assertThat(exception).isInstanceOf(CoreException::class.java) },
-                { assertThat(exception.message).isEqualTo("포인트로 결제할 수 없습니다. 사용 가능한 포인트: ${createdPoint.point}") },
-                { assertThat(orderJpaRepository.findAll()).isEmpty() },
+                { assertThat(callOrderCreatedEventCount).isEqualTo(1) },
+                { assertThat(callPaymentCompletedEventCount).isZero },
+                { assertThat(findOrder?.orderStatus).isEqualTo(OrderStatusType.PENDING) },
             )
         }
     }
@@ -602,14 +630,14 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 PaymentMethodType.POINT,
                 createdIssuedCoupon.id,
             )
+            val successCount = AtomicInteger(0)
 
             // act
-            val orderIds = mutableListOf<Long>()
             repeat(numberOfThreads) {
                 executor.submit {
                     try {
-                        val orderId = orderFacade.placeOrder(criteria)
-                        orderIds.add(orderId)
+                        orderFacade.placeOrder(criteria)
+                        successCount.incrementAndGet()
                     } catch (e: Exception) {
                         println("예외 발생: ${e.message}")
                     } finally {
@@ -621,10 +649,15 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            assertAll(
-                { assertThat(orderIds).hasSize(1) },
-                { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().status).isEqualTo(IssuedCouponStatusType.USED) },
-            )
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java).count()
+                val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java).count()
+                assertAll(
+                    { assertThat(callOrderCreatedEventCount).isEqualTo(successCount.get().toLong()) },
+                    { assertThat(callPaymentCompletedEventCount).isEqualTo(successCount.get().toLong()) },
+                    { assertThat(issuedCouponJpaRepository.findById(createdIssuedCoupon.id).get().status).isEqualTo(IssuedCouponStatusType.USED) },
+                )
+            }
         }
 
         @DisplayName("동일한 유저가 서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
@@ -653,14 +686,14 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 ),
                 PaymentMethodType.POINT,
             )
+            val successCount = AtomicInteger(0)
 
             // act
-            val orderIds = mutableListOf<Long>()
             repeat(numberOfThreads) {
                 executor.submit {
                     try {
-                        val orderId = orderFacade.placeOrder(criteria)
-                        orderIds.add(orderId)
+                        orderFacade.placeOrder(criteria)
+                        successCount.incrementAndGet()
                     } catch (e: Exception) {
                         println("예외 발생: ${e.message}")
                     } finally {
@@ -672,10 +705,15 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            assertAll(
-                { assertThat(orderIds).hasSize(numberOfThreads) },
-                { assertThat(pointJpaRepository.findByUserId(createdUser.id)?.point?.value).isZero() },
-            )
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java).count()
+                val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java).count()
+                assertAll(
+                    { assertThat(callOrderCreatedEventCount).isEqualTo(successCount.get().toLong()) },
+                    { assertThat(callPaymentCompletedEventCount).isEqualTo(successCount.get().toLong()) },
+                    { assertThat(pointJpaRepository.findByUserId(createdUser.id)?.point?.value).isZero() },
+                )
+            }
         }
 
         @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.")
@@ -689,8 +727,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdStock = stockJpaRepository.save(aStock().productId(createdProduct.id).quantity(10).build())
             val quantity = Quantity(1)
             val usernames = mutableListOf<String>()
-            var failureCount = 0
-            var successCount = 0
+            val successCount = AtomicInteger(0)
 
             repeat(numberOfThreads) {
                 val createdUser =
@@ -718,10 +755,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 executor.submit {
                     try {
                         orderFacade.placeOrder(criteria)
-                        successCount++
+                        successCount.incrementAndGet()
                     } catch (e: Exception) {
                         println("실패: ${e.message}")
-                        failureCount++
                     } finally {
                         latch.countDown()
                     }
@@ -731,11 +767,15 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // then
-            val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
-            println("락 충돌로 인한 실패 수: $failureCount")
-            println("성공한 주문 수: $successCount")
-            println("남은 재고: $remainingStock")
-            assertThat(remainingStock).isEqualTo(createdStock.quantity - successCount)
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
+                val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
+                println("성공한 주문 수: $successCount")
+                println("남은 재고: $remainingStock")
+
+                assertAll(
+                    { assertThat(remainingStock).isEqualTo(createdStock.quantity - successCount.get()) },
+                )
+            }
         }
     }
 

@@ -8,6 +8,8 @@ import com.loopers.domain.payment.TransactionKeyGenerator
 import com.loopers.domain.payment.processor.PaymentProcessor
 import com.loopers.domain.point.PointRepository
 import com.loopers.domain.point.vo.Point
+import com.loopers.event.payload.payment.PaymentCompletedEvent
+import com.loopers.event.publisher.EventPublisher
 import com.loopers.support.enums.payment.PaymentMethodType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -19,6 +21,7 @@ class PointPaymentProcessor(
     private val paymentRepository: PaymentRepository,
     private val pointRepository: PointRepository,
     private val orderRepository: OrderRepository,
+    private val eventPublisher: EventPublisher,
 ) : PaymentProcessor {
 
     @Transactional
@@ -46,7 +49,15 @@ class PointPaymentProcessor(
 
         point.usePoint(Point(command.totalPrice.value))
         val transactionKey = TransactionKeyGenerator().generate()
-        return paymentRepository.save(command.toPaymentEntity(transactionKey).apply { complete() })
+        val payment = paymentRepository.save(command.toPaymentEntity(transactionKey).apply { complete() })
+
+        // 결제 완료 이벤트 발행
+        eventPublisher.publish(PaymentCompletedEvent(
+            command.orderKey!!,
+            transactionKey,
+        ))
+
+        return payment
     }
 
     @Transactional
