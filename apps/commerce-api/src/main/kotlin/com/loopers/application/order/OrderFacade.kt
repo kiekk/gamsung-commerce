@@ -72,7 +72,7 @@ class OrderFacade(
     }
 
     @Transactional
-    fun handlePaymentCompleted(orderKey: String?, transactionKey: String?) {
+    fun completeOrder(orderKey: String?, transactionKey: String?) {
         if (orderKey.isNullOrBlank() || transactionKey.isNullOrBlank()) {
             log.warn("주문 키 또는 결제 키가 비어 있습니다. orderKey: $orderKey, transactionKey: $transactionKey")
             return
@@ -104,7 +104,7 @@ class OrderFacade(
         log.info("주문이 완료되었습니다. orderId: ${order.id}")
     }
 
-    fun handlePaymentFailed(orderKey: String?, transactionKey: String?) {
+    fun failOrder(orderKey: String?, transactionKey: String?) {
         if (orderKey.isNullOrBlank() || transactionKey.isNullOrBlank()) {
             log.warn("주문 키 또는 결제 키가 비어 있습니다. orderKey: $orderKey, transactionKey: $transactionKey")
             return

@@ -40,13 +40,13 @@ class PaymentEventListener(
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handle(event: PaymentCompletedEvent) {
-        orderFacade.handlePaymentCompleted(event.orderKey, event.transactionKey)
+        orderFacade.completeOrder(event.orderKey, event.transactionKey)
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handle(event: PaymentFailedEvent) {
-        orderFacade.handlePaymentFailed(event.orderKey, event.transactionKey)
+        orderFacade.failOrder(event.orderKey, event.transactionKey)
     }
 
     @Async
