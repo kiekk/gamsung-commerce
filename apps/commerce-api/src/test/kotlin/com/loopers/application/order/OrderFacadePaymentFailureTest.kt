@@ -116,7 +116,7 @@ class OrderFacadePaymentFailureTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            await().during(Duration.ofSeconds(2)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val findOrder = orderRepository.findWithItemsById(orderId)
                 val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java)
                     .filter { event -> event.orderId == orderId }

@@ -347,7 +347,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(orderCriteria)
 
             // assert
-            await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val findOrder = orderJpaRepository.findWithItemsById(orderId)
                 findOrder?.let { order ->
                     assertAll(
@@ -396,7 +396,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val findOrder = orderJpaRepository.findWithItemsById(orderId)
                 findOrder?.let { order ->
                     assertAll(
@@ -438,7 +438,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val orderId = orderFacade.placeOrder(criteria)
 
             // assert
-            await().atMost(Duration.ofSeconds(2)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val findOrder = orderJpaRepository.findWithItemsById(orderId)
                 val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java)
                     .filter { event -> event.orderId == orderId }
@@ -649,7 +649,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            await().during(Duration.ofSeconds(2)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java).count()
                 val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java).count()
                 assertAll(
@@ -705,7 +705,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            await().during(Duration.ofSeconds(2)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val callOrderCreatedEventCount = applicationEvents.stream(OrderCreatedEvent::class.java).count()
                 val callPaymentCompletedEventCount = applicationEvents.stream(PaymentCompletedEvent::class.java).count()
                 assertAll(
@@ -767,7 +767,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             latch.await()
 
             // then
-            await().during(Duration.ofSeconds(2)).untilAsserted {
+            await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
                 println("성공한 주문 수: $successCount")
                 println("남은 재고: $remainingStock")
