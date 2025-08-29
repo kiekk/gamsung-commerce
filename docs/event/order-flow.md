@@ -18,8 +18,8 @@ flowchart TD
     F -->|publish| G[PaymentCompletedEvent]
     E --> H[PG사 결제 요청]
     H --> Q[결제 요청 성공]
-    Q --> S[결제 성공]
-    Q --> T[결제 실패]
+    Q -->|callback| S[결제 성공]
+    Q -->|callback| T[결제 실패]
     T -->|publish| Z[PaymentFailedEvent]
     Z -->|consume| U[결제 실패 처리]
     S --> I
