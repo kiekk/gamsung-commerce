@@ -10,7 +10,7 @@ import com.loopers.event.payload.payment.PaymentCompletedEvent
 import com.loopers.event.payload.payment.PaymentFailedEvent
 import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
-import org.slf4j.LoggerFactory.*
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
@@ -22,7 +22,7 @@ class PaymentEventListener(
     private val paymentService: PaymentService,
 ) {
 
-    private val log = getLogger(this::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

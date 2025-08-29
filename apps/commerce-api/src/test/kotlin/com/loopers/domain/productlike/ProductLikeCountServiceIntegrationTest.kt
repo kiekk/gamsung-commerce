@@ -29,7 +29,7 @@ class ProductLikeCountServiceIntegrationTest @Autowired constructor(
     }
 
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] [낙관적 락] 동일한 상품에 대해 여러명이 좋아요 등록을 동시에 요청할 때, 상품의 좋아요 개수가 정상 반영되어야 한다.
      */
     @DisplayName("상품 좋아요 수 등록 요청을 할 때, ")
@@ -72,9 +72,8 @@ class ProductLikeCountServiceIntegrationTest @Autowired constructor(
         }
     }
 
-
     /*
-    **🔗 통합 테스트
+     **🔗 통합 테스트
     - [ ] [낙관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.
      */
     @DisplayName("상품 좋아요 수 취소 요청을 할 때, ")

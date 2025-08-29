@@ -52,10 +52,12 @@ class PointPaymentProcessor(
         val payment = paymentRepository.save(command.toPaymentEntity(transactionKey).apply { complete() })
 
         // 결제 완료 이벤트 발행
-        eventPublisher.publish(PaymentCompletedEvent(
+        eventPublisher.publish(
+            PaymentCompletedEvent(
             command.orderKey!!,
             transactionKey,
-        ))
+        ),
+        )
 
         return payment
     }
