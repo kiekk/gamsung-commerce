@@ -9,6 +9,7 @@ include(
     ":modules:feign",
     ":modules:retry",
     ":modules:event",
+    ":modules:kafka",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",
