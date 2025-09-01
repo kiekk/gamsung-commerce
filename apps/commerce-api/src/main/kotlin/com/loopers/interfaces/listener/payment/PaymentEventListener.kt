@@ -9,7 +9,6 @@ import com.loopers.event.payload.payment.PaymentFailedSuccessEvent
 import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentMethodType
 import org.slf4j.LoggerFactory
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -69,5 +68,4 @@ class PaymentEventListener(
             ),
         )
     }
-
 }

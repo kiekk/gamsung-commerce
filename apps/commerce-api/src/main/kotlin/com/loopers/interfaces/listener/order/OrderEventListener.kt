@@ -52,7 +52,7 @@ class OrderEventListener(
 
     /*
     결제 완료
-    */
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handle(event: PaymentCompletedEvent) {
@@ -66,7 +66,7 @@ class OrderEventListener(
 
         /*
     주문 완료 롤백
-     */
+         */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     fun handle(event: OrderCompletedEvent) {
