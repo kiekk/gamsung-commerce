@@ -18,21 +18,32 @@ flowchart TD
     F -->|publish| G[PaymentCompletedEvent]
     E --> H[PG사 결제 요청]
     H --> Q[결제 요청 성공]
+    Q -->|callback| S[결제 성공]
+    Q -->|callback| T[결제 실패]
+    T -->|publish| Z[PaymentFailedEvent]
+    Z -->|consume| U[결제 실패 처리]
+    S --> I
     H -->|Error| R[결제 요청 실패]
-    G -->|consume| I[결제 완료 처리]
+    G -->|consume| I[주문 완료 처리]
 
-%% === 결제 완료 처리 그룹 ===
-    subgraph S1[결제 완료 처리 흐름]
+%% === 주문 완료 처리 그룹 ===
+    subgraph S1[주문 완료 처리 흐름]
         I --> J[재고 차감]
         I --> K[쿠폰 사용]
         I --> L[주문 상태 변경 = '완료']
     end
 
-%% === 결제 실패 처리 그룹 ===
-    subgraph S2[결제 실패 처리 흐름]
-        I -->|Error| M[결제 실패 처리]
+%% === 주문 실패 처리 그룹 ===
+    subgraph S2[주문 실패 처리 흐름]
+        I -->|Error| M[주문 실패 처리]
         M --> N[주문 상태 변경 = '실패']
         M --> O[결제 취소 처리]
         M --> P[쿠폰 미사용 처리]
+    end
+
+%% === 결제 실패 처리 그룹 ===
+    subgraph S3[결제 실패 처리 흐름]
+        U --> V[주문 상태 변경 = '결제실패']
+        U --> W[쿠폰 미사용 처리]
     end
 ```

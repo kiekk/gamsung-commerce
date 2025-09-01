@@ -21,7 +21,6 @@ class FeignConfig {
             ),
         )
 
-
     @Bean
     fun feignLoggerLevel(): Logger.Level = Logger.Level.BASIC
 }

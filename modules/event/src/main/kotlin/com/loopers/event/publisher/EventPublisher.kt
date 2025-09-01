@@ -11,5 +11,4 @@ class EventPublisher(
     fun publish(event: EventPayload) {
         applicationEventPublisher.publishEvent(event)
     }
-
 }
