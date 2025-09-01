@@ -31,4 +31,12 @@ class PaymentService(
         payment.updateStatus(command.status)
         payment.updateTransactionKey(command.transactionKey)
     }
+
+    fun failPayment(transactionKey: String) {
+        val payment = paymentRepository.findWithItemsByTransactionKey(transactionKey)
+            ?: throw IllegalArgumentException("결제 정보를 찾을 수 없습니다. transactionKey: $transactionKey")
+
+        // 결제 실패 상태 변경
+        payment.fail()
+    }
 }

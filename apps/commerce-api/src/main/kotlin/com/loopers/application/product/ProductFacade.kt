@@ -8,6 +8,8 @@ import com.loopers.domain.productlike.ProductLikeService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
+import com.loopers.event.payload.product.ProductViewedEvent
+import com.loopers.event.publisher.EventPublisher
 import com.loopers.support.cache.CacheRepository
 import com.loopers.support.cache.dto.ProductListPageCacheValue
 import com.loopers.support.cache.policy.ProductListCachePolicy
@@ -29,6 +31,7 @@ class ProductFacade(
     private val productLikeService: ProductLikeService,
     private val userService: UserService,
     private val cacheRepository: CacheRepository,
+    private val eventPublisher: EventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(ProductFacade::class.java)
@@ -52,6 +55,8 @@ class ProductFacade(
             "브랜드를 찾을 수 없습니다. ${product.brandId}",
         )
         val productLikeCount = productLikeService.getProductLikeCount(product.id)
+        // 상품 조회 이벤트 발행
+        eventPublisher.publish(ProductViewedEvent(product.id, product.name))
         return ProductInfo.ProductDetail.from(product, brand, productLikeCount)
     }
 

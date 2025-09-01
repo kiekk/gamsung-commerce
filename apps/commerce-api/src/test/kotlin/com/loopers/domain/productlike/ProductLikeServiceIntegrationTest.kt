@@ -3,6 +3,8 @@ package com.loopers.domain.productlike
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.vo.Email
+import com.loopers.event.payload.productlike.ProductLikeEvent
+import com.loopers.event.payload.productlike.ProductUnlikeEvent
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
@@ -17,9 +19,12 @@ import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
+@RecordApplicationEvents
 @SpringBootTest
 class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeService: ProductLikeService,
@@ -29,6 +34,9 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
     private val userJpaRepository: UserJpaRepository,
 ) {
+
+    @Autowired
+    lateinit var applicationEvents: ApplicationEvents
 
     @AfterEach
     fun tearDown() {
@@ -314,7 +322,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             assertThat(productLikeCount?.productLikeCount).isZero()
         }
 
-        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 등록을 동시에 요청할 때, 충돌이 발생해도 최종 좋아요 수는 정확해야 한다.")
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 등록을 동시에 요청할 때 좋아요 집계 이벤트[ProductLikeEvent]는 정상적으로 발행되어야 한다.")
         @Test
         fun multipleUsersLikeSameProductWithOptimisticLock() {
             // given
@@ -323,8 +331,6 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             val executor = Executors.newFixedThreadPool(numberOfThreads)
             val createdProduct = productJpaRepository.save(aProduct().build())
             val userIds = mutableListOf<Long>()
-            var failureCount = 0
-            var successCount = 0
 
             repeat(numberOfThreads) {
                 val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
@@ -338,10 +344,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 executor.submit {
                     try {
                         productLikeService.likeOptimistic(ProductLikeCommand.Like(userIds[it], createdProduct.id))
-                        successCount++
                     } catch (e: OptimisticLockingFailureException) {
                         println("실패: ${e.message}")
-                        failureCount++
                     } finally {
                         latch.countDown()
                     }
@@ -351,15 +355,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // then
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
-            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
-            println("성공적으로 등록된 좋아요 수: $successCount")
-            println("최종 좋아요 수: ${productLikeCount?.productLikeCount}")
-            assertThat(productLikeCount).isNotNull
-            assertThat(productLikeCount?.productLikeCount).isEqualTo(numberOfThreads - failureCount)
+            assertThat(applicationEvents.stream(ProductLikeEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
         }
 
-        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청해도, 상품의 좋아요 개수가 정상 반영되어야 한다.")
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청할 때 좋아요 집계 이벤트[ProductUnlikeEvent]는 정상적으로 발행되어야 한다.")
         @Test
         fun multipleUsersUnikeSameProductWithOptimisticLock() {
             // arrange
@@ -368,8 +367,6 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             val executor = Executors.newFixedThreadPool(numberOfThreads)
             val createdProduct = productJpaRepository.save(aProduct().build())
             val userIds = mutableListOf<Long>()
-            var failureCount = 0
-            var successCount = 0
 
             repeat(numberOfThreads) {
                 val createdUser = userJpaRepository.save(aUser().username("user$it").email(Email("shyoon$it@gmail.com")).build())
@@ -384,10 +381,8 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                 executor.submit {
                     try {
                         productLikeService.unlikeOptimistic(ProductLikeCommand.Unlike(userIds[it], createdProduct.id))
-                        successCount++
                     } catch (e: OptimisticLockingFailureException) {
                         println("실패: ${e.message}")
-                        failureCount++
                     } finally {
                         latch.countDown()
                     }
@@ -397,15 +392,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
-            println("낙관적 락 충돌로 인한 실패 수: $failureCount")
-            println("성공적으로 취소된 좋아요 수: $successCount")
-            println("최종 좋아요 수: ${productLikeCount?.productLikeCount}")
-            assertThat(productLikeCount).isNotNull
-            assertThat(productLikeCount?.productLikeCount).isEqualTo(numberOfThreads - successCount)
+            assertThat(applicationEvents.stream(ProductUnlikeEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
         }
 
-        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도, 상품의 좋아요는 1번만 등록되어야 한다.")
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도 좋아요 집계 이벤트[ProductLikeEvent]는 정상적으로 발행되어야 한다.")
         @Test
         fun singleUserLikesSameProductMultipleTimesWithOptimisticLock() {
             // arrange
@@ -431,11 +421,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
-            assertThat(productLikeCount?.productLikeCount).isEqualTo(1)
+            assertThat(applicationEvents.stream(ProductLikeEvent::class.java).count()).isEqualTo(1L)
         }
 
-        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도, 상품의 좋아요는 1번만 취소되어야 한다.")
+        @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도 좋아요 집계 이벤트[ProductUnlikeEvent]는 정상적으로 발행되어야 한다.")
         @Test
         fun singleUserUnlikesSameProductMultipleTimesWithOptimisticLock() {
             // arrange
@@ -463,8 +452,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            val productLikeCount = productLikeService.getProductLikeCount(createdProduct.id)
-            assertThat(productLikeCount?.productLikeCount).isZero()
+            assertThat(applicationEvents.stream(ProductUnlikeEvent::class.java).count()).isEqualTo(1L)
         }
     }
 }

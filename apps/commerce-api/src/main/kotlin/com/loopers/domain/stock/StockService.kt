@@ -3,7 +3,6 @@ package com.loopers.domain.stock
 import com.loopers.support.error.ErrorType
 import com.loopers.support.error.payment.StockDeductionFailedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -20,7 +19,7 @@ class StockService(
         return stockRepository.findAllByProductIdsWithLock(productIds)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     fun deductStockQuantities(command: List<StockCommand.Deduct>) {
         val decreaseCommandMap = command.associate { it.productId to it.quantity }
         stockRepository.findAllByProductIdsWithLock(command.map { it.productId })
