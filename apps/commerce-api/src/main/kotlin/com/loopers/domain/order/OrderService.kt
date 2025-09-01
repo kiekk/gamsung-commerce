@@ -50,6 +50,13 @@ class OrderService(
         order.fail()
     }
 
+    fun failOrderByOrderKey(orderKey: String) {
+        val order = orderRepository.findWithItemsByOrderKey(orderKey)
+            ?: throw CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다. orderKey: $orderKey")
+
+        order.fail()
+    }
+
     @Transactional
     fun completeOrder(id: Long) {
         val order = orderRepository.findWithItemsById(id)
