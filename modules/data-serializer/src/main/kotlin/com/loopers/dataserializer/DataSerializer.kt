@@ -25,7 +25,7 @@ object DataSerializer {
         }
     }
 
-    fun <T> deserialize(data: Any?, clazz: Class<T>): T? {
+    fun <T> deserialize(data: Any?, clazz: Class<T>): T {
         return objectMapper.convertValue(data, clazz)
     }
 
