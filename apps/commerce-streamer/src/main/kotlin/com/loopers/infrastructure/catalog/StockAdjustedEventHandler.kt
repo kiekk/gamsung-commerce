@@ -16,7 +16,7 @@ class StockAdjustedEventHandler(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun handle(eventPayload: StockAdjustedEvent) {
-        log.info("StockAdjustedEventHandler - handle: $eventPayload")
+        log.info("[StockAdjustedEventHandler.handle] eventPayload: $eventPayload")
         cacheRepository.evict(CacheNames.PRODUCT_DETAIL_V1 + eventPayload.productId)
     }
 

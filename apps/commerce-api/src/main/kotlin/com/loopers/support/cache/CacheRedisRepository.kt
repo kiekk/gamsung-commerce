@@ -1,5 +1,6 @@
 package com.loopers.support.cache
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -10,7 +11,7 @@ private class CacheRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : CacheRepository {
 
-    private val log = org.slf4j.LoggerFactory.getLogger(CacheRedisRepository::class.java)
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun <T> get(cacheKey: CacheKey, clazz: Class<T>): T? {
         val value = redisTemplate.opsForValue().get(cacheKey.fullKey()) ?: return null
@@ -55,7 +56,7 @@ private class CacheRedisRepository(
     }
 
     companion object {
-        private val JITTER_PERCENTAGE = 0.15 // ±15%의 지터를 추가하여 TTL을 설정합니다.
+        private const val JITTER_PERCENTAGE = 0.15 // ±15%의 지터를 추가하여 TTL을 설정합니다.
         private val MINIMUM_TTL_MINUTES = Duration.ofMinutes(5) // 최소 TTL은 5분으로 설정합니다.
     }
 }

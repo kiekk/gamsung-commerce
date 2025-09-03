@@ -21,7 +21,7 @@ class CatalogV1EventConsumer(
         groupId = Group.CATALOG_EVENTS,
     )
     fun listen(message: String, ack: Acknowledgment) {
-        log.info("[CatalogV1EventConsumer.listen] message={}", message)
+        log.info("[CatalogV1EventConsumer.listen] message: $message")
         val event = Event.fromJson(message)
         event?.let {
             catalogService.handleEvent(it)

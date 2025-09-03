@@ -11,7 +11,8 @@ enum class EventType(
 ) {
     PRODUCT_CHANGED(ProductChangedEvent::class.java, Topic.PRODUCT_CHANGED),
     PRODUCT_STOCK_ADJUSTED(StockAdjustedEvent::class.java, Topic.PRODUCT_STOCK_ADJUSTED),
-    PRODUCT_LIKE_CHANGED(ProductLikeChangedEvent::class.java, Topic.PRODUCT_LIKE_CHANGED),
+    PRODUCT_LIKED(ProductLikeChangedEvent::class.java, Topic.PRODUCT_LIKE_CHANGED),
+    PRODUCT_UNLIKED(ProductLikeChangedEvent::class.java, Topic.PRODUCT_LIKE_CHANGED),
     ;
 
 
