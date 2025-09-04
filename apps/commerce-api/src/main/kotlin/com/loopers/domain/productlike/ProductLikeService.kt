@@ -81,7 +81,7 @@ class ProductLikeService(
         // 캐시 저장
         productLikeCount?.let {
             log.info("[Cache Miss] ProductLikeCount: $it")
-            cacheRepository.set(CacheKey(CacheNames.PRODUCT_DETAIL_V1, productId.toString()), it)
+            cacheRepository.set(CacheKey(CacheNames.PRODUCT_LIKE_COUNT_V1, productId.toString()), it)
         }
         return productLikeCount
     }

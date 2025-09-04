@@ -1,0 +1,16 @@
+### 상품 생성 요청
+POST http://127.0.0.1:8080/api/v1/products
+Content-Type: application/json
+Accept: application/json
+X-USER-ID: soonho
+
+{
+  "brandId": 1,
+  "name": "딸기아이스크림2",
+  "price": 4500,
+  "description": "신선한 딸기로 만든 아이스크림22",
+  "status": "ACTIVE"
+}
+
+### 상품 조회 요청
+GET http://127.0.0.1:8080/api/v1/products/2

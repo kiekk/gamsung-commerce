@@ -6,10 +6,13 @@ import org.springframework.stereotype.Component
 
 @Component
 class CatalogEventHandlerFactory(
-    private val handlers: List<CatalogEventHandler<EventPayload>>,
+    private val handlers: List<CatalogEventHandler<out EventPayload>>,
 ) {
-    fun handle(event: Event<EventPayload>) {
-        handlers.find { it.supports(event.eventType) }?.handle(event.payload)
+    @Suppress("UNCHECKED_CAST")
+    fun <T : EventPayload> handle(event: Event<T>) {
+        val handler = handlers.find { it.supports(event.eventType) }
+                as? CatalogEventHandler<T>
             ?: throw IllegalStateException("해당 이벤트를 처리할 핸들러가 없습니다.")
+        handler.handle(event.payload)
     }
 }
