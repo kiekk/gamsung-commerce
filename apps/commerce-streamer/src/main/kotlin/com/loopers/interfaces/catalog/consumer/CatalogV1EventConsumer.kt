@@ -12,6 +12,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class CatalogV1EventConsumer(
@@ -25,6 +26,7 @@ class CatalogV1EventConsumer(
         topics = [Topic.PRODUCT_V1_STOCK_SOLD_OUT, Topic.PRODUCT_V1_CHANGED, Topic.PRODUCT_V1_LIKE_CHANGED],
         groupId = Group.CATALOG_EVENTS,
     )
+    @Transactional
     fun listen(
         message: String,
         ack: Acknowledgment,

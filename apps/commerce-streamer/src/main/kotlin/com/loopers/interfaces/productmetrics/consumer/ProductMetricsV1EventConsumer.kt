@@ -12,6 +12,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class ProductMetricsV1EventConsumer(
@@ -24,6 +25,7 @@ class ProductMetricsV1EventConsumer(
         topics = [Topic.PRODUCT_V1_STOCK_ADJUSTED, Topic.PRODUCT_V1_LIKE_CHANGED, Topic.PRODUCT_V1_VIEWED],
         groupId = Group.METRICS_EVENTS,
     )
+    @Transactional
     fun listen(
         message: String,
         ack: Acknowledgment,
@@ -52,5 +54,6 @@ class ProductMetricsV1EventConsumer(
             ),
         )
         ack.acknowledge()
+        throw RuntimeException("test exception")
     }
 }
