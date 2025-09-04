@@ -54,6 +54,5 @@ class ProductMetricsV1EventConsumer(
             ),
         )
         ack.acknowledge()
-        throw RuntimeException("test exception")
     }
 }
