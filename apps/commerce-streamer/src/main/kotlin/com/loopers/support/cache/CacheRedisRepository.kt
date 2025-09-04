@@ -1,6 +1,7 @@
 package com.loopers.support.cache
 
-import org.slf4j.LoggerFactory
+import DataSerializer
+import org.slf4j.LoggerFactory.getLogger
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -11,7 +12,7 @@ private class CacheRedisRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) : CacheRepository {
 
-    private val log = LoggerFactory.getLogger(this::class.java)
+    private val log = getLogger(this::class.java)
 
     override fun <T> get(cacheKey: CacheKey, clazz: Class<T>): T? {
         val value = redisTemplate.opsForValue().get(cacheKey.fullKey()) ?: return null

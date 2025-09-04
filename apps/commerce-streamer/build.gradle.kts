@@ -7,17 +7,11 @@ dependencies {
     implementation(project(":modules:jpa"))
     implementation(project(":modules:redis"))
     implementation(project(":modules:data-serializer"))
-    implementation(project(":modules:feign"))
-    implementation(project(":modules:retry"))
     implementation(project(":modules:event"))
     implementation(project(":modules:kafka"))
     implementation(project(":supports:jackson"))
     implementation(project(":supports:logging"))
     implementation(project(":supports:monitoring"))
-
-    // feign
-    api("org.springframework.cloud:spring-cloud-starter-openfeign")
-    api("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
 
     // web
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -31,4 +25,5 @@ dependencies {
     testImplementation(testFixtures(project(":modules:jpa")))
     testImplementation(testFixtures(project(":modules:redis")))
     testImplementation(testFixtures(project(":modules:kafka")))
+
 }

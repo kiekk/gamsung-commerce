@@ -3,7 +3,6 @@ package com.loopers.support.cache
 import java.time.Duration
 
 object CacheNames {
-    const val PRODUCT_LIST_V1 = "product:list:v1:"
     const val PRODUCT_DETAIL_V1 = "product:detail:v1:"
     const val PRODUCT_LIKE_COUNT_V1 = "product:like-count:v1:"
     const val BRAND_DETAIL_V1 = "brand:detail:v1:"

@@ -3,12 +3,14 @@ package com.loopers.interfaces.listener.order
 import com.loopers.domain.coupon.IssuedCouponService
 import com.loopers.domain.order.OrderService
 import com.loopers.domain.stock.StockCommand
+import com.loopers.domain.stock.StockEventPublisher
 import com.loopers.domain.stock.StockService
 import com.loopers.event.payload.order.OrderCompletedEvent
 import com.loopers.event.payload.order.OrderFailedSuccessEvent
 import com.loopers.event.payload.payment.PaymentCompletedEvent
 import com.loopers.event.payload.payment.PaymentFailedEvent
 import com.loopers.event.payload.payment.PaymentFailedSuccessEvent
+import com.loopers.event.payload.stock.StockAdjustedEvent
 import com.loopers.event.publisher.EventPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -23,6 +25,7 @@ class OrderEventListener(
     private val issuedCouponService: IssuedCouponService,
     private val stockService: StockService,
     private val eventPublisher: EventPublisher,
+    private val stockEventPublisher: StockEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -64,9 +67,22 @@ class OrderEventListener(
         orderService.completeOrder(order.id)
     }
 
-        /*
+    /*
+    주문 완료
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun handleAfterEvent(event: OrderCompletedEvent) {
+        log.info("[OrderEventListener.handleAfterEvent] event: $event")
+        val order = orderService.findWithItemsByOrderKey(event.orderKey)
+            ?: throw IllegalStateException("주문 정보를 찾을 수 없습니다. orderKey: ${event.orderKey}")
+        order.orderItems.toProductQuantityMap().forEach { productQuantity ->
+            stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key))
+        }
+    }
+
+    /*
     주문 완료 롤백
-         */
+    */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     fun handle(event: OrderCompletedEvent) {

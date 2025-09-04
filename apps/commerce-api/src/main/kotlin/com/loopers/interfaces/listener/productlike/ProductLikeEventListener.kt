@@ -1,6 +1,7 @@
 package com.loopers.interfaces.listener.productlike
 
 import com.loopers.domain.productlike.ProductLikeCountService
+import com.loopers.domain.productlike.ProductLikeEventPublisher
 import com.loopers.event.payload.productlike.ProductLikeEvent
 import com.loopers.event.payload.productlike.ProductUnlikeEvent
 import org.slf4j.LoggerFactory
@@ -12,6 +13,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 @Component
 class ProductLikeEventListener(
     private val productLikeCountService: ProductLikeCountService,
+    private val productLikeEventPublisher: ProductLikeEventPublisher,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -19,14 +21,29 @@ class ProductLikeEventListener(
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     fun handle(event: ProductLikeEvent) {
-        log.info("상품 좋아요 이벤트 수신: $event")
+        log.info("[ProductLikeEventListener.handle] event: $event")
         productLikeCountService.increase(event.productId)
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
+    fun handleAfterEvent(event: ProductLikeEvent) {
+        log.info("[ProductLikeEventListener.handleAfterEvent] event: $event")
+        productLikeEventPublisher.publish(event)
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async
     fun handle(event: ProductUnlikeEvent) {
-        log.info("상품 좋아요 취소 이벤트 수신: $event")
+        log.info("[ProductUnlikeEventListener.handle] event: $event")
         productLikeCountService.decrease(event.productId)
     }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async
+    fun handleAfterEvent(event: ProductUnlikeEvent) {
+        log.info("[ProductUnlikeEventListener.handleAfterEvent] event: $event")
+        productLikeEventPublisher.publish(event)
+    }
+
 }
