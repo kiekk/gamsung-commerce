@@ -21,6 +21,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -29,6 +32,10 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.util.concurrent.CompletableFuture
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderV1ApiE2ETest @Autowired constructor(
@@ -41,6 +48,9 @@ class OrderV1ApiE2ETest @Autowired constructor(
     private val databaseCleanUp: DatabaseCleanUp,
     private val redisCleanUp: RedisCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -89,6 +99,10 @@ class OrderV1ApiE2ETest @Autowired constructor(
             val httpHeaders = HttpHeaders().apply { set("X-USER-ID", createdUser.username) }
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<OrderV1Dto.OrderResponse>>() {}
             val response = testRestTemplate.exchange(requestUrl, HttpMethod.GET, httpEntity, responseType)
@@ -106,6 +120,10 @@ class OrderV1ApiE2ETest @Autowired constructor(
             val requestUrl = ENDPOINT_ORDER_GET(createdOrder.id)
             val httpHeaders = HttpHeaders().apply { set("X-USER-ID", createdUser.username) }
             val httpEntity = HttpEntity<Any>(Unit, httpHeaders)
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<OrderV1Dto.OrderResponse>>() {}
@@ -191,6 +209,10 @@ class OrderV1ApiE2ETest @Autowired constructor(
             val requestUrl = ENDPOINT_ORDER
             val httpHeaders = HttpHeaders().apply { set("X-USER-ID", createdUser.username) }
             val httpEntity = HttpEntity<Any>(orderCreateRequest, httpHeaders)
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<Long>>() {}

@@ -17,11 +17,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.math.BigDecimal
+import java.util.concurrent.CompletableFuture
 
 @SpringBootTest
 class ProductQueryServiceIntegrationTest @Autowired constructor(
@@ -31,6 +38,9 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
     private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -232,6 +242,10 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
             Thread.sleep(10)
             val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by("createdAt").descending())
             val productsPage = productQueryService.searchProducts(ProductSearchCondition(), pageRequest)
@@ -303,6 +317,10 @@ class ProductQueryServiceIntegrationTest @Autowired constructor(
             productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
             productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
             val invalidSortField = "invalidField"
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val pageRequest = PageRequest.of(0, 10, Sort.by(invalidSortField).ascending())

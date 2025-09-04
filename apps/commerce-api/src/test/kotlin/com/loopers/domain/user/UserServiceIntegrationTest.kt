@@ -15,12 +15,19 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.util.concurrent.CompletableFuture
 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
@@ -29,6 +36,9 @@ class UserServiceIntegrationTest @Autowired constructor(
     private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -103,6 +113,10 @@ class UserServiceIntegrationTest @Autowired constructor(
         fun returnsMyInfo_whenRequestingMyInfo() {
             // arrange
             val createdUser = userJpaRepository.save(aUser().build())
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val myInfo = userService.findUserBy(createdUser.username)

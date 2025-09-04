@@ -12,8 +12,8 @@ import com.loopers.domain.user.UserService
 import com.loopers.domain.vo.Birthday
 import com.loopers.domain.vo.Email
 import com.loopers.domain.vo.Price
-import com.loopers.event.payload.productlike.ProductLikeEvent
-import com.loopers.event.payload.productlike.ProductUnlikeEvent
+import com.loopers.event.payload.productlike.ProductLikedEvent
+import com.loopers.event.payload.productlike.ProductUnlikedEvent
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
@@ -29,10 +29,17 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
+import java.util.concurrent.CompletableFuture
 
 @RecordApplicationEvents
 @SpringBootTest
@@ -47,6 +54,9 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val productJpaRepository: ProductJpaRepository,
     private val redisCleanUp: RedisCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
@@ -79,6 +89,10 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val createdProduct = productService.createProduct(productCreateCommand)
             val nonExistentUsername = "nonexistentuser"
             val likeCommand = ProductLikeCriteria.Like(nonExistentUsername, createdProduct.id)
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -147,13 +161,13 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
-            val callProductLikeEventCount = applicationEvents.stream(ProductLikeEvent::class.java)
+            val callProductLikedEventCount = applicationEvents.stream(ProductLikedEvent::class.java)
                 .filter { event -> event.productId == createdProduct.id }.count()
             assertAll(
                 { assertThat(productLikes).hasSize(1) },
                 { assertThat(productLikes[0].userId).isEqualTo(createdUser.id) },
                 { assertThat(productLikes[0].productId).isEqualTo(createdProduct.id) },
-                { assertThat(callProductLikeEventCount).isEqualTo(1) },
+                { assertThat(callProductLikedEventCount).isEqualTo(1) },
             )
         }
     }
@@ -248,16 +262,20 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                 ),
             )
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.username, createdProduct.id))
 
             // assert
             val productLikes = productLikeService.getProductLikesByUserId(createdUser.id)
-            val callProductUnlikeEventCount = applicationEvents.stream(ProductUnlikeEvent::class.java)
+            val callProductUnlikedEventCount = applicationEvents.stream(ProductUnlikedEvent::class.java)
                 .filter { event -> event.productId == createdProduct.id }.count()
             assertAll(
                 { assertThat(productLikes).isEmpty() },
-                { assertThat(callProductUnlikeEventCount).isEqualTo(1) },
+                { assertThat(callProductUnlikedEventCount).isEqualTo(1) },
             )
         }
     }

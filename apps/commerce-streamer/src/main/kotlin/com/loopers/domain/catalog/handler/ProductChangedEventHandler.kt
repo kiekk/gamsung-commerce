@@ -23,5 +23,4 @@ class ProductChangedEventHandler(
     override fun supports(eventType: EventType): Boolean {
         return EventType.PRODUCT_CHANGED == eventType
     }
-
 }

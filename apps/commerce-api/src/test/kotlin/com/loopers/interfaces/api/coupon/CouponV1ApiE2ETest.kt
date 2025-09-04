@@ -15,6 +15,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -22,6 +25,10 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.util.concurrent.CompletableFuture
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CouponV1ApiE2ETest @Autowired constructor(
@@ -30,6 +37,9 @@ class CouponV1ApiE2ETest @Autowired constructor(
     private val couponJpaRepository: CouponJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -63,6 +73,10 @@ class CouponV1ApiE2ETest @Autowired constructor(
                 set("X-USER-ID", createdUser.username)
             }
             val httpEntity = HttpEntity(createRequest, httpHeaders)
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<CouponV1Dto.CouponDetail>>() {}
@@ -100,6 +114,10 @@ class CouponV1ApiE2ETest @Autowired constructor(
             }
             val httpEntity = HttpEntity(issueRequest, httpHeaders)
             val requestUrl = ENDPOINT_COUPON_ISSUE(createdCoupon.id)
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<CouponV1Dto.IssuedCouponDetail>>() {}

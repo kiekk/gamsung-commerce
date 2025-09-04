@@ -1,10 +1,19 @@
 package com.loopers.config.kakfa
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.common.TopicPartition
+import org.apache.kafka.common.errors.NetworkException
+import org.apache.kafka.common.errors.RetriableException
+import org.apache.kafka.common.errors.SerializationException
+import org.apache.kafka.common.errors.TimeoutException
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.dao.DuplicateKeyException
+import org.springframework.dao.QueryTimeoutException
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
@@ -13,9 +22,15 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
 import org.springframework.kafka.listener.ContainerProperties
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer
+import org.springframework.kafka.listener.DefaultErrorHandler
 import org.springframework.kafka.support.converter.BatchMessagingMessageConverter
 import org.springframework.kafka.support.converter.ByteArrayJsonMessageConverter
-import java.util.HashMap
+import org.springframework.kafka.support.serializer.DeserializationException
+import org.springframework.util.backoff.FixedBackOff
+import java.io.IOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
 
 @EnableKafka
 @Configuration
@@ -79,5 +94,31 @@ class KafkaConfig {
             setConcurrency(3)
             isBatchListener = true
         }
+    }
+
+    @Bean
+    fun errorHandler(kafkaTemplate: KafkaTemplate<Any, Any>): DefaultErrorHandler {
+        val recoverer = DeadLetterPublishingRecoverer(kafkaTemplate) { r, e ->
+            TopicPartition("${r.topic()}.dlt", r.partition())
+        }
+        val handler = DefaultErrorHandler(recoverer, FixedBackOff(100L, 3L))
+        handler.addRetryableExceptions(
+            RetriableException::class.java,
+            TimeoutException::class.java,
+            NetworkException::class.java,
+            QueryTimeoutException::class.java,
+            SocketTimeoutException::class.java,
+            ConnectException::class.java,
+            IOException::class.java,
+        )
+        handler.addNotRetryableExceptions(
+            JsonProcessingException::class.java,
+            DeserializationException::class.java,
+            SerializationException::class.java,
+            IllegalArgumentException::class.java,
+            DataIntegrityViolationException::class.java,
+            DuplicateKeyException::class.java,
+        )
+        return handler
     }
 }

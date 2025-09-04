@@ -3,7 +3,6 @@ package com.loopers.event
 import DataSerializer
 import com.loopers.event.payload.EventPayload
 
-
 class Event<T : EventPayload>(
     val eventId: String,
     val eventType: EventType,
