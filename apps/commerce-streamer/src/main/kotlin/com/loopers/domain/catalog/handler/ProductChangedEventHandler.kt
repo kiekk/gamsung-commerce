@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.catalog
+package com.loopers.domain.catalog.handler
 
 import com.loopers.domain.catalog.CatalogEventHandler
 import com.loopers.event.EventType
