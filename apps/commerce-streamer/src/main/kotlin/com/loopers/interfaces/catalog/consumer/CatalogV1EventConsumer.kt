@@ -22,7 +22,7 @@ class CatalogV1EventConsumer(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @KafkaListener(
-        topics = [Topic.PRODUCT_V1_STOCK_ADJUSTED, Topic.PRODUCT_V1_CHANGED, Topic.PRODUCT_V1_LIKE_CHANGED],
+        topics = [Topic.PRODUCT_V1_STOCK_SOLD_OUT, Topic.PRODUCT_V1_CHANGED, Topic.PRODUCT_V1_LIKE_CHANGED],
         groupId = Group.CATALOG_EVENTS,
     )
     fun listen(

@@ -11,6 +11,7 @@ import com.loopers.event.payload.payment.PaymentCompletedEvent
 import com.loopers.event.payload.payment.PaymentFailedEvent
 import com.loopers.event.payload.payment.PaymentFailedSuccessEvent
 import com.loopers.event.payload.stock.StockAdjustedEvent
+import com.loopers.event.payload.stock.StockSoldOutEvent
 import com.loopers.event.publisher.EventPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -78,6 +79,9 @@ class OrderEventListener(
         order.orderItems.toProductQuantityMap().forEach { productQuantity ->
             stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key, productQuantity.value))
         }
+        val stocks = stockService.getStocksByProductIds(order.orderItems.toProductQuantityMap().map { it.key })
+        stocks.filter { it.isSoldOut() }
+            .forEach { stockEventPublisher.publish(StockSoldOutEvent(it.productId)) }
     }
 
     /*
