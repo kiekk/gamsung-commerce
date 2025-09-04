@@ -13,10 +13,17 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.util.concurrent.CompletableFuture
 
 @SpringBootTest
 class BrandQueryServiceTest @Autowired constructor(
@@ -24,6 +31,9 @@ class BrandQueryServiceTest @Autowired constructor(
     private val brandJpaRepository: BrandJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -122,6 +132,10 @@ class BrandQueryServiceTest @Autowired constructor(
             brandJpaRepository.save(aBrand().name("브랜드A").build())
             brandJpaRepository.save(aBrand().name("브랜드B").build())
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             val condition = BrandSearchCondition(name = "브랜드C")
             val pageRequest = PageRequest.of(0, 10)
@@ -163,6 +177,10 @@ class BrandQueryServiceTest @Autowired constructor(
             // arrange
             val createdBrand1 = brandJpaRepository.save(aBrand().name("브랜드A").build())
             val createdBrand2 = brandJpaRepository.save(aBrand().name("브랜드B").build())
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val condition = BrandSearchCondition()

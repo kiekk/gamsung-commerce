@@ -1,10 +1,10 @@
 package com.loopers.domain.productlike
 
-import com.loopers.event.payload.productlike.ProductLikeEvent
-import com.loopers.event.payload.productlike.ProductUnlikeEvent
+import com.loopers.event.payload.productlike.ProductLikedEvent
+import com.loopers.event.payload.productlike.ProductUnlikedEvent
 
 interface ProductLikeEventPublisher {
-    fun publish(productLikeEvent: ProductLikeEvent)
+    fun publish(productLikedEvent: ProductLikedEvent)
 
-    fun publish(productUnlikeEvent: ProductUnlikeEvent)
+    fun publish(productUnlikedEvent: ProductUnlikedEvent)
 }

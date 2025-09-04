@@ -43,16 +43,20 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
@@ -71,6 +75,9 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val paymentJpaRepository: PaymentJpaRepository,
     private val redisCleanUp: RedisCleanUp,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
@@ -343,6 +350,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 createdIssuedCoupon.id,
             )
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             val orderId = orderFacade.placeOrder(orderCriteria)
 
@@ -391,6 +402,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 ),
                 PaymentMethodType.POINT,
             )
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val orderId = orderFacade.placeOrder(criteria)
@@ -632,6 +647,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
             val successCount = AtomicInteger(0)
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -688,6 +707,10 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
             val successCount = AtomicInteger(0)
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -719,7 +742,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         @DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다.")
         @Test
         fun shouldNotDeductStockMoreThanAvailableWhenConcurrentOrdersArePlacedForSameProduct() {
-            // given
+            // arrange
             val numberOfThreads = 2
             val latch = CountDownLatch(numberOfThreads)
             val executor = Executors.newFixedThreadPool(numberOfThreads)
@@ -736,7 +759,11 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 usernames.add(createdUser.username)
             }
 
-            // when
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
+            // act
             repeat(numberOfThreads) {
                 val criteria = OrderCriteria.Create(
                     usernames[it],
@@ -766,7 +793,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
 
             latch.await()
 
-            // then
+            // assert
             await().pollDelay(Duration.ofSeconds(2)).pollInterval(Duration.ofSeconds(1)).untilAsserted {
                 val remainingStock = stockJpaRepository.findByProductId(createdProduct.id)?.quantity
                 println("성공한 주문 수: $successCount")

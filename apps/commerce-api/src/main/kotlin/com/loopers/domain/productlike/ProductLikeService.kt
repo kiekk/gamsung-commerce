@@ -1,7 +1,7 @@
 package com.loopers.domain.productlike
 
-import com.loopers.event.payload.productlike.ProductLikeEvent
-import com.loopers.event.payload.productlike.ProductUnlikeEvent
+import com.loopers.event.payload.productlike.ProductLikedEvent
+import com.loopers.event.payload.productlike.ProductUnlikedEvent
 import com.loopers.event.publisher.EventPublisher
 import com.loopers.support.cache.CacheKey
 import com.loopers.support.cache.CacheNames
@@ -49,7 +49,7 @@ class ProductLikeService(
         if (productLikeRepository.existsByUserIdAndProductId(command.userId, command.productId)) return
 
         productLikeRepository.create(command.toEntity()).let { created ->
-            eventPublisher.publish(ProductLikeEvent(created.productId))
+            eventPublisher.publish(ProductLikedEvent(created.productId))
         }
     }
 
@@ -61,7 +61,7 @@ class ProductLikeService(
             productLikeRepository.deleteByUserIdAndProductId(command.userId, command.productId)
         if (deleteCount == 0) return
 
-        eventPublisher.publish(ProductUnlikeEvent(command.productId))
+        eventPublisher.publish(ProductUnlikedEvent(command.productId))
     }
 
     @Transactional(readOnly = true)

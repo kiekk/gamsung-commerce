@@ -76,13 +76,13 @@ class OrderEventListener(
         val order = orderService.findWithItemsByOrderKey(event.orderKey)
             ?: throw IllegalStateException("주문 정보를 찾을 수 없습니다. orderKey: ${event.orderKey}")
         order.orderItems.toProductQuantityMap().forEach { productQuantity ->
-            stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key))
+            stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key, productQuantity.value))
         }
     }
 
     /*
     주문 완료 롤백
-    */
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
     fun handle(event: OrderCompletedEvent) {
