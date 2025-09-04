@@ -19,7 +19,8 @@ class ProductEventListener(
 
     @EventListener
     fun handle(event: ProductViewedEvent) {
-        log.info("상품 조회 이벤트 수신: $event")
+        log.info("[ProductEventListener.handle] event: $event")
+        productEventPublisher.publish(event)
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
