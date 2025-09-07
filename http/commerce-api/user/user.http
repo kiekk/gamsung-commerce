@@ -1,0 +1,12 @@
+### 회원가입 요청
+POST http://127.0.0.1:8080/api/v1/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "soonho",
+  "name": "soonho",
+  "email": "soonho@example.com",
+  "birthday": "1995-05-15",
+  "gender": "M"
+}

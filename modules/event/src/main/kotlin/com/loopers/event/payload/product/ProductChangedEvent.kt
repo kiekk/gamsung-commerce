@@ -1,7 +1,7 @@
-package com.loopers.event.payload.productlike
+package com.loopers.event.payload.product
 
 import com.loopers.event.payload.EventPayload
 
-data class ProductUnlikeEvent(
+data class ProductChangedEvent(
     val productId: Long,
 ) : EventPayload

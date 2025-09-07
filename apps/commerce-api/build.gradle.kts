@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":modules:feign"))
     implementation(project(":modules:retry"))
     implementation(project(":modules:event"))
+    implementation(project(":modules:kafka"))
     implementation(project(":supports:jackson"))
     implementation(project(":supports:logging"))
     implementation(project(":supports:monitoring"))
@@ -29,4 +30,5 @@ dependencies {
     // test-fixtures
     testImplementation(testFixtures(project(":modules:jpa")))
     testImplementation(testFixtures(project(":modules:redis")))
+    testImplementation(testFixtures(project(":modules:kafka")))
 }

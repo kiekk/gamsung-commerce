@@ -3,8 +3,8 @@ package com.loopers.domain.productlike
 import com.loopers.domain.product.fixture.ProductEntityFixture.Companion.aProduct
 import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.domain.vo.Email
-import com.loopers.event.payload.productlike.ProductLikeEvent
-import com.loopers.event.payload.productlike.ProductUnlikeEvent
+import com.loopers.event.payload.productlike.ProductLikedEvent
+import com.loopers.event.payload.productlike.ProductUnlikedEvent
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
@@ -16,11 +16,18 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
@@ -34,6 +41,9 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
     private val userJpaRepository: UserJpaRepository,
 ) {
+
+    @MockitoBean
+    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
@@ -154,6 +164,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                     createdProduct.id,
                 ),
             )
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val productUnlikeCommand = ProductLikeCommand.Unlike(
@@ -355,7 +369,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // then
-            assertThat(applicationEvents.stream(ProductLikeEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
+            assertThat(applicationEvents.stream(ProductLikedEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
         }
 
         @DisplayName("[낙관적 락] 동일한 상품에 대해 여러명이 좋아요 취소를 요청할 때 좋아요 집계 이벤트[ProductUnlikeEvent]는 정상적으로 발행되어야 한다.")
@@ -376,6 +390,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
 
             productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, userIds.size))
 
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
+
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -392,7 +410,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            assertThat(applicationEvents.stream(ProductUnlikeEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
+            assertThat(applicationEvents.stream(ProductUnlikedEvent::class.java).count()).isEqualTo(numberOfThreads.toLong())
         }
 
         @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 등록을 요청해도 좋아요 집계 이벤트[ProductLikeEvent]는 정상적으로 발행되어야 한다.")
@@ -421,7 +439,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            assertThat(applicationEvents.stream(ProductLikeEvent::class.java).count()).isEqualTo(1L)
+            assertThat(applicationEvents.stream(ProductLikedEvent::class.java).count()).isEqualTo(1L)
         }
 
         @DisplayName("[낙관적 락] 동일한 상품에 대해 한명이 동시에 여러 번 좋아요 취소를 요청해도 좋아요 집계 이벤트[ProductUnlikeEvent]는 정상적으로 발행되어야 한다.")
@@ -435,6 +453,10 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             val createdProduct = productJpaRepository.save(aProduct().build())
             productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
             productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 1))
+
+            // kafka mock
+            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
+            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             repeat(numberOfThreads) {
@@ -452,7 +474,7 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             latch.await()
 
             // assert
-            assertThat(applicationEvents.stream(ProductUnlikeEvent::class.java).count()).isEqualTo(1L)
+            assertThat(applicationEvents.stream(ProductUnlikedEvent::class.java).count()).isEqualTo(1L)
         }
     }
 }

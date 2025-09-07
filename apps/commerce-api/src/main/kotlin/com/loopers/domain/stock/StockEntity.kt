@@ -26,4 +26,8 @@ class StockEntity(
         require(!isQuantityLessThan(quantity)) { "차감할 재고 수량이 없습니다." }
         this.quantity -= quantity
     }
+
+    fun isSoldOut(): Boolean {
+        return quantity == 0
+    }
 }
