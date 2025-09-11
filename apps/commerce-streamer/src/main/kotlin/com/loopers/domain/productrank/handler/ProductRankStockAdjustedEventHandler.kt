@@ -21,7 +21,10 @@ class ProductRankStockAdjustedEventHandler(
             val sumOfQuantity = events.sumOf { it.quantity }
             val sumOfAmount = events.sumOf { it.amount }
             val score = ProductRankScoreCalculator.calculateScoreBySalesCount(sumOfQuantity, sumOfAmount)
-            log.info("[ProductRankStockAdjustedEventHandler.handle] productId: $productId, sumOfQuantity: $sumOfQuantity, sumOfAmount: $sumOfAmount")
+            log.info(
+                "[ProductRankStockAdjustedEventHandler.handle] productId: $productId," +
+                        " sumOfQuantity: $sumOfQuantity, sumOfAmount: $sumOfAmount",
+            )
             cacheRepository.zIncrBy(cacheKey, productId, score)
         }
     }

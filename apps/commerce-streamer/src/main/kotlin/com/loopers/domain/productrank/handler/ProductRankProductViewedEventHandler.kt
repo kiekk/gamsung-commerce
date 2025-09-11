@@ -20,7 +20,10 @@ class ProductRankProductViewedEventHandler(
         events.groupingBy { it.productId }.eachCount()
             .forEach { (productId, count) ->
                 val score = ProductRankScoreCalculator.calculateScoreByViewCount(count)
-                log.info("[ProductRankProductViewedEventHandler.handle] productId: $productId, count: $count, cacheKey: $cacheKey, score: ${score * count}")
+                log.info(
+                    "[ProductRankProductViewedEventHandler.handle] productId: $productId," +
+                            " count: $count, cacheKey: $cacheKey, score: ${score * count}",
+                )
                 cacheRepository.zIncrBy(cacheKey, productId, score)
             }
     }

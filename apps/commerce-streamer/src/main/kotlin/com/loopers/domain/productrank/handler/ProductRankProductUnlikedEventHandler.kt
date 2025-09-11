@@ -20,7 +20,10 @@ class ProductRankProductUnlikedEventHandler(
         events.groupingBy { it.productId }.eachCount()
             .forEach { (productId, count) ->
                 val score = ProductRankScoreCalculator.calculateScoreByLikeCount(-count)
-                log.info("[ProductRankProductUnlikedEventHandler.handle] productId: $productId, count: ${-count}, cacheKey: $cacheKey, score: ${score * count}")
+                log.info(
+                    "[ProductRankProductUnlikedEventHandler.handle] productId: $productId," +
+                            " count: ${-count}, cacheKey: $cacheKey, score: ${score * count}",
+                )
                 cacheRepository.zIncrBy(cacheKey, productId, score)
             }
     }

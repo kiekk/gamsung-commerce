@@ -21,7 +21,11 @@ class ProductRankV1EventConsumer(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @KafkaListener(
-        topics = [EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED, EventType.Topic.PRODUCT_V1_LIKE_CHANGED, EventType.Topic.PRODUCT_V1_VIEWED],
+        topics = [
+            EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED,
+            EventType.Topic.PRODUCT_V1_LIKE_CHANGED,
+            EventType.Topic.PRODUCT_V1_VIEWED,
+        ],
         groupId = EventType.Group.PRODUCT_RANK_DAY_EVENTS,
         containerFactory = KafkaConfig.BATCH_LISTENER,
     )
@@ -48,7 +52,11 @@ class ProductRankV1EventConsumer(
     }
 
     @KafkaListener(
-        topics = [EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED, EventType.Topic.PRODUCT_V1_LIKE_CHANGED, EventType.Topic.PRODUCT_V1_VIEWED],
+        topics = [
+            EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED,
+            EventType.Topic.PRODUCT_V1_LIKE_CHANGED,
+            EventType.Topic.PRODUCT_V1_VIEWED,
+        ],
         groupId = EventType.Group.PRODUCT_RANK_HOUR_EVENTS,
         containerFactory = KafkaConfig.BATCH_LISTENER,
     )
