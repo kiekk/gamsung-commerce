@@ -16,10 +16,14 @@ class ProductRankStockAdjustedEventHandler(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    override fun handle(cacheKey: CacheKey, event: StockAdjustedEvent) {
-        val score = ProductRankScoreCalculator.calculateScoreBySalesCount(event.quantity, event.amount)
-        log.info("[ProductLikedEventHandler.handle] event: $event, cacheKey: $cacheKey, score: $score")
-        cacheRepository.zIncrBy(cacheKey, event.productId, score)
+    override fun handle(cacheKey: CacheKey, events: List<StockAdjustedEvent>) {
+        events.groupBy { it.productId }.forEach { (productId, events) ->
+            val sumOfQuantity = events.sumOf { it.quantity }
+            val sumOfAmount = events.sumOf { it.amount }
+            val score = ProductRankScoreCalculator.calculateScoreBySalesCount(sumOfQuantity, sumOfAmount)
+            log.info("[ProductRankStockAdjustedEventHandler.handle] productId: $productId, sumOfQuantity: $sumOfQuantity, sumOfAmount: $sumOfAmount")
+            cacheRepository.zIncrBy(cacheKey, productId, score)
+        }
     }
 
     override fun supports(eventType: EventType): Boolean {

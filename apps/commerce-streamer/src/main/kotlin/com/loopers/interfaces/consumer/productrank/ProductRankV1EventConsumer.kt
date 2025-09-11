@@ -1,9 +1,11 @@
 package com.loopers.interfaces.consumer.productrank
 
+import com.loopers.config.kakfa.KafkaConfig
 import com.loopers.domain.productrank.ProductRankService
 import com.loopers.event.Event
 import com.loopers.event.EventType
 import com.loopers.support.cache.productrank.ProductRankCacheKeyGenerator
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -21,19 +23,26 @@ class ProductRankV1EventConsumer(
     @KafkaListener(
         topics = [EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED, EventType.Topic.PRODUCT_V1_LIKE_CHANGED, EventType.Topic.PRODUCT_V1_VIEWED],
         groupId = EventType.Group.PRODUCT_RANK_DAY_EVENTS,
+        containerFactory = KafkaConfig.BATCH_LISTENER,
     )
     @Transactional
     fun productRankDayEventListen(
-        message: String,
+        records: List<ConsumerRecord<String, String>>,
         ack: Acknowledgment,
     ) {
-        log.info("[ProductRankV1EventConsumer.productRankDayEventListen] message: $message")
-        val event = Event.fromJson(message) ?: throw IllegalArgumentException("Invalid event message: $message")
+        log.info("[ProductRankV1EventConsumer.productRankDayEventListen] records: $records")
 
-        productRankService.handleEvent(
-            ProductRankCacheKeyGenerator.generate(LocalDate.now()),
-            event,
-        )
+        val eventMap = records
+            .map { Event.fromJson(it.value()) ?: throw IllegalArgumentException("Invalid event message: ${it.value()}") }
+            .groupBy { it.eventType }
+
+        eventMap.forEach { (eventType, events) ->
+            productRankService.handleEvent(
+                ProductRankCacheKeyGenerator.generate(LocalDate.now()),
+                eventType,
+                events.map { it.payload },
+            )
+        }
 
         ack.acknowledge()
     }
@@ -41,19 +50,26 @@ class ProductRankV1EventConsumer(
     @KafkaListener(
         topics = [EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED, EventType.Topic.PRODUCT_V1_LIKE_CHANGED, EventType.Topic.PRODUCT_V1_VIEWED],
         groupId = EventType.Group.PRODUCT_RANK_HOUR_EVENTS,
+        containerFactory = KafkaConfig.BATCH_LISTENER,
     )
     @Transactional
     fun productRankHourEventListen(
-        message: String,
+        records: List<ConsumerRecord<String, String>>,
         ack: Acknowledgment,
     ) {
-        log.info("[ProductRankV1EventConsumer.productRankHourEventListen] message: $message")
-        val event = Event.fromJson(message) ?: throw IllegalArgumentException("Invalid event message: $message")
+        log.info("[ProductRankV1EventConsumer.productRankHourEventListen] records: $records")
 
-        productRankService.handleEvent(
-            ProductRankCacheKeyGenerator.generate(LocalDateTime.now()),
-            event,
-        )
+        val eventMap = records
+            .map { Event.fromJson(it.value()) ?: throw IllegalArgumentException("Invalid event message: ${it.value()}") }
+            .groupBy { it.eventType }
+
+        eventMap.forEach { (eventType, events) ->
+            productRankService.handleEvent(
+                ProductRankCacheKeyGenerator.generate(LocalDateTime.now()),
+                eventType,
+                events.map { it.payload },
+            )
+        }
 
         ack.acknowledge()
     }

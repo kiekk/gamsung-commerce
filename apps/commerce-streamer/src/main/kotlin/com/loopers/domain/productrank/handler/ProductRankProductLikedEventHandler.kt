@@ -16,10 +16,13 @@ class ProductRankProductLikedEventHandler(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    override fun handle(cacheKey: CacheKey, event: ProductLikedEvent) {
-        val score = ProductRankScoreCalculator.calculateScoreByLikeCount(1)
-        log.info("[ProductLikedEventHandler.handle] event: $event, cacheKey: $cacheKey, score: $score")
-        cacheRepository.zIncrBy(cacheKey, event.productId, score)
+    override fun handle(cacheKey: CacheKey, events: List<ProductLikedEvent>) {
+        events.groupingBy { it.productId }.eachCount()
+            .forEach { (productId, count) ->
+                val score = ProductRankScoreCalculator.calculateScoreByLikeCount(count)
+                log.info("[ProductRankProductLikedEventHandler.handle] productId: $productId, count: $count, cacheKey: $cacheKey, score: ${score * count}")
+                cacheRepository.zIncrBy(cacheKey, productId, score)
+            }
     }
 
     override fun supports(eventType: EventType): Boolean {

@@ -30,15 +30,19 @@ class ProductRankSimulationScheduler(
         log.info("[ProductRankScheduler.generateRandomEvent] start")
 
         // Daily
+        val dailyEvent = generateRandomEvent()
         productRankService.handleEvent(
             ProductRankCacheKeyGenerator.generate(LocalDate.now()),
-            generateRandomEvent(),
+            dailyEvent.eventType,
+            listOf(dailyEvent.payload),
         )
 
         // Hourly
+        val hourlyEvent = generateRandomEvent()
         productRankService.handleEvent(
             ProductRankCacheKeyGenerator.generate(LocalDateTime.now()),
-            generateRandomEvent(),
+            hourlyEvent.eventType,
+            listOf(hourlyEvent.payload),
         )
         log.info("[ProductRankScheduler.generateRandomEvent] end")
     }
