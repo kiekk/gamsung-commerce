@@ -50,7 +50,6 @@ private class CacheRedisRepository(
         redisTemplate.opsForZSet().incrementScore(cacheKey.fullKey(), productId.toString(), score)
         if (redisTemplate.getExpire(cacheKey.fullKey()) == -1L) {
             log.info("[CacheRedisRepository.zIncrBy] Setting TTL for key: {}", cacheKey.ttl)
-            // TODO: TTL 수정
             redisTemplate.expire(cacheKey.fullKey(), cacheKey.ttl)
         }
     }
@@ -70,7 +69,6 @@ private class CacheRedisRepository(
         redisTemplate.opsForZSet().add(cacheKey.fullKey(), normalizedTuples)
         if (redisTemplate.getExpire(cacheKey.fullKey()) == -1L) {
             log.info("[CacheRedisRepository.zAddAll] Setting TTL for key: {}", cacheKey.ttl)
-            // TODO: TTL 수정
             redisTemplate.expire(cacheKey.fullKey(), cacheKey.ttl)
         }
     }

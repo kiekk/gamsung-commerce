@@ -2,7 +2,7 @@ package com.loopers.support.cache.productrank
 
 import com.loopers.support.cache.CacheKey
 import com.loopers.support.cache.CacheNames
-import java.time.Duration
+import com.loopers.support.utils.TimeCalculatorUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -16,7 +16,7 @@ object ProductRankCacheKeyGenerator {
             CacheNames.PRODUCT_RANK_ALL_KEY_PREFIX,
             formattedDate,
             // ttl 2시간 설정
-            Duration.ofHours(2),
+            TimeCalculatorUtils.calculateDurationByHours(LocalDateTime.now(), 2),
         )
     }
 
@@ -27,7 +27,7 @@ object ProductRankCacheKeyGenerator {
             CacheNames.PRODUCT_RANK_ALL_KEY_PREFIX,
             formattedDate,
             // ttl 2일로 설정
-            Duration.ofDays(2),
+            TimeCalculatorUtils.calculateDurationByDays(LocalDateTime.now(), 2),
         )
     }
 }
