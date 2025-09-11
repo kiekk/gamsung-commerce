@@ -1,0 +1,15 @@
+package com.loopers.domain.productrank
+
+object ProductRankScoreCalculator {
+    fun calculateScoreByViewCount(viewCount: Long): Double {
+        return viewCount * ProductRankScoreWeight.PRODUCT_VIEW_COUNT_WEIGHT
+    }
+
+    fun calculateScoreByLikeCount(likeCount: Long): Double {
+        return likeCount * ProductRankScoreWeight.PRODUCT_LIKE_COUNT_WEIGHT
+    }
+
+    fun calculateScoreBySalesCount(salesCount: Int, amount: Long): Double {
+        return (salesCount * amount) * ProductRankScoreWeight.PRODUCT_SALES_COUNT_WEIGHT
+    }
+}
