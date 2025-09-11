@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
+import java.util.TimeZone
 
 @EnableScheduling
 @SpringBootApplication
@@ -12,7 +13,7 @@ class CommerceStreamerApplication {
     @PostConstruct
     fun started() {
         // set timezone
-        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Asia/Seoul"))
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"))
     }
 }
 
