@@ -42,4 +42,34 @@ class ProductRankFacade(
 
         return PageImpl(productRanks, pageable, productRankTotalCount)
     }
+
+    fun getProductRanksByHour(
+        criteria: ProductRankCriteria.SearchHour,
+        pageable: Pageable,
+    ): Page<ProductRankInfo.ProductRankList> {
+        log.info("[ProductRankFacade.getProductRanksByHour] criteria: {}, pageable: {}", criteria, pageable)
+        val productRankMap = productRankService.getProductRankIdsByHour(criteria.toCommand(pageable.offset, pageable.pageSize))
+
+        if (productRankMap.isEmpty()) {
+            return PageImpl(emptyList(), pageable, 0)
+        }
+
+        val products = productQueryService.getProductsByIds(productRankMap.keys.map { it.toLong() }.toList())
+            ?: emptyList()
+        // 랭크 정보 추가
+        val productRanks = products
+            .map {
+                ProductRankInfo.ProductRankList.from(
+                    it,
+                    productRankMap[it.id.toString()]?.rank,
+                    productRankMap[it.id.toString()]?.score,
+                )
+            }
+            .sortedBy { it.rankNumber }
+            .toList()
+        // 총 개수 조회
+        val productRankTotalCount = productRankService.getProductRankTotalCountByHour(criteria.rankDate)
+
+        return PageImpl(productRanks, pageable, productRankTotalCount)
+    }
 }
