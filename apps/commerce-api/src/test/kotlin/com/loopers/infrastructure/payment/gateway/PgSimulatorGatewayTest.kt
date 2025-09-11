@@ -4,6 +4,7 @@ import com.loopers.domain.payment.gateway.PaymentGateway
 import com.loopers.domain.payment.gateway.PaymentGatewayCommand
 import com.loopers.domain.payment.gateway.PaymentGatewayResult
 import com.loopers.interfaces.api.ApiResponse
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.enums.payment.PaymentCardType
 import com.loopers.support.enums.payment.PaymentStatusType
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
@@ -13,28 +14,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 
+@Import(KafkaMockConfig::class)
 @SpringBootTest
 class PgSimulatorGatewayTest @Autowired constructor(
     private val circuitBreakerRegistry: CircuitBreakerRegistry,
     private val paymentGateway: PaymentGateway,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     private lateinit var circuitBreaker: CircuitBreaker
 
@@ -147,10 +143,6 @@ class PgSimulatorGatewayTest @Autowired constructor(
             circuitBreaker.transitionToOpenState()
             circuitBreaker.transitionToHalfOpenState()
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             val request = PaymentGatewayCommand.Request(
                 "ORDER-1",
                 PaymentCardType.HYUNDAI,
@@ -197,10 +189,6 @@ class PgSimulatorGatewayTest @Autowired constructor(
             whenever(pgSimulatorFeignClient.createPayment(any(), any()))
                 .thenThrow(RuntimeException("Internal Server Error"))
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             try {
                 paymentGateway.requestPayment(1L, request)
@@ -246,10 +234,6 @@ class PgSimulatorGatewayTest @Autowired constructor(
             whenever(pgSimulatorFeignClient.createPayment(any(), any()))
                 .thenReturn(ApiResponse.success(PaymentGatewayResult.Requested("T-HALF-OPEN", PaymentStatusType.PENDING)))
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             val waitDurationInOpenState = 2L
             TimeUnit.SECONDS.sleep(waitDurationInOpenState + 1)
 
@@ -282,10 +266,6 @@ class PgSimulatorGatewayTest @Autowired constructor(
                     TimeUnit.SECONDS.sleep(circuitBreaker.circuitBreakerConfig.slowCallDurationThreshold.plusSeconds(1).toSeconds())
                     ApiResponse.success(PaymentGatewayResult.Requested("T-SLOW", PaymentStatusType.PENDING))
                 }
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             repeat(circuitBreaker.circuitBreakerConfig.minimumNumberOfCalls) {

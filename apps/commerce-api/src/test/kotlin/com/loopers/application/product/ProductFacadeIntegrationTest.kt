@@ -10,6 +10,7 @@ import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.support.error.CoreException
 import com.loopers.utils.DatabaseCleanUp
@@ -24,10 +25,12 @@ import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import java.math.BigDecimal
 
+@Import(KafkaMockConfig::class)
 @SpringBootTest
 class ProductFacadeIntegrationTest @Autowired constructor(
     private val productFacade: ProductFacade,
@@ -435,10 +438,10 @@ class ProductFacadeIntegrationTest @Autowired constructor(
             val createdProduct1 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품A").build())
             val createdProduct2 = productJpaRepository.save(aProduct().brandId(createdBrand.id).name("상품B").build())
             val createdProductLikeCount1 = productLikeCountJpaRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build(),
+                ProductLikeCountEntityFixture.aProductLikeCount().productId(createdProduct1.id).productLikeCount(10).build(),
             )
             val createdProductLikeCount2 = productLikeCountJpaRepository.save(
-                ProductLikeCountEntityFixture.Companion.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build(),
+                ProductLikeCountEntityFixture.aProductLikeCount().productId(createdProduct2.id).productLikeCount(20).build(),
             )
 
             // act

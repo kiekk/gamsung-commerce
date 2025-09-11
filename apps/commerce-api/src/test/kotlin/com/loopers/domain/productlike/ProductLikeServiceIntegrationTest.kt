@@ -9,28 +9,25 @@ import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeCountJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
+import com.loopers.support.KafkaMockConfig
 import com.loopers.utils.DatabaseCleanUp
+import com.loopers.utils.RedisCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
+@Import(KafkaMockConfig::class)
 @RecordApplicationEvents
 @SpringBootTest
 class ProductLikeServiceIntegrationTest @Autowired constructor(
@@ -40,16 +37,15 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
     private val productLikeJpaRepository: ProductLikeJpaRepository,
     private val productLikeCountJpaRepository: ProductLikeCountJpaRepository,
     private val userJpaRepository: UserJpaRepository,
+    private val redisCleanUp: RedisCleanUp,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
 
     @AfterEach
     fun tearDown() {
+        redisCleanUp.truncateAll()
         databaseCleanUp.truncateAllTables()
     }
 
@@ -164,10 +160,6 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
                     createdProduct.id,
                 ),
             )
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val productUnlikeCommand = ProductLikeCommand.Unlike(
@@ -390,10 +382,6 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
 
             productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, userIds.size))
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -453,10 +441,6 @@ class ProductLikeServiceIntegrationTest @Autowired constructor(
             val createdProduct = productJpaRepository.save(aProduct().build())
             productLikeJpaRepository.save(ProductLikeEntity(createdUser.id, createdProduct.id))
             productLikeCountJpaRepository.save(ProductLikeCountEntity(createdProduct.id, 1))
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             repeat(numberOfThreads) {

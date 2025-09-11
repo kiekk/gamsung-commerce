@@ -8,6 +8,7 @@ import com.loopers.domain.product.query.ProductQueryService
 import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.cache.CacheNames
 import com.loopers.support.cache.CacheRepository
 import com.loopers.utils.DatabaseCleanUp
@@ -20,10 +21,12 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 
+@Import(KafkaMockConfig::class)
 @SpringBootTest
 class ProductCacheFacadeIntegrationTest @Autowired constructor(
     private val brandJpaRepository: BrandJpaRepository,

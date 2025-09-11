@@ -17,6 +17,7 @@ import com.loopers.event.payload.productlike.ProductUnlikedEvent
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.productlike.ProductLikeJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.enums.user.GenderType
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
@@ -29,18 +30,13 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
-import java.util.concurrent.CompletableFuture
 
+@Import(KafkaMockConfig::class)
 @RecordApplicationEvents
 @SpringBootTest
 class ProductLikeFacadeIntegrationTest @Autowired constructor(
@@ -54,9 +50,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
     private val productJpaRepository: ProductJpaRepository,
     private val redisCleanUp: RedisCleanUp,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
@@ -89,10 +82,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
             val createdProduct = productService.createProduct(productCreateCommand)
             val nonExistentUsername = "nonexistentuser"
             val likeCommand = ProductLikeCriteria.Like(nonExistentUsername, createdProduct.id)
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val exception = assertThrows<CoreException> {
@@ -261,10 +250,6 @@ class ProductLikeFacadeIntegrationTest @Autowired constructor(
                     createdProduct.id,
                 ),
             )
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             productLikeFacade.unlike(ProductLikeCriteria.Unlike(createdUser.username, createdProduct.id))

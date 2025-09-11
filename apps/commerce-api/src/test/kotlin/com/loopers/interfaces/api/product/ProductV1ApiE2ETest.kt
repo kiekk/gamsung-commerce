@@ -7,6 +7,7 @@ import com.loopers.infrastructure.brand.BrandJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.enums.product.ProductStatusType
 import com.loopers.utils.DatabaseCleanUp
 import com.loopers.utils.RedisCleanUp
@@ -16,22 +17,17 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import java.util.concurrent.CompletableFuture
 
+@Import(KafkaMockConfig::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductV1ApiE2ETest @Autowired constructor(
     private val testRestTemplate: TestRestTemplate,
@@ -41,9 +37,6 @@ class ProductV1ApiE2ETest @Autowired constructor(
     private val databaseCleanUp: DatabaseCleanUp,
     private val redisCleanUp: RedisCleanUp,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @AfterEach
     fun tearDown() {
@@ -105,10 +98,6 @@ class ProductV1ApiE2ETest @Autowired constructor(
             val httpHeaders = HttpHeaders().apply { set("X-USER-ID", createdUser.username) }
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_PRODUCT, HttpMethod.POST, httpEntity, responseType)
@@ -140,10 +129,6 @@ class ProductV1ApiE2ETest @Autowired constructor(
             )
             val httpHeaders = HttpHeaders().apply { set("X-USER-ID", createdUser.username) }
             val httpEntity = HttpEntity<Any>(createRequest, httpHeaders)
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<ProductV1Dto.ProductResultResponse>>() {}

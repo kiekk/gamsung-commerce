@@ -27,6 +27,7 @@ import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.product.ProductJpaRepository
 import com.loopers.infrastructure.stock.StockJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
+import com.loopers.support.KafkaMockConfig
 import com.loopers.support.enums.coupon.IssuedCouponStatusType
 import com.loopers.support.enums.order.OrderStatusType
 import com.loopers.support.enums.payment.PaymentCardType
@@ -43,24 +44,22 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
 import java.time.Duration
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
+@Import(KafkaMockConfig::class)
 @RecordApplicationEvents
 @SpringBootTest
 class OrderFacadeIntegrationTest @Autowired constructor(
@@ -75,9 +74,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private val paymentJpaRepository: PaymentJpaRepository,
     private val redisCleanUp: RedisCleanUp,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
@@ -250,7 +246,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             val createdUser = userJpaRepository.save(aUser().build())
             val createdProduct = productJpaRepository.save(aProduct().build())
             stockJpaRepository.save(aStock().build())
-            val nonExistIssuedCouponId: Long = 999L
+            val nonExistIssuedCouponId = 999L
             val quantity = Quantity(2)
             val orderCriteria = OrderCriteria.Create(
                 createdUser.username,
@@ -350,10 +346,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 createdIssuedCoupon.id,
             )
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             val orderId = orderFacade.placeOrder(orderCriteria)
 
@@ -402,10 +394,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 ),
                 PaymentMethodType.POINT,
             )
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val orderId = orderFacade.placeOrder(criteria)
@@ -647,10 +635,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
             val successCount = AtomicInteger(0)
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -707,10 +691,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
             )
             val successCount = AtomicInteger(0)
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             repeat(numberOfThreads) {
                 executor.submit {
@@ -758,10 +738,6 @@ class OrderFacadeIntegrationTest @Autowired constructor(
                 pointJpaRepository.save(aPoint().userId(createdUser.id).point(Point(10_000)).build())
                 usernames.add(createdUser.username)
             }
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             repeat(numberOfThreads) {

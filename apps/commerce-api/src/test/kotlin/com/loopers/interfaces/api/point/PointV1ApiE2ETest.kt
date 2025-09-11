@@ -5,6 +5,7 @@ import com.loopers.domain.user.UserEntityFixture.Companion.aUser
 import com.loopers.infrastructure.point.PointJpaRepository
 import com.loopers.infrastructure.user.UserJpaRepository
 import com.loopers.interfaces.api.ApiResponse
+import com.loopers.support.KafkaMockConfig
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -12,32 +13,24 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import java.util.concurrent.CompletableFuture
 
+@Import(KafkaMockConfig::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PointV1ApiE2ETest @Autowired constructor(
     private val testRestTemplate: TestRestTemplate,
     private val userJpaRepository: UserJpaRepository,
     private val databaseCleanUp: DatabaseCleanUp,
 ) {
-
-    @MockitoBean
-    lateinit var kafkaTemplate: KafkaTemplate<Any, Any>
 
     @Autowired
     private lateinit var pointJpaRepository: PointJpaRepository
@@ -94,10 +87,6 @@ class PointV1ApiE2ETest @Autowired constructor(
         fun returnsBadRequest_whenUserIdHeaderIsMissing() {
             // arrange
 
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
-
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
             val response = testRestTemplate.exchange(ENDPOINT_GET, HttpMethod.GET, HttpEntity<Any>(Unit), responseType)
@@ -151,10 +140,6 @@ class PointV1ApiE2ETest @Autowired constructor(
             httpHeaders.contentType = MediaType.APPLICATION_JSON
             val requestBody = PointV1Dto.ChargeRequest(point)
             val httpEntity = HttpEntity(requestBody, httpHeaders)
-
-            // kafka mock
-            val future = CompletableFuture.completedFuture(mock<SendResult<Any, Any>>())
-            whenever(kafkaTemplate.send(any(), any(), any())).thenReturn(future)
 
             // act
             val responseType = object : ParameterizedTypeReference<ApiResponse<PointV1Dto.PointResultResponse>>() {}
