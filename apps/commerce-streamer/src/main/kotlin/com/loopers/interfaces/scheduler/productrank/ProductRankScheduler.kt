@@ -19,4 +19,12 @@ class ProductRankScheduler(
         productRankCarryOverService.carryOverTomorrowRank(20, 0.01)
         log.info("[ProductRankScheduler.carryOverTomorrowRank] end")
     }
+
+    @Scheduled(cron = "0 50 * * * *", zone = "Asia/Seoul")
+    fun carryOverNextHourRank() {
+        log.info("[ProductRankScheduler.carryOverNextHourRank] start")
+        // 상위 20개 상품 랭킹을 carry-over, 점수는 1% 감소
+        productRankCarryOverService.carryOverNextHourRank(20, 0.01)
+        log.info("[ProductRankScheduler.carryOverNextHourRank] end")
+    }
 }
