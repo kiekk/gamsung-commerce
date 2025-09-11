@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-class ProductLikedEventHandlerProduct(
+class ProductMetricsProductLikedEventHandlerProduct(
     private val productMetricsRepository: ProductMetricsRepository,
 ) : ProductMetricsEventHandler<ProductLikedEvent> {
 

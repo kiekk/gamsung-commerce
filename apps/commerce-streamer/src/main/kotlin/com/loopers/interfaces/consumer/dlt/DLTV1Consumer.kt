@@ -1,7 +1,6 @@
-package com.loopers.interfaces.dlt.consumer
+package com.loopers.interfaces.consumer.dlt
 
-import com.loopers.event.EventType.Group
-import com.loopers.event.EventType.Topic
+import com.loopers.event.EventType
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -14,12 +13,12 @@ class DLTV1Consumer {
 
     @KafkaListener(
         topics = [
-            Topic.PRODUCT_V1_CHANGED_DLT,
-            Topic.PRODUCT_V1_STOCK_ADJUSTED_DLT,
-            Topic.PRODUCT_V1_LIKE_CHANGED_DLT,
-            Topic.PRODUCT_V1_VIEWED_DLT,
+            EventType.Topic.PRODUCT_V1_CHANGED_DLT,
+            EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED_DLT,
+            EventType.Topic.PRODUCT_V1_LIKE_CHANGED_DLT,
+            EventType.Topic.PRODUCT_V1_VIEWED_DLT,
         ],
-        groupId = Group.DLT_EVENTS,
+        groupId = EventType.Group.DLT_EVENTS,
     )
     fun listen(message: String, ack: Acknowledgment) {
         log.info("[DLTV1Consumer.listen] message: $message")

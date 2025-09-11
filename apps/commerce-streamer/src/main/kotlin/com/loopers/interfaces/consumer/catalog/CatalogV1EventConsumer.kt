@@ -1,11 +1,10 @@
-package com.loopers.interfaces.productmetrics.consumer
+package com.loopers.interfaces.consumer.catalog
 
+import com.loopers.domain.catalog.CatalogService
 import com.loopers.domain.events.EventHandledCommand
 import com.loopers.domain.events.EventHandledService
-import com.loopers.domain.productmetrics.ProductMetricsService
 import com.loopers.event.Event
-import com.loopers.event.EventType.Group
-import com.loopers.event.EventType.Topic
+import com.loopers.event.EventType
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -15,15 +14,20 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 @Component
-class ProductMetricsV1EventConsumer(
-    private val productMetricsService: ProductMetricsService,
+class CatalogV1EventConsumer(
+    private val catalogService: CatalogService,
     private val eventHandledService: EventHandledService,
 ) {
+
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @KafkaListener(
-        topics = [Topic.PRODUCT_V1_STOCK_ADJUSTED, Topic.PRODUCT_V1_LIKE_CHANGED, Topic.PRODUCT_V1_VIEWED],
-        groupId = Group.METRICS_EVENTS,
+        topics = [
+            EventType.Topic.PRODUCT_V1_STOCK_SOLD_OUT,
+            EventType.Topic.PRODUCT_V1_CHANGED,
+            EventType.Topic.PRODUCT_V1_LIKE_CHANGED,
+        ],
+        groupId = EventType.Group.CATALOG_EVENTS,
     )
     @Transactional
     fun listen(
@@ -33,16 +37,19 @@ class ProductMetricsV1EventConsumer(
         @Header(KafkaHeaders.RECEIVED_PARTITION) partition: Int,
         @Header(KafkaHeaders.OFFSET) offset: Long,
     ) {
-        log.info("[MetricsV1EventConsumer.listen] message: $message")
+        log.info("[CatalogV1EventConsumer.listen] message: $message")
         val event = Event.fromJson(message) ?: throw IllegalArgumentException("Invalid event message: $message")
 
-        if (eventHandledService.isAlreadyHandled(event.eventId, Group.METRICS_EVENTS)) {
-            log.info("[MetricsV1EventConsumer.listen] already handled eventId: ${event.eventId}, group: ${Group.METRICS_EVENTS}")
+        if (eventHandledService.isAlreadyHandled(event.eventId, EventType.Group.CATALOG_EVENTS)) {
+            log.info(
+                "[CatalogV1EventConsumer.listen] already handled eventId:" +
+                        " ${event.eventId}, group: ${EventType.Group.CATALOG_EVENTS}",
+            )
             ack.acknowledge()
             return
         }
 
-        productMetricsService.handleEvent(event)
+        catalogService.handleEvent(event)
         eventHandledService.markSuccess(
             EventHandledCommand.Succeed(
                 event.eventId,
@@ -50,7 +57,7 @@ class ProductMetricsV1EventConsumer(
                 topic,
                 partition,
                 offset,
-                Group.METRICS_EVENTS,
+                EventType.Group.CATALOG_EVENTS,
             ),
         )
         ack.acknowledge()

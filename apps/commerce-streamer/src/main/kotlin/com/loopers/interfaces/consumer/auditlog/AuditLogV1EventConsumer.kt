@@ -1,10 +1,9 @@
-package com.loopers.interfaces.auditlog.consumer
+package com.loopers.interfaces.consumer.auditlog
 
 import com.loopers.domain.auditlog.AuditLogCommand
 import com.loopers.domain.auditlog.AuditLogService
 import com.loopers.event.Event
-import com.loopers.event.EventType.Group
-import com.loopers.event.EventType.Topic
+import com.loopers.event.EventType
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -20,12 +19,12 @@ class AuditLogV1EventConsumer(
 
     @KafkaListener(
         topics = [
-            Topic.PRODUCT_V1_STOCK_ADJUSTED,
-            Topic.PRODUCT_V1_CHANGED,
-            Topic.PRODUCT_V1_LIKE_CHANGED,
-            Topic.PRODUCT_V1_VIEWED,
+            EventType.Topic.PRODUCT_V1_STOCK_ADJUSTED,
+            EventType.Topic.PRODUCT_V1_CHANGED,
+            EventType.Topic.PRODUCT_V1_LIKE_CHANGED,
+            EventType.Topic.PRODUCT_V1_VIEWED,
         ],
-        groupId = Group.AUDIT_LOG_EVENTS,
+        groupId = EventType.Group.AUDIT_LOG_EVENTS,
     )
     fun listen(
         message: String,
