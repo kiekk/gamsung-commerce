@@ -41,6 +41,8 @@ enum class EventType(
         companion object {
             const val CATALOG_EVENTS = "catalog-events-consumer"
             const val METRICS_EVENTS = "metrics-events-consumer"
+            const val PRODUCT_RANK_DAY_EVENTS = "product-rank-day-consumer"
+            const val PRODUCT_RANK_HOUR_EVENTS = "product-rank-hour-consumer"
             const val AUDIT_LOG_EVENTS = "audit-log-events-consumer"
 
             // DLT

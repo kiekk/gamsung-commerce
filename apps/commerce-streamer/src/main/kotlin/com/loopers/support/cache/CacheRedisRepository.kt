@@ -2,6 +2,7 @@ package com.loopers.support.cache
 
 import DataSerializer
 import org.slf4j.LoggerFactory.getLogger
+import org.springframework.data.redis.core.DefaultTypedTuple
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -41,6 +42,34 @@ private class CacheRedisRepository(
             redisTemplate.delete(key)
         }.onFailure { e ->
             throw RuntimeException("Failed to delete key: $key", e)
+        }
+    }
+
+    override fun zIncrBy(cacheKey: CacheKey, productId: Long, score: Double) {
+        log.info("[CacheRedisRepository.zIncrBy] cacheKey: {}, productId: {}, score: {}", cacheKey, productId, score)
+        redisTemplate.opsForZSet().incrementScore(cacheKey.fullKey(), productId.toString(), score)
+        if (redisTemplate.getExpire(cacheKey.fullKey()) == -1L) {
+            log.info("[CacheRedisRepository.zIncrBy] Setting TTL for key: {}", cacheKey.ttl)
+            redisTemplate.expire(cacheKey.fullKey(), cacheKey.ttl)
+        }
+    }
+
+    override fun findTopRankByScoreDesc(cacheKey: CacheKey, offset: Long, size: Int): Map<String, Double> {
+        log.info("[CacheRedisRepository.findTopRankByScoreDesc] cacheKey: {}, offset: {}, size: {}", cacheKey, offset, size)
+        val tuples = redisTemplate.opsForZSet()
+            .reverseRangeWithScores(cacheKey.fullKey(), offset, offset + size - 1)
+            ?: return emptyMap()
+        return tuples.mapIndexed { _, tuple ->
+            tuple.value!! to tuple.score!!
+        }.toMap()
+    }
+
+    override fun zAddAll(cacheKey: CacheKey, normalizedTuples: Set<DefaultTypedTuple<String>>) {
+        log.info("[CacheRedisRepository.zAddAll] cacheKey: {}, normalizedTuples size: {}", cacheKey, normalizedTuples.size)
+        redisTemplate.opsForZSet().add(cacheKey.fullKey(), normalizedTuples)
+        if (redisTemplate.getExpire(cacheKey.fullKey()) == -1L) {
+            log.info("[CacheRedisRepository.zAddAll] Setting TTL for key: {}", cacheKey.ttl)
+            redisTemplate.expire(cacheKey.fullKey(), cacheKey.ttl)
         }
     }
 
