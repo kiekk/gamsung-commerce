@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -29,7 +28,6 @@ class ProductRankV1EventConsumer(
         groupId = EventType.Group.PRODUCT_RANK_DAY_EVENTS,
         containerFactory = KafkaConfig.BATCH_LISTENER,
     )
-    @Transactional
     fun productRankDayEventListen(
         records: List<ConsumerRecord<String, String>>,
         ack: Acknowledgment,
@@ -60,7 +58,6 @@ class ProductRankV1EventConsumer(
         groupId = EventType.Group.PRODUCT_RANK_HOUR_EVENTS,
         containerFactory = KafkaConfig.BATCH_LISTENER,
     )
-    @Transactional
     fun productRankHourEventListen(
         records: List<ConsumerRecord<String, String>>,
         ack: Acknowledgment,
