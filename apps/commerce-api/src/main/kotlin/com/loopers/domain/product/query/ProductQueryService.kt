@@ -120,4 +120,29 @@ class ProductQueryService(
 
         return PageImpl(productListViewModels, pageable, totalCount)
     }
+
+    fun getProductsByIds(productIds: List<Long>): List<ProductListViewModel>? {
+        val product = QProductEntity.productEntity
+        val brand = QBrandEntity.brandEntity
+        val likeCount = QProductLikeCountEntity.productLikeCountEntity
+
+        return queryFactory
+            .select(
+                QProductListViewModel(
+                    product.id,
+                    product.name,
+                    product.price.value,
+                    product.status,
+                    brand.name,
+                    likeCount.productLikeCount,
+                    product.createdAt,
+                ),
+            )
+            .from(product)
+            .join(brand).on(brand.id.eq(product.brandId))
+            .leftJoin(likeCount).on(product.id.eq(likeCount.productId))
+            .groupBy(product.id)
+            .where(product.id.`in`(productIds))
+            .fetch()
+    }
 }

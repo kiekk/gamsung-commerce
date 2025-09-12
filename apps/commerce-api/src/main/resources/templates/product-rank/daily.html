@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <title>상품 랭킹 TOP 20</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.7.0"
+            integrity="sha384-EzBXYPt0/T6gxNp0nuPtLkmRpmDBbjg6WmCUZRLXBBwYYmwAUxzlSGej0ARHX0Bo"
+            crossorigin="anonymous" defer></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+<main class="max-w-6xl mx-auto p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">상품 랭킹 TOP 20 (Daily)</h1>
+
+    <!-- 자동 새로고침 래퍼: 최초 로드 + 10초 주기 -->
+    <div th:replace="~{product-rank/daily-list :: product-ranking-auto(rankingDate=${rankingDate}, items=${items})}"></div>
+</main>
+
+</body>
+</html>

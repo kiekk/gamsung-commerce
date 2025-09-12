@@ -41,9 +41,15 @@ class ProductInfo {
         val productStatus: ProductStatusType,
         val productPrice: Long,
         val productLikeCount: Int,
+        val productRankNumber: Long?,
     ) {
         companion object {
-            fun from(product: ProductEntity, brand: BrandEntity, productLikeCountEntity: ProductLikeCountEntity?): ProductDetail {
+            fun from(
+                product: ProductEntity,
+                brand: BrandEntity,
+                productLikeCountEntity: ProductLikeCountEntity?,
+                productRankNumber: Long?,
+            ): ProductDetail {
                 return ProductDetail(
                     product.id,
                     product.name,
@@ -51,6 +57,7 @@ class ProductInfo {
                     product.status,
                     product.price.value,
                     productLikeCountEntity?.productLikeCount ?: 0,
+                    productRankNumber,
                 )
             }
         }

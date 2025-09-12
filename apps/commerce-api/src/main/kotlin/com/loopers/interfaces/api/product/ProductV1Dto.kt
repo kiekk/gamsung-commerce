@@ -74,6 +74,7 @@ class ProductV1Dto {
         val productStatus: ProductStatusType,
         val productPrice: Long,
         val productLikeCount: Int,
+        val productRankNumber: Long?,
     ) {
         companion object {
             fun from(productDetail: ProductInfo.ProductDetail): ProductDetailResponse {
@@ -84,6 +85,7 @@ class ProductV1Dto {
                     productDetail.productStatus,
                     productDetail.productPrice,
                     productDetail.productLikeCount,
+                    productDetail.productRankNumber,
                 )
             }
         }

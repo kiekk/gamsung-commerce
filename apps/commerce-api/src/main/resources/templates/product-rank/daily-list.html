@@ -1,0 +1,105 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div id="ranking-host"
+     th:fragment="product-ranking-auto(rankingDate, items)"
+     class="relative"
+     th:attr="hx-get=|/rankings/daily-refresh|"
+     hx-trigger="load once, every 1s"
+     hx-target="#ranking-root"
+     hx-select="#ranking-root"
+     hx-swap="outerHTML"
+     hx-history="false"
+     hx-indicator="#ranking-loading-indicator">
+
+    <!-- 로딩 인디케이터 (HTMX가 요청중일 때 표시) -->
+    <div id="ranking-loading-indicator"
+         class="hidden absolute -top-10 right-0 htmx-indicator">
+        <div class="flex items-center text-gray-700">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="10"
+                        stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0
+                 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            <span class="text-sm">업데이트 중…</span>
+        </div>
+    </div>
+
+    <!-- 실제 콘텐츠 조각 삽입 -->
+    <div th:replace="~{this :: product-ranking-content(rankingDate=${rankingDate}, items=${items})}"></div>
+</div>
+
+<!-- 2) Table Content Fragment -->
+<div id="ranking-root"
+     th:fragment="product-ranking-content(rankingDate, items)">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="text-gray-700">
+                <span class="font-semibold">기준일:</span>
+                <span th:text="${rankingDate}">2025-09-11</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border-collapse border border-gray-200">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="border border-gray-200 px-4 py-3 text-center w-16">순위</th>
+                    <th class="border border-gray-200 px-4 py-3 text-left">랭킹</th>
+                    <th class="border border-gray-200 px-4 py-3 text-center">상품명</th>
+                    <th class="border border-gray-200 px-4 py-3 text-center">가격</th>
+                    <th class="border border-gray-200 px-4 py-3 text-center">좋아요수</th>
+                    <th class="border border-gray-200 px-4 py-3 text-center">score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="product, iter : ${items}"
+                    class="hover:bg-gray-50">
+                    <td class="border border-gray-200 px-4 py-2 text-center font-medium"
+                        th:text="${iter.index + 1}">1
+                    </td>
+                    <td class="border border-gray-200 px-4 py-2 text-center"
+                        th:text="${product.rankNumber}">랭킹
+                    </td>
+                    <td class="border border-gray-200 px-4 py-2"
+                        th:text="${product.productName}">상품명
+                    </td>
+                    <td class="border border-gray-200 px-4 py-2 text-center"
+                        th:text="${product.productPrice}">0
+                    </td>
+                    <td class="border border-gray-200 px-4 py-2 text-center"
+                        th:text="${product.productLikeCount}">0
+                    </td>
+                    <td class="border border-gray-200 px-4 py-2 text-center"
+                        th:text="${product.score}">0
+                    </td>
+                </tr>
+
+                <!-- 빈 목록 처리 -->
+                <tr th:if="${#lists.isEmpty(items)}">
+                    <td colspan="6" class="border border-gray-200 px-4 py-8 text-center text-gray-500">
+                        표시할 랭킹 데이터가 없습니다.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 수동 새로고침 버튼(옵션) -->
+        <div class="mt-4 flex justify-end">
+            <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50"
+                    th:attr="hx-get=|/rankings/daily-refresh|"
+                    hx-target="#ranking-root"
+                    hx-select="#ranking-root"
+                    hx-swap="outerHTML"
+                    hx-indicator="#ranking-loading-indicator">
+                수동 새로고침
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

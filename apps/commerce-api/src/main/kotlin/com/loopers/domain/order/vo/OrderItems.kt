@@ -19,4 +19,8 @@ class OrderItems(
 
     fun toProductQuantityMap(): Map<Long, Int> =
         items.groupingBy { it.productId }.eachCount()
+
+    fun getProductPrice(productId: Long): Long {
+        return items.firstOrNull { it.productId == productId }?.amount?.value ?: 0L
+    }
 }
