@@ -77,7 +77,8 @@ class OrderEventListener(
         val order = orderService.findWithItemsByOrderKey(event.orderKey)
             ?: throw IllegalStateException("주문 정보를 찾을 수 없습니다. orderKey: ${event.orderKey}")
         order.orderItems.toProductQuantityMap().forEach { productQuantity ->
-            stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key, productQuantity.value))
+            val amount = order.orderItems.getProductPrice(productQuantity.key)
+            stockEventPublisher.publish(StockAdjustedEvent(productQuantity.key, productQuantity.value, amount))
         }
         val stocks = stockService.getStocksByProductIds(order.orderItems.toProductQuantityMap().map { it.key })
         stocks.filter { it.isSoldOut() }

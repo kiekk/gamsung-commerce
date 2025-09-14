@@ -1,5 +1,7 @@
 package com.loopers.support.cache
 
+import DataSerializer
+import com.loopers.support.cache.dto.ScoreRankDto
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
@@ -41,6 +43,30 @@ private class CacheRedisRepository(
         }.onFailure { e ->
             throw RuntimeException("Failed to delete key: $key", e)
         }
+    }
+
+    override fun findTopRankByScoreDesc(cacheKey: CacheKey, offset: Long, size: Int): Map<String, ScoreRankDto> {
+        log.info("[CacheRedisRepository.findTopByScoreDesc] key: {}, offset: {}, size: {}", cacheKey.fullKey(), offset, size)
+        val tuples = redisTemplate.opsForZSet()
+            .reverseRangeWithScores(cacheKey.fullKey(), offset, offset + size - 1)
+            ?: return emptyMap()
+
+        return tuples.mapIndexed { index, tuple ->
+            tuple.value!! to ScoreRankDto(
+                tuple.score!!,
+                offset + index + 1,
+            )
+        }.toMap()
+    }
+
+    override fun findRank(cacheKey: CacheKey, item: String): Long? {
+        log.info("[CacheRedisRepository.zRank] key: {}, item: {}", cacheKey.fullKey(), item)
+        return redisTemplate.opsForZSet().reverseRank(cacheKey.fullKey(), item)?.plus(1)
+    }
+
+    override fun getTotalCount(cacheKey: CacheKey): Long {
+        log.info("[CacheRedisRepository.zCard] key: {}", cacheKey.fullKey())
+        return redisTemplate.opsForZSet().zCard(cacheKey.fullKey()) ?: 0L
     }
 
     private fun jitteredTtl(baseTTL: Duration): Duration {
