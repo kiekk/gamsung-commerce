@@ -4,7 +4,7 @@ import com.loopers.batch.job.productmetrics.WeeklyProductMetricsJobConfig
 import com.loopers.domain.productmetrics.ProductMetricsWeeklyRepository
 import com.loopers.domain.productmetrics.view.ProductMetricsView
 import com.loopers.domain.productmetrics.view.ProductMetricsViewRepository
-import com.loopers.domain.productmetrics.view.fixture.ProductMetricsEntityFixture.Companion.aProductMetrics
+import com.loopers.domain.productmetrics.view.fixture.ProductMetricsViewFixture.Companion.aProductMetrics
 import com.loopers.infrastructure.productmetrics.view.ProductMetricsViewJpaRepository
 import com.loopers.utils.DatabaseCleanUp
 import org.assertj.core.api.Assertions.assertThat

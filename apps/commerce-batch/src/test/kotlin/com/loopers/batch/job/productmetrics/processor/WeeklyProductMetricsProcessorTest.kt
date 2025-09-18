@@ -2,7 +2,7 @@ package com.loopers.batch.job.productmetrics.processor
 
 import com.loopers.batch.processor.productmetrics.WeeklyProductMetricsProcessor
 import com.loopers.domain.productmetrics.ProductMetricsWeekly
-import com.loopers.domain.productmetrics.view.fixture.ProductMetricsEntityFixture.Companion.aProductMetrics
+import com.loopers.domain.productmetrics.view.fixture.ProductMetricsViewFixture.Companion.aProductMetrics
 import com.loopers.domain.productrank.ProductRankScoreCalculator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
