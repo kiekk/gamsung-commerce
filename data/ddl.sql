@@ -1,4 +1,4 @@
-create table brand
+create table if not exists brand
 (
     created_at datetime(6)                           not null,
     deleted_at datetime(6)                           null,
@@ -11,7 +11,7 @@ create table brand
         unique (name)
 );
 
-create table coupon
+create table if not exists coupon
 (
     value      double                       null,
     created_at datetime(6)                  not null,
@@ -25,7 +25,7 @@ create table coupon
     type       enum ('FIXED', 'PERCENTAGE') null
 );
 
-create table event_handled
+create table if not exists event_handled
 (
     event_type     tinyint                    null,
     partition_no   int                        not null,
@@ -42,7 +42,7 @@ create table event_handled
     check (`event_type` between 0 and 5)
 );
 
-create table event_log
+create table if not exists event_log
 (
     partition_no int                                                                                                                                not null,
     created_at   datetime(6)                                                                                                                        not null,
@@ -57,7 +57,7 @@ create table event_log
     event_type   enum ('PRODUCT_CHANGED', 'PRODUCT_LIKED', 'PRODUCT_STOCK_ADJUSTED', 'PRODUCT_STOCK_SOLD_OUT', 'PRODUCT_UNLIKED', 'PRODUCT_VIEWED') null
 );
 
-create table issued_coupon
+create table if not exists issued_coupon
 (
     coupon_id  bigint                  not null,
     created_at datetime(6)             not null,
@@ -71,7 +71,7 @@ create table issued_coupon
     status     enum ('ACTIVE', 'USED') null
 );
 
-create table member
+create table if not exists member
 (
     created_at datetime(6)     not null,
     deleted_at datetime(6)     null,
@@ -89,7 +89,7 @@ create table member
         unique (email)
 );
 
-create table orders
+create table if not exists orders
 (
     amount           bigint                                              null,
     created_at       datetime(6)                                         not null,
@@ -111,7 +111,7 @@ create table orders
     order_status     enum ('CANCELED', 'COMPLETED', 'FAILED', 'PENDING') null
 );
 
-create table order_item
+create table if not exists order_item
 (
     amount     bigint      null,
     created_at datetime(6) not null,
@@ -125,7 +125,7 @@ create table order_item
         foreign key (order_id) references orders (id)
 );
 
-create table payment
+create table if not exists payment
 (
     card_type       tinyint                                             null,
     created_at      datetime(6)                                         not null,
@@ -145,7 +145,7 @@ create table payment
     check (`card_type` between 0 and 2)
 );
 
-create table point
+create table if not exists point
 (
     created_at datetime(6) not null,
     deleted_at datetime(6) null,
@@ -159,7 +159,7 @@ create table point
         unique (user_id)
 );
 
-create table product
+create table if not exists product
 (
     brand_id    bigint                                 not null,
     created_at  datetime(6)                            not null,
@@ -173,7 +173,7 @@ create table product
     status      enum ('ACTIVE', 'DELETED', 'INACTIVE') null
 );
 
-create table product_like
+create table if not exists product_like
 (
     created_at datetime(6) not null,
     deleted_at datetime(6) null,
@@ -186,7 +186,7 @@ create table product_like
         unique (user_id, product_id)
 );
 
-create table product_like_count
+create table if not exists product_like_count
 (
     product_like_count int         not null,
     created_at         datetime(6) not null,
@@ -197,7 +197,7 @@ create table product_like_count
     version            bigint      null
 );
 
-create table product_metrics
+create table if not exists product_metrics
 (
     like_count  int         not null,
     metric_date date        null,
@@ -219,7 +219,7 @@ create index idx_product_metrics_metric_date
 create index idx_product_metrics_product_id
     on product_metrics (product_id);
 
-create table product_rank_daily
+create table if not exists product_rank_daily
 (
     rank_date   date         null,
     rank_number int          not null,
@@ -232,7 +232,7 @@ create table product_rank_daily
     product_id  varchar(255) null
 );
 
-create table product_rank_hourly
+create table if not exists product_rank_hourly
 (
     rank_number    int          not null,
     score          double       not null,
@@ -245,7 +245,7 @@ create table product_rank_hourly
     product_id     varchar(255) null
 );
 
-create table stock
+create table if not exists stock
 (
     quantity   int         not null,
     created_at datetime(6) not null,
@@ -253,5 +253,64 @@ create table stock
     product_id bigint      not null
         primary key,
     updated_at datetime(6) not null
+);
+
+create table if not exists product_metrics_weekly
+(
+    aggregate_date       date         null,
+    aggregate_end_date   date         null,
+    aggregate_start_date date         null,
+    like_count           int          not null,
+    sales_count          int          not null,
+    score                double       not null,
+    view_count           int          not null,
+    product_id           bigint       not null
+        primary key,
+    updated_at           datetime(6)  null,
+    version              varchar(255) null
+);
+
+create table if not exists product_metrics_monthly
+(
+    aggregate_date       date         null,
+    aggregate_end_date   date         null,
+    aggregate_start_date date         null,
+    like_count           int          not null,
+    sales_count          int          not null,
+    score                double       not null,
+    view_count           int          not null,
+    product_id           bigint       not null
+        primary key,
+    updated_at           datetime(6)  null,
+    version              varchar(255) null
+);
+
+create table if not exists mv_product_rank_weekly
+(
+    aggregate_date     date         null,
+    product_like_count int          not null,
+    product_status     enum ('ACTIVE', 'DELETED', 'INACTIVE') null,
+    created_at         datetime(6)  null,
+    product_id         bigint       not null
+        primary key,
+    product_price      bigint       not null,
+    rank_number        bigint       not null,
+    brand_name         varchar(255) null,
+    product_name       varchar(255) null,
+    check (`product_status` between 0 and 2)
+);
+
+create table if not exists mv_product_rank_monthly
+(
+    aggregate_date     date         null,
+    product_like_count int          not null,
+    product_status     enum ('ACTIVE', 'DELETED', 'INACTIVE') null,
+    created_at         datetime(6)  null,
+    product_id         bigint       not null
+        primary key,
+    product_price      bigint       not null,
+    rank_number        bigint       not null,
+    brand_name         varchar(255) null,
+    product_name       varchar(255) null,
 );
 
