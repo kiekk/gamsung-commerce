@@ -296,8 +296,7 @@ create table if not exists mv_product_rank_weekly
     product_price      bigint       not null,
     rank_number        bigint       not null,
     brand_name         varchar(255) null,
-    product_name       varchar(255) null,
-    check (`product_status` between 0 and 2)
+    product_name       varchar(255) null
 );
 
 create table if not exists mv_product_rank_monthly
@@ -311,6 +310,6 @@ create table if not exists mv_product_rank_monthly
     product_price      bigint       not null,
     rank_number        bigint       not null,
     brand_name         varchar(255) null,
-    product_name       varchar(255) null,
+    product_name       varchar(255) null
 );
 

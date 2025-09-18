@@ -1,2 +1,0 @@
-### 주간 집계 배치 실행
-POST http://127.0.0.1:8086/api/v1/batch/product-metrics/weekly?aggregateDate=2025-09-19

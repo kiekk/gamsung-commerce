@@ -3,17 +3,18 @@ package com.loopers.interfaces.api.productrank
 import com.loopers.application.productrank.ProductRankCriteria
 import com.loopers.application.productrank.ProductRankInfo
 import com.loopers.support.enums.product.ProductStatusType
+import com.loopers.support.enums.rank.RankType
 import org.springframework.format.annotation.DateTimeFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class ProductRankV1Dto {
     data class Request(
-        @field:DateTimeFormat(pattern = "yyyy-MM-dd")
-        val rankDate: LocalDate,
+        @field:DateTimeFormat(pattern = "yyyyMMddHH")
+        val rankDate: LocalDateTime,
+        val rankType: RankType,
     ) {
-        fun toCriteria(): ProductRankCriteria.SearchDay {
-            return ProductRankCriteria.SearchDay(rankDate)
+        fun toCriteria(): ProductRankCriteria.Search {
+            return ProductRankCriteria.Search(rankDate, rankType)
         }
     }
 
