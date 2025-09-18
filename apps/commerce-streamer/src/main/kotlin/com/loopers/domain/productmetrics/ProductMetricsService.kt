@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 class ProductMetricsService(
     private val eventHandlerFactory: ProductMetricsEventHandlerFactory,
 ) {
-    fun handleEvent(event: Event<EventPayload>) {
+    fun handleEvent(event: Event<out EventPayload>) {
         eventHandlerFactory.handle(event)
     }
 }

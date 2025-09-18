@@ -1,5 +1,6 @@
 package com.loopers.interfaces.scheduler.productrank
 
+import com.loopers.domain.productmetrics.ProductMetricsService
 import com.loopers.domain.productrank.ProductRankService
 import com.loopers.event.Event
 import com.loopers.event.EventType
@@ -21,6 +22,7 @@ import java.util.UUID
 @Component
 class ProductRankSimulationScheduler(
     private val productRankService: ProductRankService,
+    private val productMetricsService: ProductMetricsService,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -35,6 +37,9 @@ class ProductRankSimulationScheduler(
             ProductRankCacheKeyGenerator.generate(LocalDate.now()),
             dailyEvent.eventType,
             listOf(dailyEvent.payload),
+        )
+        productMetricsService.handleEvent(
+            dailyEvent,
         )
 
         // Hourly
