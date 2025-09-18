@@ -1,0 +1,27 @@
+### Realtime 랭킹
+GET http://localhost:8080/api/v1/rankings?rankDate=2025091810&rankType=REALTIME&page=0&size=20
+Accept: application/json
+
+---
+
+### Hourly 랭킹
+GET http://localhost:8080/api/v1/rankings?rankDate=2025091823&rankType=HOURLY&page=0&size=20
+Accept: application/json
+
+---
+
+### Daily 랭킹 (미구현)
+#GET http://localhost:8080/api/v1/rankings?rankDate=2025091910&rankType=DAILY&page=0&size=20
+#Accept: application/json
+
+---
+
+### Weekly 랭킹
+GET http://localhost:8080/api/v1/rankings?rankDate=2025091910&rankType=WEEKLY&page=0&size=20
+Accept: application/json
+
+---
+
+### Monthly 랭킹
+GET http://localhost:8080/api/v1/rankings?rankDate=2025091910&rankType=MONTHLY&page=0&size=20
+Accept: application/json

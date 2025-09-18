@@ -2,6 +2,7 @@ rootProject.name = "soono-gamsung-commerce"
 
 include(
     ":apps:commerce-api",
+    ":apps:commerce-batch",
     ":apps:commerce-streamer",
     ":apps:pg-simulator",
     ":modules:jpa",

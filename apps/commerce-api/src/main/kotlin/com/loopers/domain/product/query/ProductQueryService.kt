@@ -141,7 +141,6 @@ class ProductQueryService(
             .from(product)
             .join(brand).on(brand.id.eq(product.brandId))
             .leftJoin(likeCount).on(product.id.eq(likeCount.productId))
-            .groupBy(product.id)
             .where(product.id.`in`(productIds))
             .fetch()
     }

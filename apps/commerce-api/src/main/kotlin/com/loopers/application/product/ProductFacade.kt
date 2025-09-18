@@ -5,7 +5,6 @@ import com.loopers.domain.product.ProductService
 import com.loopers.domain.product.query.ProductQueryService
 import com.loopers.domain.product.query.ProductSearchCondition
 import com.loopers.domain.productlike.ProductLikeService
-import com.loopers.domain.productrank.ProductRankService
 import com.loopers.domain.stock.StockCommand
 import com.loopers.domain.stock.StockService
 import com.loopers.domain.user.UserService
@@ -14,6 +13,7 @@ import com.loopers.event.publisher.EventPublisher
 import com.loopers.support.cache.CacheRepository
 import com.loopers.support.cache.dto.ProductListPageCacheValue
 import com.loopers.support.cache.policy.ProductListCachePolicy
+import com.loopers.support.cache.productrank.ProductRankCacheKeyGenerator
 import com.loopers.support.error.CoreException
 import com.loopers.support.error.ErrorType
 import org.slf4j.LoggerFactory
@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Component
 class ProductFacade(
@@ -33,7 +34,6 @@ class ProductFacade(
     private val userService: UserService,
     private val cacheRepository: CacheRepository,
     private val eventPublisher: EventPublisher,
-    private val productRankService: ProductRankService,
 ) {
 
     private val log = LoggerFactory.getLogger(ProductFacade::class.java)
@@ -58,7 +58,10 @@ class ProductFacade(
         )
         val productLikeCount = productLikeService.getProductLikeCount(product.id)
         // 랭킹 조회
-        val productRankByDay = productRankService.getProductRankByDay(id)
+        val productRankByDay = cacheRepository.findRank(
+            ProductRankCacheKeyGenerator.generate(LocalDate.now()),
+            id.toString(),
+        )
         // 상품 조회 이벤트 발행
         eventPublisher.publish(ProductViewedEvent(product.id, product.name))
         return ProductInfo.ProductDetail.from(product, brand, productLikeCount, productRankByDay)

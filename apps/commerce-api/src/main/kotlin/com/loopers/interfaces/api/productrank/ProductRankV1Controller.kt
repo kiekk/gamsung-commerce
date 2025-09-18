@@ -19,7 +19,7 @@ class ProductRankV1Controller(
         request: ProductRankV1Dto.Request,
         pageable: Pageable,
     ): ApiResponse<Page<ProductRankV1Dto.ProductRankListResponse>> {
-        return productRankFacade.getProductRanksByDay(request.toCriteria(), pageable)
+        return productRankFacade.getProductRanks(request.toCriteria(), pageable)
             .map { ProductRankV1Dto.ProductRankListResponse.from(it) }
             .let { ApiResponse.success(it) }
     }
