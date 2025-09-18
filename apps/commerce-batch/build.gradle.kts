@@ -13,6 +13,9 @@ dependencies {
     // web
     implementation("org.springframework.boot:spring-boot-starter-web")
 
+    // querydsl
+    kapt("com.querydsl:querydsl-apt::jakarta")
+
     // batch
     implementation("org.springframework.boot:spring-boot-starter-batch")
 
