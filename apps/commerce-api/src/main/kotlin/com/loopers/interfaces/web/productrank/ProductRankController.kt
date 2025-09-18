@@ -2,12 +2,12 @@ package com.loopers.interfaces.web.productrank
 
 import com.loopers.application.productrank.ProductRankCriteria
 import com.loopers.application.productrank.ProductRankFacade
+import com.loopers.support.enums.rank.RankType
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Controller
@@ -18,10 +18,11 @@ class ProductRankController(
 
     @GetMapping("daily")
     fun dailyRanking(model: Model): String {
-        val today = LocalDate.now()
-        val products = productRankFacade.getProductRanksByDay(
-            ProductRankCriteria.SearchDay(
+        val today = LocalDateTime.now()
+        val products = productRankFacade.getProductRanks(
+            ProductRankCriteria.Search(
                 today,
+                RankType.DAILY,
             ),
             PageRequest.of(0, 20),
         )
@@ -32,10 +33,11 @@ class ProductRankController(
 
     @GetMapping("daily-refresh")
     fun dailyRankingRefresh(model: Model): String {
-        val today = LocalDate.now()
-        val products = productRankFacade.getProductRanksByDay(
-            ProductRankCriteria.SearchDay(
+        val today = LocalDateTime.now()
+        val products = productRankFacade.getProductRanks(
+            ProductRankCriteria.Search(
                 today,
+                RankType.DAILY,
             ),
             PageRequest.of(0, 20),
         )
@@ -47,9 +49,10 @@ class ProductRankController(
     @GetMapping("hourly")
     fun hourlyRanking(model: Model): String {
         val today = LocalDateTime.now()
-        val products = productRankFacade.getProductRanksByHour(
-            ProductRankCriteria.SearchHour(
+        val products = productRankFacade.getProductRanks(
+            ProductRankCriteria.Search(
                 today,
+                RankType.HOURLY,
             ),
             PageRequest.of(0, 20),
         )
@@ -61,9 +64,10 @@ class ProductRankController(
     @GetMapping("hourly-refresh")
     fun hourlyRankingRefresh(model: Model): String {
         val today = LocalDateTime.now()
-        val products = productRankFacade.getProductRanksByHour(
-            ProductRankCriteria.SearchHour(
+        val products = productRankFacade.getProductRanks(
+            ProductRankCriteria.Search(
                 today,
+                RankType.HOURLY,
             ),
             PageRequest.of(0, 20),
         )

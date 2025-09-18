@@ -31,6 +31,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      enabled: false
 
 server:
   port: 8086
@@ -47,6 +49,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      enabled: false
 
 server:
   port: 8086
@@ -63,6 +67,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: never
+    job:
+      enabled: false
 
 ---
 spring:
@@ -72,3 +78,5 @@ spring:
   batch:
     jdbc:
       initialize-schema: never
+    job:
+      enabled: false
