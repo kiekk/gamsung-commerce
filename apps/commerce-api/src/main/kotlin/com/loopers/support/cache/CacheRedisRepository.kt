@@ -2,11 +2,11 @@ package com.loopers.support.cache
 
 import DataSerializer
 import com.loopers.support.cache.dto.ScoreRankDto
+import com.loopers.support.cache.jitter.JitteredTTLCalculator
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.time.Duration
-import kotlin.random.Random
 
 @Component
 private class CacheRedisRepository(
@@ -22,7 +22,7 @@ private class CacheRedisRepository(
 
     override fun <T> set(cacheKey: CacheKey, value: T) {
         runCatching {
-            val jitteredTtl = jitteredTtl(cacheKey.ttl)
+            val jitteredTtl = JitteredTTLCalculator.jitteredTtl(cacheKey.ttl)
             log.info(
                 "[jitteredTtl] key: {}, baseTTL: {}, jitteredTTL: {}",
                 cacheKey.fullKey(),
@@ -34,6 +34,21 @@ private class CacheRedisRepository(
             }
         }.onFailure { e ->
             throw RuntimeException("Failed to serialize and set value for key: ${cacheKey.prefix}", e)
+        }
+    }
+
+    override fun <T> set(key: String, value: T, ttl: Duration) {
+        runCatching {
+            log.info(
+                "[set with ttl] key: {}, ttl: {}",
+                key,
+                ttl.toMillis(),
+            )
+            DataSerializer.serialize(value).let {
+                redisTemplate.opsForValue().set(key, it, ttl)
+            }
+        }.onFailure { e ->
+            throw RuntimeException("Failed to set key: $key", e)
         }
     }
 

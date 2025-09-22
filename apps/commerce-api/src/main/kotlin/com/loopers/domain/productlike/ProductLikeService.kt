@@ -3,10 +3,8 @@ package com.loopers.domain.productlike
 import com.loopers.event.payload.productlike.ProductLikedEvent
 import com.loopers.event.payload.productlike.ProductUnlikedEvent
 import com.loopers.event.publisher.EventPublisher
-import com.loopers.support.cache.CacheKey
 import com.loopers.support.cache.CacheNames
-import com.loopers.support.cache.CacheRepository
-import org.slf4j.LoggerFactory
+import com.loopers.support.cache.optimized.OptimizedCacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,10 +13,7 @@ class ProductLikeService(
     private val productLikeRepository: ProductLikeRepository,
     private val productLikeCountRepository: ProductLikeCountRepository,
     private val eventPublisher: EventPublisher,
-    private val cacheRepository: CacheRepository,
 ) {
-
-    private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     fun like(command: ProductLikeCommand.Like) {
@@ -65,25 +60,9 @@ class ProductLikeService(
     }
 
     @Transactional(readOnly = true)
+    @OptimizedCacheable(type = CacheNames.PRODUCT_LIKE_COUNT_V1, ttlSeconds = 10)
     fun getProductLikeCount(productId: Long): ProductLikeCountEntity? {
-        val cache = cacheRepository.get(
-            CacheKey(CacheNames.PRODUCT_LIKE_COUNT_V1, productId.toString()),
-            ProductLikeCountEntity::class.java,
-        )
-        // 캐시 존재
-        cache?.let {
-            log.info("[Cache Hit] ProductLikeCount: $cache")
-            return it
-        }
-
-        val productLikeCount = productLikeCountRepository.findByProductId(productId)
-
-        // 캐시 저장
-        productLikeCount?.let {
-            log.info("[Cache Miss] ProductLikeCount: $it")
-            cacheRepository.set(CacheKey(CacheNames.PRODUCT_LIKE_COUNT_V1, productId.toString()), it)
-        }
-        return productLikeCount
+        return productLikeCountRepository.findByProductId(productId)
     }
 
     @Transactional(readOnly = true)
