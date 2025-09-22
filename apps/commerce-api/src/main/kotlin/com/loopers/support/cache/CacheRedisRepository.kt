@@ -29,7 +29,7 @@ private class CacheRedisRepository(
                 cacheKey.ttl.toMillis(),
                 jitteredTtl.toMillis(),
             )
-            DataSerializer.serialize(value)?.let {
+            DataSerializer.serialize(value).let {
                 redisTemplate.opsForValue().set(cacheKey.fullKey(), it, jitteredTtl)
             }
         }.onFailure { e ->

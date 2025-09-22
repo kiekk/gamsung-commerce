@@ -9,7 +9,7 @@ class Event<T : EventPayload>(
     val payload: T,
 ) {
 
-    fun toJson(): String? {
+    fun toJson(): String {
         return DataSerializer.serialize(this)
     }
 
