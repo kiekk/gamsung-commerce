@@ -68,21 +68,4 @@ private class CacheRedisRepository(
         log.info("[CacheRedisRepository.zCard] key: {}", cacheKey.fullKey())
         return redisTemplate.opsForZSet().zCard(cacheKey.fullKey()) ?: 0L
     }
-
-    private fun jitteredTtl(baseTTL: Duration): Duration {
-        val baseTTLMs = baseTTL.toMillis()
-        val delta = (baseTTLMs * JITTER_PERCENTAGE).toLong() // 지터 최대 폭
-
-        val offset = Random.nextLong(-delta, delta + 1)
-
-        // MINIMUM_TTL_MINUTES으로 다시 계산, 5지만 5분으로 계산해야함
-        val jittered = (baseTTLMs + offset).coerceAtLeast(MINIMUM_TTL_MINUTES.toMillis())
-
-        return Duration.ofMillis(jittered)
-    }
-
-    companion object {
-        private const val JITTER_PERCENTAGE = 0.15 // ±15%의 지터를 추가하여 TTL을 설정합니다.
-        private val MINIMUM_TTL_MINUTES = Duration.ofMinutes(5) // 최소 TTL은 5분으로 설정합니다.
-    }
 }
