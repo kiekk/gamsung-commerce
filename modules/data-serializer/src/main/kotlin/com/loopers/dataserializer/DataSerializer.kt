@@ -29,12 +29,12 @@ object DataSerializer {
         return objectMapper.convertValue(data, clazz)
     }
 
-    fun <T> serialize(data: T): String? {
+    fun <T> serialize(data: T): String {
         try {
             return objectMapper.writeValueAsString(data)
         } catch (e: JsonProcessingException) {
             log.error("[DataSerializer.serialize] object={}", data, e)
-            return null
+            return ""
         }
     }
 }
